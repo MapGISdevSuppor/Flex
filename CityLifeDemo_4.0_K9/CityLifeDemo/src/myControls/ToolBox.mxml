@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--系统工具菜单-->
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+		   xmlns:controls="zdims.control.*"
+		   width="460"  height="65"
+		   backgroundColor="0xffffff" backgroundAlpha="0"
+		   dropShadowEnabled="true" shadowDistance="4"
+		   horizontalScrollPolicy="off" verticalScrollPolicy="off" 
+		   creationComplete="unit()"  >
+	<!--<mx:Canvas x="0.5" y="0.5" borderColor="0xffffff" backgroundColor="0x000000" color="0xffffff"  backgroundAlpha="0.4" 
+			   dropShadowEnabled="true" shadowDistance="4" cornerRadius="10"
+			   horizontalScrollPolicy="off" verticalScrollPolicy="off" width="465" height="34">-->
+	<mx:Image width="447" source="images/shadow.png" x="-15" height="58" y="-7"/>
+		<mx:HBox y="0" 
+				 width="373"
+				 horizontalGap="5" height="30" x="20">
+			
+			<mx:Image buttonMode="true"
+					  toolTip="放大"
+					  source="image/widget/btn_01.png"
+					  click="onSelectToolClick('zoomin',null)"/>
+			<mx:Image buttonMode="true"
+					  toolTip="缩小"
+					  source="image/widget/btn_02.png"
+					  click="onSelectToolClick('zoomout',null)"/>
+			<mx:Image buttonMode="true"
+					  toolTip="移动"
+					  source="image/widget/btn_03.png"
+					  click="onSelectToolClick('pan',null)"/>
+			<mx:Image buttonMode="true"
+					  toolTip="更新"
+					  source="image/widget/btn_05.png"
+					  click="onSelectToolClick('refresh',null)"/>
+			<mx:Image buttonMode="true"
+					  toolTip="复位"
+					  source="image/widget/btn_04.png"
+					  click="onSelectToolClick('restore',null)"/>
+			<mx:Image buttonMode="true"
+					  toolTip="放大镜"
+					  source="image/widget/tool_7.gif"
+					  click="setVisibility(this.magnifier)"/>
+			<mx:Image buttonMode="true"
+					  toolTip="鹰眼,请在2D视图下使用"
+					  source="image/widget/tool_6.gif"
+					  click="if(!isNull(this.eagleeye))onSelectToolClick('eagle',null)"/>
+			<mx:Image buttonMode="true"
+					  toolTip="导航"
+					  source="image/i13.gif"
+					  click="setVisibility(this.navigator)"/>
+			<mx:Image buttonMode="true"
+					  toolTip="添加标注"
+					  source="image/mark/marker2/image2/title.png"
+					  click="setMarker()"/>
+			<mx:Canvas >
+				<mx:Image buttonMode="true" y="6"
+						  toolTip="地图查询"
+						  source="image/bus/car.gif"
+						  click="setVisibility(this.search)"  />
+			</mx:Canvas>
+			
+		</mx:HBox>
+	<!--</mx:Canvas>-->
+				
+	<mx:Script>
+		<![CDATA[
+			import com.adobe.ac.mxeffects.DistortionConstants;
+			import com.adobe.ac.mxeffects.Push;
+			
+			import mx.collections.ArrayCollection;
+			import mx.containers.Panel;
+			import mx.controls.Alert;
+			import mx.controls.LinkButton;
+			import mx.controls.Text;
+			import mx.core.UIComponent;
+			import mx.effects.Iris;
+			import mx.events.EffectEvent;
+			import mx.events.FlexEvent;
+			import mx.events.ListEvent;
+			
+			import sjd.managers.ResizeManager;
+			
+			import zdims.control.Magnifier;
+			import zdims.control.MarkerEdit;
+			import zdims.control.NavigationBar;
+			import zdims.event.IMSMapEvent;
+			import zdims.map.IMSEagleEye;
+			import zdims.map.IMSMap;
+			import zdims.util.BusCom;
+			import zdims.util.IMSOperType;
+			import zdims.util.Node;
+			
+			
+			private var _map:IMSMap;
+			private var lastEvent:String;
+			private var lastCallFun:Function;			
+			
+			[Inspectable(category="MapGisIMS")]
+			public var navigator:NavigationBar;
+			[Inspectable(category="MapGisIMS")]
+			public var eagleeye:IMSEagleEye;
+			[Inspectable(category="MapGisIMS")]
+			public var magnifier:Magnifier;
+			[Inspectable(category="MapGisIMS")]
+			public var markeditor:MarkerEdit;
+			[Inspectable(category="MapGisIMS")]
+			public var search:ContentBox;
+			
+			
+			[Inspectable(category="MapGisIMS")]
+			public function set imsmap(m:IMSMap):void
+			{
+				if(m!=null)
+					m.addEventListener(IMSMapEvent.MAP_OPERTYPECHANGE,onOperTypeChange);
+				this._map=m;
+			}
+			[Inspectable(category="MapGisIMS")]
+			/**
+			 * 给地图容器赋值
+			 */
+			public function get imsmap():IMSMap
+			{
+				return this._map;
+			}
+			
+			/**
+			 *窗口初始化 
+			 */
+			private function unit():void
+			{
+				try
+				{
+				}
+				catch (err:Error)
+				{}
+			}
+			
+			/**
+			 * 工具触发函数
+			 */
+			private function onSelectToolClick(activeTool:String,callback:Function,exterFun:String="",enableExterCallBack:Boolean=true):void
+			{
+				if (this.imsmap == null)
+				{
+					Alert.show("Menubox控件的imsmap属性为空，请赋值。");
+					return;
+				}
+				var isExter:Boolean = exterFun == "" ? false : true;
+				switch (activeTool.toLowerCase())
+				{
+					case "zoomin":
+						this.imsmap.setCurOper(IMSOperType.ZoomIn);
+						break;
+					case "zoomout":
+						this.imsmap.setCurOper(IMSOperType.ZoomOut);
+						break;
+					case "pan":
+						this.imsmap.setCurOper(IMSOperType.Drag);
+						break;
+					case "refresh":
+						this.imsmap.refresh();
+						break;
+					case "restore":
+						this.imsmap.restore();
+						break;
+					case "eagle":
+						if (this.eagleeye!=null)
+						{
+							this.eagleeye.switchEagleEye();
+						}
+						if(this.imsmap.activeMapDoc==null)
+						{
+							Alert.show("当前鹰眼在2D视图下有效","提示");
+						}
+						break;
+					default:
+						this.imsmap.setCurOper(IMSOperType.Drag);
+						callback();
+						break;
+				}
+			}
+			
+			//标注
+			private function setMarker():void
+			{
+				if(!isNull(this.markeditor))
+					this.markeditor.setMarker();
+			}
+			
+			public function isNull(obj:Object,showMsg:Boolean=true):Boolean
+			{
+				if (obj==null&&showMsg)
+					Alert.show("未找到相应控件，可能原因是未创建相应控件或未将Menubox与目标控件关联！","提示");
+				return obj==null?true:false;				
+			}
+			
+			private function addMapEvent(evtType:String,fun:Function):void
+			{
+				this.imsmap.addEventListener(evtType,fun);
+				this.lastEvent=evtType;
+				this.lastCallFun=fun;
+			}
+			
+			private function removeMapEvent(evtType:String,fun:Function):void
+			{
+				if (evtType!=null&&fun!=null)
+				{
+					this.imsmap.removeEventListener(evtType,fun);
+				}
+			}
+			
+			private function onOperTypeChange(e:Event):void
+			{
+				removeMapEvent(this.lastEvent,this.lastCallFun);
+			}
+			
+			/**
+			 * 设置显示窗口,鱼眼效果加载控件
+			 */
+			private function setVisibility(obj:Object):void
+			{
+				if (!isNull(obj))
+				{
+					if (!UIComponent(obj).visible)
+					{
+						this.PushFore(obj);
+						UIComponent(obj).visible = true;
+					}
+					var irisOut:Iris = new Iris();
+					irisOut.duration = 1000;
+					irisOut.showTarget = true;
+					UIComponent(obj).setStyle("hideEffect",irisOut);					
+					UIComponent(obj).visible = !UIComponent(obj).visible;
+				}
+			}
+			
+			private function PushFore(obj:Object):void
+			{
+				var effect:Panel=new Panel();
+				effect.width=0;
+				effect.height=0;
+				effect.setStyle("hearderHeight",0);
+				effect.setStyle("horizontalGap",0);
+				effect.setStyle("verticalGap",0);
+				effect.setStyle("borderThicknessRight",0);
+				effect.setStyle("borderThicknessLeft",0);
+				effect.setStyle("borderThicknessBottom",0);
+				effect.setStyle("borderThicknessTop",0);
+				effect.alpha=1;
+				UIComponent(obj).parent.addChild(effect);
+				var e:Push=new Push(effect);
+				e.lightingStrength = 0;
+				e.siblings = [obj];
+				e.direction=DistortionConstants.TOP;
+				e.horizontalLightingLocation = DistortionConstants.RIGHT;
+				e.duration=1000;//动画延时
+				e.play();//播放效果
+				UIComponent(obj).parent.removeChild(effect);//移除效果
+			}
+		]]>
+	</mx:Script>
+</mx:Canvas>
