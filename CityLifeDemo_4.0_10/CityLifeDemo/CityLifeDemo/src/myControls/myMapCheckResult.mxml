@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--驾车搜索结果显示窗口-->
+<SuperPanel xmlns="myControls.*"
+		   xmlns:mx="http://www.adobe.com/2006/mxml"
+		   allowClose="true"
+		   allowDrag="true"
+		   allowMaximize="true"
+		   allowMinimize="true"
+		   allowResize="true"
+		   layout="absolute"
+		   top="100"
+		   right="10"
+		   width="400"
+		   height="350"
+		   minHeight="350" minWidth="400"
+		   backgroundAlpha="0.3"
+		   title="驾车搜索结果显示"
+		   styleName="Title"
+		   close="close()"
+		   alpha="1"
+		  
+		   fontSize="12">
+	<mx:Script>
+		<![CDATA[
+			import mx.containers.HDividedBox;
+			import mx.events.FlexEvent;
+			public var _boder:HDividedBox;
+			
+			[Inspectable(category="MapGisIMS")]
+			public function  set boder(m:HDividedBox):void
+			{
+				this._boder=m;
+			}
+			public function get boder():HDividedBox
+			{
+				return this._boder;
+			}
+			
+			public  function close():void
+			{
+				this.visible=false;
+				
+			}
+//			public override function titleBar_doubleClickHandler(e:MouseEvent):void
+//			{
+//				super.titleBar_doubleClickHandler(e);
+//				this.boder.addChildAt(this,0);
+//			}
+		
+		]]>
+	</mx:Script>
+	<mx:Panel id="busResult" width="100%" height="100%" title="公交换乘结果"/>
+	<mx:Panel id="roadResult" width="100%" height="100%" title="自驾分析结果"/>
+	<mx:Panel id="location_grid" width="100%" height="100%" title="本地搜索结果"/>
+</SuperPanel>

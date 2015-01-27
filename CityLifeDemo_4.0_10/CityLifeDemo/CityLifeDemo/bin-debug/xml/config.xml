@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+	<MapURLConfig>
+		<config>
+		<VectorUrl>http://127.0.0.1:6163/igs/rest/ims/relayhandler</VectorUrl>
+		<TileURL>http://127.0.0.1:6163/igs/rest/ims/relayhandler</TileURL>
+		<ServerURL>http://www.mapgis.com/RsWebSite/newFlexDemo/FlexNetWebSite/Gateway.aspx</ServerURL>
+		<TerrainURL>http://mt0.google.cn/vt/lyrs=t@130,r@207000000&hl=zh-CN&gl=CN&</TerrainURL>
+		<BasicURL>http://mt0.google.cn/vt/lyrs=m@176000000&hl=zh-CN&gl=cn&</BasicURL>	
+		<QueryWebAddress>http://www.mapgis.com/RsWebSite/CityDemoWeb/Service.asmx?WSDL</QueryWebAddress>
+		</config>
+	</MapURLConfig>

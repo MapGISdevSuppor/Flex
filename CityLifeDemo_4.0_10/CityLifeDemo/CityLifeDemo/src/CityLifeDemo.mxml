@@ -1,0 +1,702 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 			   
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:map="zdims.map.*"
+			   xmlns:othermap="zdims.othermap.*" 
+			   xmlns:control="zdims.control.*" 
+			   xmlns:zdims="zdims.*" xmlns:myControl="myControls.*"
+			   xmlns:local="*" xmlns:controls="zdims.controls.*" xmlns:drawing="zdims.drawing.*"
+			   width="100%" height="100%" minWidth="955" minHeight="600" 
+			   backgroundColor="0xffffff"  pageTitle="城市生活服务系统"  
+			   initialize="application1_initializeHandler(event)"
+			   creationComplete="application1_creationCompleteHandler(event)" 
+			   currentState="default" xmlns:tiledMapService="zdims.map.tiledMapService.*">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Style source="mainStyle.as"/>
+	
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<!--<fx:Script source="CityLife.as"/>-->
+	<fx:Script>
+		<![CDATA[
+			import Mapgis7.WebService.BasLib.EnumLayerStatus;
+			
+			import config.ServerIP;
+			
+			import flash.geom.PerspectiveProjection;
+			import flash.net.navigateToURL;
+			import flash.ui.ContextMenu;
+			import flash.utils.flash_proxy;
+			
+			import flashx.textLayout.factory.TruncationOptions;
+			
+			import mx.collections.ArrayCollection;
+			import mx.containers.HBox;
+			import mx.controls.Alert;
+			import mx.controls.Text;
+			import mx.core.ApplicationGlobals;
+			import mx.core.UIComponent;
+			import mx.effects.Resize;
+			import mx.events.BrowserChangeEvent;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.events.ListEvent;
+			import mx.events.ResizeEvent;
+			import mx.managers.BrowserManager;
+			import mx.managers.IBrowserManager;
+			import mx.managers.PopUpManager;
+			import mx.printing.FlexPrintJob;
+			import mx.printing.FlexPrintJobScaleType;
+			import mx.utils.URLUtil;
+			
+			import myControls.ContentBox;
+			import myControls.myPrintToolBox;
+			
+			import sjd.managers.ResizeManager;
+			
+			import utilEvent.ReadURLEvent;
+			
+			import zdims.control.IMSRoad;
+			import zdims.controls.EditMapView;
+			import zdims.drawing.GraphicsLayer;
+			import zdims.othermap.GoogleLayerType;
+			import zdims.othermap.TianDiLayerType;
+			public var container:HDividedBox;
+//			public var vmapdoc:VectorMapDoc;
+			private var printset:myPrintToolBox;
+			private var browserManager:IBrowserManager;
+			public var historyManagementEnabled:Boolean=true;
+			private var mapEditView:EditMapView;
+			private var flag:Boolean=false;
+			private var menu_2D:ContextMenu=null;
+			
+			private var VecAddress:String="";
+			private var TileAddress:String="";
+			private var TerrainAddress:String="";
+			private var queryWebAddress:String="";
+			private var BasicAddress:String="";
+			private var SvrAddress:String="";
+			private var viewConfig:ServerIP;
+			
+			protected function application1_initializeHandler(event:FlexEvent):void
+			{
+				if(viewConfig==null){
+					viewConfig=new ServerIP();
+					viewConfig.mapConfig1(this);
+				}
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, TilereadURLCompelte);
+			}
+			//获取服务地址
+			private function TilereadURLCompelte(event:ReadURLEvent):void
+			{
+				TerrainAddress=viewConfig.TerrainURL;
+				queryWebAddress=viewConfig.QueryWebAddress;
+				BasicAddress=viewConfig.BasicURL;
+				VecAddress=viewConfig.vectorURL;
+				SvrAddress=viewConfig.ServerURL;
+				TileAddress=viewConfig.TileURL;
+				if(tileLayer!=null){
+					this.tileLayer.serverAddress=TileAddress;
+				}
+				if(thrTileLayer!=null){
+					this.thrTileLayer.serverAddress=TileAddress;
+				}
+				if(googleMap!=null){
+					this.googleMap.serverAddress=BasicAddress;
+				}
+				if(search!=null){
+					this.search.serverAdress=this.TileAddress;
+					this.search.queryWebAddress=this.queryWebAddress;
+				}
+				
+			}
+			
+			//显示2D图层
+			protected function tilebtn_clickHandler():void
+			{
+//				this.mapContainer_2D.errorString=false;
+				this.mapContainer_Bing.height=0;
+				this.mapContainer_2D.percentHeight=100;
+				this.mapContainer_3D.height=0;
+				this.mapContainer_Google.height=0;
+//				this.mapContainer_Tianditu.height=0;
+				this.mapContainer_Yahoo.height=0;
+//				if(mapContainer_2D!=null&&mapDoc!=null)
+//				{
+//					mapDoc.visible=false;//设置2D视图下，矢量地图文档为不可见
+//					tileLayer.visible=true;		
+					//设置当前激活图层
+//					this.mapContainer_2D.activeMapDoc=mapDoc;
+//					this.mapDoc.updateAllLayerInfo();
+//				}
+				//复位及更新
+				this.mapContainer_2D.restore();
+				this.mapContainer_2D.refresh(); 
+				//关联工具条及工具
+				toolbox.imsmap=mapContainer_2D;
+				magnifier.imsmap=mapContainer_2D;
+				eagle.imsmap=mapContainer_2D;
+				navigation.imsmap=mapContainer_2D;   //设置导航条与当前地图容器绑定
+				markEdit.imsmap=mapContainer_2D;		
+				//打印视图状态下的地图显示容器赋值
+				if(mapEditView!=null)
+				{
+					mapEditView.imsMap=mapContainer_2D;
+//				    mapEditView.vectorMapDoc=this.mapContainer_2D.activeMapDoc;
+				    mapEditView.graphicsLayer=graphicsLayer1;
+//					mapEditView.mapDocName=mapContainer_2D.activeMapDoc.mapDocName;
+				}
+				flag=true;
+				search.flg=flag;
+			}
+			
+			//显示2.5维立体图层
+			protected function thrbtn_clickHandler():void
+			{
+				//地图切换
+				this.mapContainer_2D.height=0;
+				this.mapContainer_Bing.height=0;
+				this.mapContainer_Google.height=0;
+//				this.mapContainer_Tianditu.height=0;
+				this.mapContainer_Yahoo.height=0;
+				this.mapContainer_3D.percentHeight=100;
+				//当前激活文档置空，清除公交及自驾路线、结果
+				this.mapContainer_2D.activeMapDoc=null;
+				this.toolbox.search.clearAllRoad();//清除公交轨迹
+				if(this.toolbox.search.road)
+//					this.toolbox.search.resetcar();  //清除自驾轨迹
+				this.toolbox.search.clearMarker();   //清除本地搜索标注
+				this.toolbox.search.busresult.location_grid.removeAllElements();
+				this.toolbox.search.busresult.location_grid.visible=false;
+				this.toolbox.search.busresult.busResult.removeAllChildren();//清除公交结果显示框
+				this.toolbox.search.busresult.busResult.visible=false;  //设置公交结果显示框为不可见
+				this.toolbox.search.busresult.roadResult.visible=false;//设置自驾结果显示框为不可见
+				if(mapEditView!=null)
+					mapEditView.enableFrame=false;//设置图框在当前状态下为不可见
+				//复位及更新
+				this.mapContainer_3D.restore();
+				this.mapContainer_3D.refresh();
+				//关联工具条及工具
+				toolbox.imsmap=mapContainer_3D;//将工具条与地图容器绑定
+				magnifier.imsmap=mapContainer_3D;//将放大镜与地图容器绑定
+				markEdit.imsmap=mapContainer_3D;//将标注控件与地图容器绑定
+				navigation.imsmap=mapContainer_3D;  //将导航条与地图容器绑定
+				flag=false;
+				search.flg=flag;
+			}
+			
+			//显示google地图
+			protected function GoogleMapbtn_clickHandler():void
+			{	//地图切换	
+				this.mapContainer_2D.height=0;
+				this.mapContainer_3D.height=0;
+				this.mapContainer_Bing.height=0;
+//				this.mapContainer_Tianditu.height=0;
+				this.mapContainer_Yahoo.height=0;
+				this.mapContainer_Google.percentHeight=100;
+				
+				
+				//当前激活文档置空，清除公交及自驾路线、结果
+				this.mapContainer_2D.activeMapDoc=null;
+				if(this.toolbox.search.road)
+//					this.toolbox.search.resetcar();
+				this.toolbox.search.clearAllRoad();
+				this.toolbox.search.clearMarker();   //清除本地搜索标注
+				this.toolbox.search.busresult.location_grid.removeAllElements();//清除本地关键字检索结果
+				this.toolbox.search.busresult.location_grid.visible=false;
+				this.toolbox.search.busresult.busResult.removeAllChildren();//清除公交结果显示框
+				this.toolbox.search.busresult.busResult.visible=false;  //设置公交结果显示框为不可见
+				this.toolbox.search.busresult.roadResult.visible=false;//设置自驾结果显示框为不可见
+				if(mapEditView!=null)
+					mapEditView.enableFrame=false;//设置图框在当前状态下为不可见
+				//复位及更新	
+				this.mapContainer_Google.restore();
+				this.mapContainer_Google.refresh(); 
+				//关联工具条及工具
+				toolbox.imsmap=mapContainer_Google;
+				magnifier.imsmap=mapContainer_Google;
+				navigation.imsmap=mapContainer_Google;
+				markEdit.imsmap=mapContainer_Google;
+				flag=false;
+				search.flg=flag;
+			}
+			
+			
+			
+			//显示微软必应地图
+			protected function Bingbtn_clickHandler():void
+			{    
+				//地图切换
+				this.mapContainer_2D.height=0;
+				this.mapContainer_3D.height=0;
+				this.mapContainer_Google.height=0;
+//				this.mapContainer_Tianditu.height=0;
+				this.mapContainer_Yahoo.height=0;
+				this.mapContainer_Bing.percentHeight=100;
+				
+				//当前激活文档置空，清除公交及自驾路线、结果
+				this.mapContainer_2D.activeMapDoc=null;
+				if(this.toolbox.search.road)
+//					this.toolbox.search.resetcar();
+				this.toolbox.search.clearAllRoad();
+				this.toolbox.search.clearMarker();   //清除本地搜索标注
+				this.toolbox.search.busresult.location_grid.removeAllElements();
+				this.toolbox.search.busresult.location_grid.visible=false;
+				this.toolbox.search.busresult.busResult.removeAllChildren();//清除公交结果显示框
+				this.toolbox.search.busresult.busResult.visible=false;  //设置公交结果显示框为不可见
+				this.toolbox.search.busresult.roadResult.visible=false;//设置自驾结果显示框为不可见
+				if(mapEditView!=null)
+					mapEditView.enableFrame=false;//设置图框在当前状态下为不可见
+				//复位及更新
+				this.mapContainer_Bing.restore();
+				this.mapContainer_Bing.refresh();
+				//关联工具条及工具
+				toolbox.imsmap=mapContainer_Bing;
+				magnifier.imsmap=mapContainer_Bing;
+				navigation.imsmap=mapContainer_Bing;
+				markEdit.imsmap=mapContainer_Bing;
+				flag=false;
+				search.flg=flag;
+			}
+			
+			//显示雅虎地图
+			protected function Yahoobtn_clickHandler():void
+			{
+				//地图切换
+				this.mapContainer_2D.height=0;
+				this.mapContainer_3D.height=0;
+				this.mapContainer_Bing.height=0;
+				this.mapContainer_Google.height=0;
+//				this.mapContainer_Tianditu.height=0;
+				this.mapContainer_Yahoo.percentHeight=100;
+				
+				//当前激活文档置空，清除公交及自驾路线、结果
+				this.mapContainer_2D.activeMapDoc=null;
+				if(this.toolbox.search.road)
+//					this.toolbox.search.resetcar();
+				this.toolbox.search.clearAllRoad();
+				this.toolbox.search.clearMarker();   //清除本地搜索标注
+				this.toolbox.search.busresult.location_grid.removeAllElements();
+				this.toolbox.search.busresult.location_grid.visible=false;
+				this.toolbox.search.busresult.busResult.removeAllChildren();//清除公交结果显示框
+				this.toolbox.search.busresult.busResult.visible=false;  //设置公交结果显示框为不可见
+				this.toolbox.search.busresult.roadResult.visible=false;//设置自驾结果显示框为不可见
+				if(mapEditView!=null)
+					mapEditView.enableFrame=false;//设置图框在当前状态下为不可见
+				//复位及更新
+				this.mapContainer_Yahoo.restore();
+				this.mapContainer_Yahoo.refresh();
+				//关联工具条及工具
+				toolbox.imsmap=mapContainer_Yahoo;
+				markEdit.imsmap=mapContainer_Yahoo;
+				navigation.imsmap=mapContainer_Yahoo
+				magnifier.imsmap=mapContainer_Yahoo;
+				flag=false;
+				search.flg=flag;
+			}
+			
+			//显示天地图
+			protected function Tdtbtn_clickHandler():void
+			{
+				//地图切换
+				this.mapContainer_2D.height=0;
+				this.mapContainer_3D.height=0;
+				this.mapContainer_Bing.height=0;
+				this.mapContainer_Google.height=0;
+				this.mapContainer_Yahoo.height=0;
+//				this.mapContainer_Tianditu.percentHeight=100;
+				
+				//当前激活文档置空，清除公交及自驾路线、结果
+				this.mapContainer_2D.activeMapDoc=null;
+				if(this.toolbox.search.road)
+//					this.toolbox.search.resetcar();
+				this.toolbox.search.clearAllRoad();
+				this.toolbox.search.clearMarker();   //清除本地搜索标注
+				this.toolbox.search.busresult.location_grid.removeAllElements();
+				this.toolbox.search.busresult.location_grid.visible=false;
+				this.toolbox.search.busresult.busResult.removeAllChildren();//清除公交结果显示框
+				this.toolbox.search.busresult.busResult.visible=false;  //设置公交结果显示框为不可见
+				this.toolbox.search.busresult.roadResult.visible=false;//设置自驾结果显示框为不可见
+				if(mapEditView!=null)
+					mapEditView.enableFrame=false;//设置图框在当前状态下为不可见
+				//复位及更新
+//				this.mapContainer_Tianditu.restore();
+//				this.mapContainer_Tianditu.refresh();
+				//关联工具条及工具
+//				toolbox.imsmap=mapContainer_Tianditu;
+//				magnifier.imsmap=mapContainer_Tianditu;
+//				navigation.imsmap=mapContainer_Tianditu;
+//				markEdit.imsmap=mapContainer_Tianditu;
+				flag=false;
+				search.flg=flag;
+			}
+			
+			//窗口初始化加载内容设置
+			protected function application1_creationCompleteHandler(event:FlexEvent):void
+			{
+				Security.loadPolicyFile("http://122.49.20.12/crossdomain.xml");
+				//初始化加载，显示为3D景观图
+				this.mapContainer_2D.height=0;
+				this.mapContainer_Bing.height=0;
+				this.mapContainer_Google.height=0;
+//				this.mapContainer_Tianditu.height=0;
+				this.mapContainer_Yahoo.height=0;
+				this.mapContainer_3D.percentHeight=100;
+				this.toolbox.imsmap=mapContainer_3D;
+				this.navigation.imsmap=mapContainer_3D;
+				this.magnifier.imsmap=mapContainer_3D;
+				this.markEdit.imsmap=mapContainer_3D;
+				toolbox.x=this.width-toolbox.width-20;//设置工具条始终居中
+				
+				banner.left=305;//设置Banner居中
+				banner.y=49;
+				toolbox.y=banner.y+5;
+				banner.height=1;
+				banner.right=-5;
+				layerBtn.x=(this.width-layerBtn.width)/2-100;
+				layerBtn.y=27;
+				
+				
+				//浏览器导航实例
+				browserManager=BrowserManager.getInstance();
+				browserManager.setTitle("城市生活服务系统");
+				flag=false;
+				search.flg=flag;
+			}
+			
+			/**
+			 *点击返回浏览按钮，返回浏览视图
+			 */
+			protected function back_clickHandler(event:MouseEvent):void
+			{
+				PopUpManager.removePopUp(printset);//移除打印工具箱
+				this.currentState="default";		
+				//				//地图位置还原
+				this.hbox.y=0;
+				this.hbox.x=0;
+				this.hbox.percentHeight=100;
+				this.hbox.percentWidth=100;			
+				this.mapContainer_2D.contextMenu=menu_2D;
+			}
+			
+			/**
+			 *地图浏览视图下，点击打印按钮，切换到打印视图
+			 */
+			protected function printIcon_clickHandler():void
+			{	
+				
+				this.setCurrentState("print_view",true);
+				//	PopUpManager.addPopUp(printset,this.printview,false);  //打印预览中不包括打印框
+				//	printset.x=200;
+				//	printset.y=200;
+				//	Alert.show("此视图为打印设置视图，若要调整打印框大小，请在打印设置里调整。为了方便打印内容的缩放，同时提供了打印内容的手动缩放，单击地图会出现可编辑框，可以手动拖放地图显示范围的大小。","说明");
+				menu_2D=this.mapContainer_2D.contextMenu;
+				this.mapContainer_2D.contextMenu=null;//添加点线区时的右键菜单设置
+				
+				//打印工具箱的属性设置
+				//				printset.boder=printview;
+				//				printset.imsmap=mapContainer_2D;
+				//				printset.vmapdoc=mapDoc;
+				
+//				printBar.vmapdoc=mapDoc;
+				
+				
+				if(!mapEditView)
+				{
+					mapEditView=new EditMapView();
+					mapEditView.addEventListener(FlexEvent.CREATION_COMPLETE,function(e:FlexEvent):void{
+						mapEditView.imsMap=mapContainer_2D;
+//						mapEditView.vectorMapDoc=this.mapDoc;
+						mapEditView.graphicsLayer=graphicsLayer1;
+//						mapEditView.mapDocName=mapDoc.mapDocName;
+						mapEditView.x=100;
+						mapEditView.y=50;
+						mapEditView.width=printview.width-200;
+						mapEditView.height=printview.height-100;
+						mapEditView.update();
+						
+						hbox.horizontalScrollPolicy="off";
+						hbox.verticalScrollPolicy="off";
+						mapEditView.addEditElement(hbox);
+						hbox.percentHeight=100;
+						hbox.percentWidth=100;
+					});
+				}
+				else
+				{
+					mapEditView.x=100;
+					mapEditView.y=50;
+					mapEditView.width=printview.width-200;
+					mapEditView.height=printview.height-100;
+					mapEditView.update();
+					hbox.horizontalScrollPolicy="off";
+					hbox.verticalScrollPolicy="off";
+					
+					mapEditView.addEditElement(hbox);
+					hbox.percentHeight=100;
+					hbox.percentWidth=100;
+				}
+				if(flag)
+				{
+					mapEditView.imsMap=mapContainer_2D;
+//					mapEditView.vectorMapDoc=mapDoc;
+					mapEditView.graphicsLayer=graphicsLayer1;
+//					mapEditView.mapDocName=mapDoc.mapDocName;
+				}
+				//				printset.editmapview=this.mapEditView;
+				printBar.editmapview=this.mapEditView;
+				printBar.flg=this.flag;
+				this.printview.addElement(mapEditView);		
+				//	printview.addElement(printset); //在打印预览中包括打印设置框
+				
+			}
+			
+			/**
+			 *打印视图中点击打印按钮，弹出打印设置工具箱
+			 */
+			private function printBtn_click():void
+			{
+				if(printset!=null)
+					PopUpManager.removePopUp(printset);
+				//				if(printset==null)
+				//				{   //如果当前视图中不包括打印工具箱，新建
+				printset=new myPrintToolBox();
+				
+				//				}
+				
+				PopUpManager.addPopUp(printset,this.printview,false);
+				printset.visible=true;
+				//				printset.init();
+				//				printset.width=400;
+				//				printset.height=380;
+				//				ResizeManager.enableResize(printset,100);
+				printset.x=200;
+				printset.y=200;
+				//打印工具箱的属性设置
+				printset.boder=printview;
+				printset.imsmap=mapContainer_2D;
+//				printset.vmapdoc=mapDoc;
+				printset.editmapview=this.mapEditView;
+				
+				//打印工具箱的属性设置
+				printset.boder=printview;
+				printset.imsmap=mapContainer_2D;
+//				printset.vmapdoc=mapDoc;
+				printset.editmapview=this.mapEditView;
+				printset.visible=true;//设置打印工具箱为可见
+				
+			}
+			
+			/**
+			 *点击此页说明按钮，弹出打印页面说明
+			 */
+			protected function introductionBtn_clickHandler(event:MouseEvent):void
+			{
+				Alert.show("此视图为打印设置视图，若要调整打印框大小，请在打印设置里调整。为了方便打印内容的缩放，同时提供了打印内容的手动缩放，单击地图会出现可编辑框，可以手动拖放地图显示范围的大小。","说明");
+			}
+			
+			protected function googleMap_initializeHandler(event:FlexEvent):void
+			{
+				if(BasicAddress!=""){
+					this.googleMap.serverAddress=BasicAddress;
+				}
+				//googleMap.serverAddress="http://mt3.google.cn/vt/lyrs=t@128,r@170000000&hl=zh-CN&gl=cn";
+				//	googleMap.serverAddress="http://mt0.google.cn/vt/lyrs=s@106&gl=cn";
+			}
+
+
+			protected function tileLayer_initializeHandler(event:FlexEvent):void
+			{
+				if(TileAddress!=""){
+					this.tileLayer.serverAddress=this.TileAddress;
+				}
+				
+			}
+
+
+			protected function thrTileLayer_initializeHandler(event:FlexEvent):void
+			{
+				if(TileAddress!=""){
+					this.thrTileLayer.serverAddress=this.TileAddress;
+				}
+				
+			}
+			protected function initQueryAddress(event:FlexEvent):void{
+				if(TileAddress!=""){
+					this.search.serverAdress=this.TileAddress;
+				}
+				if(queryWebAddress!=""){
+					this.search.queryWebAddress=this.queryWebAddress;
+				}
+				
+				
+			}
+
+		]]>
+	</fx:Script>
+	<s:states>
+		<!--地图浏览视图状态-->
+		<s:State  name="default" stateGroups="group1"/>
+		<!--地图打印视图状态-->
+		<s:State name="print_view" stateGroups="group1"/>
+	</s:states>	
+	
+	<s:Group id="group" width="100%" height="100%" includeIn="default,print_view">
+		
+		<mx:HDividedBox id="hbox"
+						
+						y="0" x="0" width="100%" height="100%"
+						dividerThickness="20" dividerAlpha="0.8" includeIn="default" horizontalScrollPolicy="off" verticalScrollPolicy="off"  >
+			
+			<mx:Canvas id="canva"
+					   y="127" 
+					   width="80%" height="100%"  horizontalScrollPolicy="off" verticalScrollPolicy="off" >
+				
+				
+				<!--常规地图容器-->
+				<map:IMSMap id="mapContainer_2D"  y="0" width="100%" initShowLevel="3" height="100%" levelNum="7"  enableAnimate="false" 
+							xMaxMap="114.500" xMinMap="114.125" yMaxMap="30.829" yMinMap="30.453" 
+							toolTip="Flex(中地数码)"  >
+					
+					<!--Goolge常规-->
+					<!--<othermap:GoogleTileLayer startLevel="7" viewBeginLevel="7"  viewEndLevel="21" 
+											  originalColumn="104" originalRow="52" googleLayerType="{GoogleLayerType.RasterMap}"/>-->
+					
+					<!--瓦片地图-->
+					<map:TileLayer    id="tileLayer"  hdfName="WhMap" viewBeginLevel="0" viewEndLevel="7"  initialize="tileLayer_initializeHandler(event)" 
+									  x="391" y="193">
+					</map:TileLayer>				
+					
+					<drawing:GraphicsLayer id="graphicsLayer1">
+					</drawing:GraphicsLayer>
+					
+					<!--矢量地图文档-->
+					<!--<map:VectorMapDoc  id="mapDoc" autoGetMapInfo="true"  serverAddress="http://localhost/RelayHandlerSite/RelayHandler.ashx" mapDocName="wh.map">
+					</map:VectorMapDoc>-->
+					
+					<!--鹰眼-->
+					<map:IMSEagleEye x="4" y="0" eagleLocation="右上" imsmap="{mapContainer_2D}"  id="eagle" width="109" height="71" toolTip="鹰眼">
+					</map:IMSEagleEye>
+					
+				</map:IMSMap>
+				<map:IMSMap id="mapContainer_3D" y="0" width="100%" initShowLevel="3" levelNum="5" enableAnimate="false"
+							xMaxMap="114.500" xMinMap="114.125" yMaxMap="30.829" yMinMap="30.453">
+					
+					<!--2.5维立体图层-->
+					<map:TileLayer  x="377" y="85" id="thrTileLayer" hdfName="Wh3D"  initialize="thrTileLayer_initializeHandler(event)"   dataVersion="0" indexOffset="2">
+					</map:TileLayer>
+					
+				</map:IMSMap>
+				
+				<!--墨卡托地图容器-->
+				<map:IMSMap id="mapContainer_Google" width="100%"  y="0"   height="100%" initShowLevel="0" levelNum="15" enableAnimate="false"
+							xMinMap="606816.915774785" xMaxMap="696952.611049457" yMinMap="2312001.72083783" yMaxMap="2402137.41611214" >
+					<!--Google地图（此示例为地形图，若需加载其他图，直接改类型即可）-->
+					<othermap:GoogleTileLayer id="googleMap" x="196" y="84" startLevel="7" googleLayerType="{GoogleLayerType.BasicMap}"
+											   originalRow="52" originalColumn="104"  viewBeginLevel="0" viewEndLevel="21"
+											   initialize="googleMap_initializeHandler(event)" >					
+					</othermap:GoogleTileLayer>	
+					<!--<myControl:MyGoogleTile id="googleMap" x="347" y="256" startLevel="7" googleLayerType="{GoogleLayerType.TerrainMap}"
+											originalRow="52" originalColumn="104"  viewBeginLevel="0" viewEndLevel="21">
+					</myControl:MyGoogleTile>-->
+				</map:IMSMap>
+				
+				<map:IMSMap id="mapContainer_Bing" width="100%" y="0" height="100%" initShowLevel="0" levelNum="11" enableAnimate="false"
+							xMinMap="606816.915774785" xMaxMap="696952.611049457" yMinMap="2312001.72083783" yMaxMap="2402137.41611214">
+					<!--微软必应地图-->
+					<othermap:BingTileLayer id="bingMap" x="175" y="191" startLevel="7"  isDisTileNetErrInfo="false"
+											originalRow="52" originalColumn="104" viewBeginLevel="0" viewEndLevel="17">
+					</othermap:BingTileLayer>
+				</map:IMSMap>
+				
+				<map:IMSMap id="mapContainer_Yahoo" width="100%" y="0" height="100%" initShowLevel="0" levelNum="12" enableAnimate="false"
+							xMinMap="606816.915774785" xMaxMap="696952.611049457" yMinMap="2312001.72083783" yMaxMap="2402137.41611214">
+					<!--雅虎地图-->
+					<othermap:YahooTileLayer id="yahooMap" x="283" y="239" originalRow="52" isDisTileNetErrInfo="false"
+											 originalColumn="104" startLevel="7" viewBeginLevel="0" viewEndLevel="18">
+					</othermap:YahooTileLayer>
+				</map:IMSMap>
+				
+				<!--<map:IMSMap id="mapContainer_Tianditu" width="100%" y="0" height="100%" initShowLevel="3" levelNum="10" enableAnimate="false">-->
+					<!--天地图（此示例为卫星影象图，若需加载其他图，直接改类型即可）-->
+					<!--<othermap:TianDiTileLayer id="tiandtMap1" x="175" y="71" startLevel="9"  tianDiLayerType="{TianDiLayerType.VectorLayer}"
+											  originalRow="84" originalColumn="418" viewBeginLevel="0" viewEndLevel="18" >
+					</othermap:TianDiTileLayer>
+					<othermap:TianDiTileLayer id="tiandtMap" x="175" y="71" startLevel="9"  tianDiLayerType="{TianDiLayerType.AnnoLayer}"
+											  originalRow="84" originalColumn="418" viewBeginLevel="0" viewEndLevel="18" >
+					</othermap:TianDiTileLayer>				   				    
+					
+										
+				</map:IMSMap>-->
+				
+				
+				<!--导航条-->
+				<control:NavigationBar x="2" y.default="127" y.print_view="10" imsmap="{mapContainer_2D}" id="navigation">
+				</control:NavigationBar>
+				
+				<!--放大镜-->
+				<control:Magnifier x="477" y="10" imsmap="{mapContainer_2D}" id="magnifier">
+				</control:Magnifier>
+				
+				<!--标注控件-->
+				<control:MarkerEdit id="markEdit" imsmap="{mapContainer_2D}" visible="false" x="300" y="250"/>
+				
+				<!--地图查询搜索-->
+				<myControl:ContentBox id="search" x="300" y="300" visible="false" 
+									  imsmap="{mapContainer_2D}"  
+									  busresult="{myBusResult}"  
+									 
+									  initialize="initQueryAddress(event)"
+									  >
+				</myControl:ContentBox>
+				<!--地图查询结果显示-->
+				<myControl:myMapCheckResult id="myBusResult" x="200" y="200" visible="false" boder="{this.hbox}"/>
+						
+			</mx:Canvas>
+		</mx:HDividedBox>
+		<!--系统banner-->
+		<myControl:Banner id="banner" >
+		</myControl:Banner>
+		<!--工具条-->
+		<myControl:ToolBox id="toolbox"   height="37" verticalScrollPolicy="off" width="417"
+						   markeditor="{markEdit}" eagleeye="{eagle}" imsmap="{mapContainer_2D}"  navigator="{navigation}" magnifier="{magnifier}" 
+						   search="{search}" includeIn="default" />		
+		<!--系统logo-->
+		<mx:Image  x="131" y="0" width="106" height="102" source="images/ball6.png" alpha="1"/>
+		<mx:Label  x="141" y="24" text="MapGIS" width="78" height="30" fontSize="18" color="#F6F7FA" textAlign="center"/>	
+		<mx:Image  x="38" y="95" source="images/shadow.png" width="304" height="31"/>
+		<mx:Label  x="245" y="33" text="生活" fontSize="30" fontWeight="bold" alpha="1" fontFamily="微软雅黑" color="#5831EA"/>
+		<mx:Label  x="130" y="43" text="二次开发案例" width="102" height="34" fontSize="15" fontWeight="bold" fontFamily="微软雅黑" color="#F6F7FA" textAlign="center" width.default="102" x.default="130" fontSize.default="15" fontWeight.default="bold" fontFamily.default="微软雅黑" y.default="54"/>
+		<mx:Label  x="46" y="36" text="城市" fontSize="30" fontWeight="bold" alpha="1" fontFamily="微软雅黑" color="#5831EA"/>
+		<mx:Label  x="42" y="78" text="Cheng Shi" width="95" height="24" fontSize="20" color="#1846F0" fontFamily="Brush Script MT" fontWeight="bold"/>
+		<mx:Label  x="241" y="75" text="Sheng Huo" width="102" height="24" fontSize="20" color="#1846F0" fontFamily="Brush Script MT" fontWeight="bold"/>
+		
+		<!--打印框-->
+		<s:BorderContainer  y="123" width="100%" height="100%" id="printview" includeIn="print_view">		
+		
+		</s:BorderContainer>
+		<mx:Canvas id="layerBtn" includeIn="default">
+			<mx:LinkButton includeIn="default" x="141" y="0" width="42" height="42" toolTip="2D" icon="@Embed(source='images/layer/2D.png')" click="tilebtn_clickHandler()"/>
+			<mx:LinkButton includeIn="default" x="219" y="0" width="42" height="42" toolTip="3D" icon="@Embed(source='images/layer/3D.png')" click="thrbtn_clickHandler()"/>
+			<mx:LinkButton includeIn="default" x="289" y="0" width="42" height="42" toolTip="Google" icon="@Embed(source='images/layer/3.jpg')" click="GoogleMapbtn_clickHandler()"/>
+			<mx:LinkButton includeIn="default" x="365" y="7" width="42" height="42" toolTip="Bing" icon="@Embed(source='images/layer/bing.png')" click="Bingbtn_clickHandler()"/>
+			<mx:LinkButton includeIn="default" x="453" y="3" width="42" height="42" toolTip="Yahoo" icon="@Embed(source='images/layer/yahoo.png')" click="Yahoobtn_clickHandler()"/>
+			<!--<mx:LinkButton includeIn="default" x="525" y="0" width="42" height="42" toolTip="天地图" icon="@Embed(source='images/layer/tianditu.png')" click="Tdtbtn_clickHandler()"/>-->
+			<mx:LinkButton includeIn="default" x="525" y="0" width="42" height="42"  id="printIcon"  icon="@Embed(source='images/printbox/9.png')" 
+						   buttonMode="true" toolTip="打印" click.default="printIcon_clickHandler()"/>
+		</mx:Canvas>
+		<!--打印工具条-->
+		<myControl:myPrintBar id="printBar"  includeIn="print_view" right="20" y="61" height="54" boder="{this.printview}" imsmap="{mapContainer_2D}">
+		</myControl:myPrintBar>
+		<!--打印视图-->
+		<mx:LinkButton id="back"            width="38" x="399" y="29" click="back_clickHandler(event)"            icon="@Embed(source='images/printbox/scan.png')"  toolTip="返回浏览"  includeIn="print_view" height="38"/>
+		<mx:LinkButton id="printBtn"        width="38" x="506" y="29" click="printBtn_click()"                    icon="@Embed(source='images/printbox/9.png')"   includeIn="print_view"      height="38" toolTip="打印"/>
+		<mx:LinkButton id="introductionBtn" width="38" x="613" y="29" click="introductionBtn_clickHandler(event)" icon="@Embed(source='images/printbox/instruct.png')" toolTip="此页说明" includeIn="print_view"    height="38"/>
+	</s:Group>
+	
+</s:Application>
