@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+	<MapURLConfig>
+		<config>
+		<HDFName>worldTile-6F63-43b9-A7F1-79A1D6C64962</HDFName>
+		<XMinMap>-181.18399779022</XMinMap>
+		<XMaxMap>188.619962766591</XMaxMap>
+		<YMinMap>-90.7340663245236</YMinMap>
+		<YMaxMap>279.069894232288</YMaxMap>
+		<LevelNum>8</LevelNum>
+		<InitShowLevel>3</InitShowLevel>
+		<RestoreCenterX>3.72</RestoreCenterX>
+		<RestoreCenterY>-10.17</RestoreCenterY>
+		</config>
+	</MapURLConfig>

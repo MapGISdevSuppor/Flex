@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx"  width="100%"
+		   height="100%"
+		   fontSize="12"
+		   creationComplete="init()">
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			
+			import spark.events.IndexChangeEvent;
+			private var lineHpType:ArrayCollection=new ArrayCollection([{id:"1"},{id:"2"},{id:"3"},{id:"4"},{id:"5"},{id:"6"},{id:"7"},{id:"8"},{id:"9"},{id:"10"}]);
+			private var dataLinecolorArray:ArrayCollection=new ArrayCollection([{color:"黑色"},{color:"红色"},{color:"黄色"},{color:"绿色"},{color:"蓝色"},{color:"紫色"}]);
+			
+
+			protected function patternLineID_changeHandler(event:IndexChangeEvent):void
+			{
+				// TODO Auto-generated method stub
+				this.patternID2.text=patternLineID.selectedItem.id.toString();
+			}
+
+
+		
+
+			protected function colorTemp_changeHandler(event:IndexChangeEvent):void
+			{
+				// TODO Auto-generated method stub
+				var Str_color:String=this.colorTemp.selectedItem.color;
+				var Color_ID:int=1;
+				switch(Str_color){
+					case "黑色":
+						Color_ID=1;
+						break;
+					case "红色":
+						Color_ID=175;
+						break;
+					case "黄色":
+						Color_ID=4;
+						break;
+					case "绿色":
+						Color_ID=7;
+						break;
+					case "蓝色":
+						Color_ID=5;
+						break;
+					case "紫色":
+						Color_ID=3;
+						break;
+					default:
+						Color_ID=1;
+						break;
+				}
+				this.color.text=Color_ID.toString();
+			}
+
+
+			protected function patternTempID_changeHandler(event:IndexChangeEvent):void
+			{
+				// TODO Auto-generated method stub
+				this.patternID.text=patternTempID.selectedItem.id.toString();
+			}
+
+		]]>
+	</fx:Script>
+	<mx:Label x="10"
+			  y="8"
+			  text="线型号："/>
+
+	<s:DropDownList id="patternTempID"
+					x="88"
+					y="6" selectedIndex="0" width="70"
+					height="25" labelField="id"
+					dataProvider="{lineHpType}"
+					 change="patternTempID_changeHandler(event)"
+					>
+		
+		
+	</s:DropDownList>
+	<s:Label x="165" y="10" id="patternID" text="1" visible="false">
+		
+	</s:Label>
+	
+	
+	
+	<mx:Label x="10"
+			  y="37"
+			  text="辅助线型："/>
+	
+	<s:DropDownList id="patternLineID"
+					x="88"
+					y="35" selectedIndex="0" width="70"
+					height="25" labelField="id"
+					dataProvider="{lineHpType}"
+					change="patternLineID_changeHandler(event)"
+					 >
+		
+		
+	</s:DropDownList>
+	<s:Label x="165"  y="40" id="patternID2" text="1" visible="false" >
+		
+	</s:Label>
+
+	<mx:Label x="11"
+			  y="69"
+			  text="外部笔宽："/>
+	<mx:TextInput id="penWidth"
+				  x="88"
+				  y="67"
+				  text="10"
+				  width="114"/>
+	<mx:Label x="10"
+			  y="99"
+			  text="线比例x系数："/>
+	<mx:TextInput id="lineScaleX"
+				  x="88"
+				  y="97"
+				  text="10"
+				  width="113"/>
+	<mx:Label x="11"
+			  y="129"
+			  text="线比例y系数："/>
+	<mx:TextInput id="lineScaleY"
+				  x="88"
+				  y="127"
+				  text="10"
+				  width="114"/>
+	<mx:Label x="10"
+			  y="160"
+			  text="线颜色："
+			  height="20"/>
+
+	
+	<s:DropDownList id="colorTemp"
+					x="88"
+					y="157" selectedIndex="0" width="70"
+					height="25" labelField="color"
+					dataProvider="{dataLinecolorArray}"
+                    change="colorTemp_changeHandler(event)"
+					>
+		</s:DropDownList>
+	<s:Label  x="165" y="162" id="color" text="1" visible="false">
+		
+	</s:Label>
+	
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import Mapgis7.WebService.BasLib.WebGraphicsInfo;
+			import Mapgis7.WebService.BasLib.GInfoType;
+			private var gInfo:WebGraphicsInfo;
+			/**
+			 * 获取线样式信息类型
+			 */ 
+			public function getFeatureGinfoType():String
+			{
+				return GInfoType.LinInfo;
+			}
+			/**
+			 * 设置线样式信息
+			 */ 
+			public function setGraphicStyle(style:WebGraphicsInfo):void
+			{
+				this.gInfo = style;
+			}
+			/**
+			 * 窗口初始化
+			 */
+			public function init():void
+			{
+				if (gInfo == null)
+					return;
+				this.color.text = gInfo.LinInfo.Color.toString();
+				this.lineScaleX.text = gInfo.LinInfo.Xscale.toString();
+				this.lineScaleY.text = gInfo.LinInfo.Yscale.toString();
+				this.patternID.text = gInfo.LinInfo.LinStyleID.toString();
+				this.patternID2.text = gInfo.LinInfo.LinStyleID2.toString();
+				this.penWidth.text = gInfo.LinInfo.LinWidth.toString();
+			}
+			/**
+			 * 设置颜色值
+			 */
+		//	public function setColor(list:ComboBox):void
+		//	{
+		//		list.text = list.text.split(":")[0];
+		//	}
+			
+			
+		]]>
+	</fx:Script>
+	
+</mx:Canvas>

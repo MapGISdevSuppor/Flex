@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="400" height="300"
+		   implements="IClass.BasicInterFace" xmlns:ns="$$tools$$.tool002.*">
+	<fx:Script>
+		<![CDATA[
+			import IClass.BasicInterFace;
+			
+			import zdims.control.IMSCatalog;
+			public var mapCatolog:IMSCatalog=null;
+			public	function loadInit(basicApp:FlexVecModuleDemo,toolId:String):void{
+				
+				//				if(mapCatolog){
+				//					basicApp.imsmap.removeElement(mapCatolog);
+				//					mapCatolog=null
+				//				}
+				
+				if(mapCatolog==null){
+					mapCatolog=new IMSCatalog();
+					mapCatolog.id="catalog";
+					mapCatolog.left=0;
+					mapCatolog.verticalCenter=0;
+					mapCatolog.visible=true;
+					//mapCatolog.hideEffect="wipeOut";
+					//mapCatolog.showEffect="wipeIn";
+					mapCatolog.imsmap=basicApp.imsmap;
+					basicApp.imsmap.addElement(mapCatolog);
+					//展开图层目录树的所有节点
+					mapCatolog.imstree.expandChildrenOf(mapCatolog.imstree.firstVisibleItem,true);
+					basicApp.imsmap.refresh();
+				}
+					
+				else{
+					
+					//图层目录树控制            
+					if(mapCatolog.visible)
+					{
+						//隐藏图层目录窗口
+						mapCatolog.visible = false;
+					}
+					else
+					{
+						//显示图层目录窗口
+						mapCatolog.visible = true;
+						//展开图层目录树的所有节点
+						mapCatolog.imstree.expandChildrenOf(mapCatolog.imstree.firstVisibleItem,true);
+					} 
+				}	
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+</mx:Module>

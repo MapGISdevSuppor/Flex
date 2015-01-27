@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<map:OverlayObject xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				   xmlns:s="library://ns.adobe.com/flex/spark" 
+				   xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:map="zdims.map.*" width="400" height="300"
+				   initialize="init()" borderStyle="none">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import mx.core.UIComponent;
+			private var rateHeiht:Number=20;
+			public var chartWidth:Number=100;
+			public var chartHeigth:Number=80;
+			private var Tchart:UIComponent=null;
+			private var CenterX:Number=200;
+			private var CenterY:Number=300;
+			
+			
+			private function init():void{
+				if(Tchart!=null){
+					Tchart.graphics.clear();
+				}
+				if(Tchart==null){
+					Tchart=new UIComponent();
+					Tchart.visible=true;
+					this.addElement(Tchart);
+				}
+				
+				Tchart.graphics.beginFill(0x82145);  
+				Tchart.graphics.lineStyle(1,0xFF0010);   
+				Tchart.graphics.moveTo(CenterX-chartWidth*2/3,CenterY+chartHeigth/2-rateHeiht);//移动到右边中点  
+				Tchart.graphics.lineTo(CenterX-chartWidth*2/3,CenterY+chartHeigth/2);//移动到某个点 （左边的中点）   
+				Tchart.graphics.lineTo(CenterX+chartWidth/3,CenterY+chartHeigth/2);//移动到上边中点   
+				Tchart.graphics.lineTo(CenterX+chartWidth*2/3,CenterY-chartHeigth/2);//移动到右边中点   
+				Tchart.graphics.lineTo(CenterX+2*chartWidth/3,CenterY-chartHeigth/2-rateHeiht);//移动到起始点 
+				Tchart.graphics.lineTo(CenterX-chartWidth/3,CenterY-chartHeigth/2-rateHeiht);//下边的重点   
+				Tchart.graphics.lineTo(CenterX-chartWidth*2/3,CenterY+chartHeigth/2-rateHeiht);
+				Tchart.graphics.endFill();
+				Tchart.graphics.lineTo(CenterX+chartWidth/3,CenterY+chartHeigth/2-rateHeiht);//移动到上边中点  
+				Tchart.graphics.lineTo(CenterX+chartWidth/3,CenterY+chartHeigth/2);//移动到上边中点   
+				Tchart.graphics.lineTo(CenterX+chartWidth/3,CenterY+chartHeigth/2-rateHeiht);//移动到上边中点  
+				Tchart.graphics.lineTo(CenterX+2*chartWidth/3,CenterY-chartHeigth/2-rateHeiht);//移动到起始点 
+			}
+			
+			
+		]]>
+	</fx:Script>
+	
+	
+</map:OverlayObject>

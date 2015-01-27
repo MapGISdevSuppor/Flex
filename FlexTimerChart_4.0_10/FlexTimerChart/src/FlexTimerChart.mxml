@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"  minWidth="955" minHeight="600" xmlns:map="zdims.map.*"
+			   xmlns:othermap="zdims.othermap.*" initialize="tile_creationCompleteHandler()" creationComplete="init()" xmlns:compants="compants.*">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:GlowFilter id="glower" alpha="1.0" blurX="6.0" blurY="6.0" color="#FF5800" inner="false"
+					  knockout="false" quality="2" strength="1"/>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import config.ServerIP;
+			
+			import mx.controls.Alert;
+			
+			import utilEvent.ReadURLEvent;
+			
+			import zdims.control.Measure;
+			import zdims.event.IMSMapEvent;
+			import zdims.othermap.TianDiLayerType;
+			import zdims.util.IMSOperType;
+			
+			import zdimsExtends.chart.NewChartColumn;
+			private var chartColumn:NewChartColumn;
+			private var timer:Timer;
+			private var chartArr:Array=null;
+			private var t:int=1;
+			private var measureObj:Measure=new Measure();
+			public var pntArray:Array=new Array(
+				new Point(130.3415309942718,45.549888377748644),
+				new Point(126.6850221069303,42.57051076584074),
+				new Point(122.80280279444423,40.809969449713336),
+				new Point(116.34748463531045,40.132838174279726),
+				new Point(114.81265374432758,38.14658643300778),
+				new Point(112.96182825814236,33.361525419943575),
+				new Point(111.60756570727514,36.79232388214056),
+				new Point(117.2503263358886,39.229996473701576),
+				new Point(119.10115182207382,36.56661345699602),
+				new Point(119.68799892744961,32.910104569654514),
+				new Point(121.71939275375045,31.10442116849819),
+				new Point(119.82342518253634,28.892459002081715),
+				new Point(114.58694331918305,30.021011127804407),
+				new Point(111.24642902704389,27.40277019612776),
+				new Point(108.31219350016488,33.58723584508812),
+				new Point(115.26407459461666,26.048507645260536),
+				new Point(117.43089467600423,24.829671349480023),
+				new Point(112.28469698270877,22.843419608208087),
+				new Point(108.71847226542505,22.482282927976826),
+				new Point(107.770488479818,26.229075985376163),
+				new Point(106.95793094929765,29.659874447573145),
+				new Point(102.71457495658034,28.711890661966084),
+				new Point(100.7734653003373,22.843419608208087),
+				new Point(103.88826916733193,34.670645885781894),
+				new Point(106.14537341877731,37.24374473242963),
+				new Point(109.0344668606274,41.7579532353204),
+				new Point(95.53698343698402,35.2574929911577),
+				new Point(87.18569770663609,40.35854859942427),
+				new Point(87.99825523715643,30.066153212833317),
+				new Point(109.48588771091647,18.690347785548582),
+				new Point(114.9029379143854,22.43714084294792),
+				new Point(120.72626688311449,22.84341960820811),
+				new Point(117.2954684209175,31.10442116849821)
+			);
+			private var chartInfo1:Array=new Array(120,1232,3312,4422,5532,6674,7232,6342,5876,5102,5465,5676);
+			private var chartInfo2:Array=new Array(232,1345,2894,3503,4105,5507,5232,4876,5234,4565,4822,5211);
+			private var chartInfo3:Array=new Array(325,824,1323,2012,3789,4405,5100,6342,7800,9121,11232,14832);
+			private var chartInfo4:Array=new Array(1400,1567,2500,3212,3333,4321,5321,6841,7231,10234,15212,18321);
+			private var chartInfo5:Array=new Array(823,1234,1872,2567,3100,3898,4300,4512,4801,5321,5898,6810);
+			private var chartInfo6:Array=new Array(432,1430,2682,3123,4476,5898,5321,4832,4222,4523,5321,7143);
+			private var chartInfo7:Array=new Array(523,898,1234,1675,2201,2678,3245,3785,4232,5543,6123,7908);
+			private var chartInfo8:Array=new Array(786,1563,1987,2432,2876,3423,3678,4321,5565,8782,10213);
+			private var chartInfo9:Array=new Array(920,1456,2522,2981,3898,4543,5600,6789,7892,8121,8142,15212);
+			private var chartInfo10:Array=new Array(1000,1543,2312,3242,3678,4543,5674,6321,7897,8904,10430,13321);
+			private var chartInfo11:Array=new Array(1500,2676,3456,4321,5323,6543,7653,9789,9223,8212,9300,12561);
+			private var chartInfo12:Array=new Array(867,1234,2453,3456,5432,6453,6890,8324,9876,10233,14561,17678);
+			private var chartInfo13:Array=new Array(1464,2878,4832,4245,6890,7898,8967,9431,12321,14562,17896,21122);
+			private var chartInfo14:Array=new Array(1232,1856,2322,3212,4534,5465,6723,6208,9876,11232,14545,17898);
+			private var chartInfo15:Array=new Array(589,1232,2321,3421,4321,5343,6564,7654,8275,8453,9234,12321);
+			private var chartInfo16:Array=new Array(634,1898,1343,2343,3421,3898,4563,5463,6543,7890,8785,10232);
+			private var chartInfo17:Array=new Array(832,1230,2202,3323,4034,4898,5400,6400,7543,9765,11879,13231);
+			private var chartInfo18:Array=new Array(1450,3212,4532,5879,6345,7898,9943,12323,14534,18975,23221,27545);
+			private var chartInfo19:Array=new Array(1032,1454,2345,4323,5465,6787,8767,9898,12323,14345,20567,18789);
+			private var chartInfo20:Array=new Array(454,1232,2245,3454,5323,6454,7453,8234,8523,9234,9890,11240);
+			private var chartInfo21:Array=new Array(780,1232,1504,2210,3400,3500,5000,6010,6787,7687,8906,10222);
+			private var chartInfo22:Array=new Array(1232,2543,3245,4565,7643,8798,9899,11023,13223,14345,16787,19875);
+			private var chartInfo23:Array=new Array(343,804,1432,2343,3432,4345,5456,6567,7156,7989,8232,8999);
+			private var chartInfo24:Array=new Array(232,1324,865,898,532,1789,2211,2898,3234,4545,4878,5565);
+			private var chartInfo25:Array=new Array(323,754,1234,2343,3122,3876,4565,5676,6123,6454,6875,7121);
+			private var chartInfo26:Array=new Array(102,767,498,289,454,656,967,1823,1567,2321,3764,3345);
+			private var chartInfo27:Array=new Array(342,1208,878,1342,1875,2434,3878,3212,3454,3989,4354,4987);
+			private var chartInfo28:Array=new Array(545,1121,1454,1654,1967,2434,2676,2987,3454,3876,4412,5821);
+			private var chartInfo29:Array=new Array(654,789,832,1832,1678,2421,3465,3212,3822,4232,4676,5012);
+			private var chartInfo30:Array=new Array(789,1320,1787,2343,3564,4343,5454,6545,7234,7878,8343,8912);
+			private var chartInfo31:Array=new Array(1121,2343,3454,5543,4454,6565,7436,8784,9878,12121,14323,18987);
+			private var chartInfo32:Array=new Array(1343,3231,4545,5456,6567,7556,9907,12122,14323,16532,18752,20893);
+			private var chartInfo33:Array=new Array(1464,2678,3232,4345,5890,6898,7967,8431,12898,10562,12896,14798);
+			private var chartInfoArr:Array=new Array(chartInfo1,chartInfo2,chartInfo3,chartInfo4,chartInfo5,chartInfo6,chartInfo7,chartInfo8,chartInfo9,chartInfo10,
+				chartInfo11,chartInfo12,chartInfo13,chartInfo14,chartInfo15,chartInfo16,chartInfo17,chartInfo18,chartInfo19,chartInfo20,
+				chartInfo21,chartInfo22,chartInfo23,chartInfo24,chartInfo25,chartInfo26,chartInfo27,chartInfo28,chartInfo29,chartInfo30,chartInfo31,chartInfo32,chartInfo33);
+			private var charInfoLength:Number;
+			private var index:int=0;
+			private var flag:Boolean=true;
+			public var fillColor:uint=0x3399FF;
+			public var fillAlpha:Number=1;
+			public var borderColor:uint=0xFFFFFF;
+			public var borderAlpha:Number=1;
+			public var txtBorderColor:uint=0x0033FF;
+			public var borderThickness:Number=1;
+			private var viewConfig:ServerIP;
+			private function tile_creationCompleteHandler():void{
+				viewConfig=new ServerIP();
+				viewConfig.mapConfig1(this);
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, readURLCompelte);
+			}
+			//获取服务地址
+			private function readURLCompelte(event:ReadURLEvent):void
+			{
+				this.tilelayer.serverAddress=viewConfig.TileURL;
+				this.imsmap.refresh();
+			}
+			protected function init():void
+			{
+
+				if(measureObj==null){
+					measureObj=new Measure();
+				}
+				if(measureObj!=null){
+					measureObj.imsmap=this.imsmap;
+					measureObj.setMeasureType('len');
+					measureObj.close();
+				}
+				
+				if(chartArr!=null){
+					if(chartArr.length>0){
+						for(var k:int=0;k<chartArr.length;k++){
+							if(chartArr[k]!=null){
+								var newChartTemp:NewChartColumn=chartArr[k] as NewChartColumn;
+								newChartTemp.clearChart();
+							}
+						}
+					}
+					chartArr=null;	
+					timer=null;
+				}
+				if(chartArr==null){
+					chartArr=new Array();
+					for(var i:int=0;i<this.pntArray.length;i++){
+						chartColumn=new NewChartColumn();
+						chartColumn.imsmap=this.imsmap;
+						chartColumn.chartWidth=20;
+						chartColumn.chartHeight=12;
+						chartColumn.logicCenterX=this.pntArray[i].x;
+						chartColumn.logicCenterY=this.pntArray[i].y;
+						chartColumn.rateHeiht=0;
+						chartColumn.rate=t;
+						chartColumn.fillColor=fillColor;
+						chartColumn.fillAlpha=this.fillAlpha;
+						chartColumn.borderColor=borderColor;
+						chartColumn.borderAlpha=this.borderAlpha;
+						chartColumn.txtBorderColor=txtBorderColor;
+						chartColumn.borderThickness=borderThickness;
+						chartColumn.txtContent="0";
+						chartColumn.initDraw();
+						chartArr.push(chartColumn);
+						
+					}
+					
+					this.charInfoLength=chartInfo5.length;
+					index=0;
+					if(timer!=null){
+						timer=null;
+					}
+					if(timer==null){
+					timer = new Timer(1000);
+					timer.removeEventListener(TimerEvent.TIMER,onFlashTimer);
+					timer.removeEventListener(TimerEvent.TIMER_COMPLETE,onFlashComplete);
+					timer.addEventListener(TimerEvent.TIMER,onFlashTimer);
+					timer.addEventListener(TimerEvent.TIMER_COMPLETE,onFlashComplete);
+					}
+				}
+				if(this.imsmap!=null){
+					this.imsmap.addEventListener(IMSMapEvent.MAP_CHANGE,onChangeHandle);
+					this.imsmap.addEventListener(IMSMapEvent.MAP_ZOOMOVER,onChangeHandle);
+				}
+			}
+			protected function onChangeHandle(e:Event):void{
+				var lev:int=this.imsmap.getLevel();
+				if(lev<=4){
+				this.imsmap.initShowLevel=4;
+				this.imsmap.enableZoomOutMinLevel=false;
+				}else{
+				this.imsmap.initShowLevel=5;
+				this.imsmap.enableZoomOutMinLevel=true;
+				}
+			}
+			protected function onFlashTimer(e:TimerEvent):void{
+				if(index==0){
+					if(chartInfoArr!=null&&chartInfoArr.length>0){
+						for(var i:int=0;i<chartInfoArr.length;i++){
+							if(chartInfoArr[i]!=null){
+								if(chartInfoArr[i][index]>0){
+									var loc0:int=getRate(chartInfoArr[i][index]);
+									var chartTemp:NewChartColumn=chartArr[i] as NewChartColumn;
+									if(chartTemp!=null){
+										chartTemp.txtContent=chartInfoArr[i][index].toString();
+										chartTemp.rate=loc0*t;
+										chartTemp.increaseChart();
+									}
+								}
+							}
+						}
+					}
+				}else if(index<charInfoLength){
+					if(chartInfoArr!=null&&chartInfoArr.length>0){
+						for(var j:int=0;j<chartInfoArr.length;j++){
+							if(chartInfoArr[j]!=null){
+								if(chartInfoArr[j][index]!=null&&chartInfoArr[j][index-1]!=null){
+									var loc1:int=getRate(chartInfoArr[j][index-1]);
+									var loc2:int=getRate(chartInfoArr[j][index]);
+									var loc3:int=loc2-loc1;
+									var timeChartTemp:NewChartColumn=chartArr[j] as NewChartColumn;
+									if(timeChartTemp!=null){
+										timeChartTemp.txtContent=chartInfoArr[j][index].toString();
+										timeChartTemp.rate=loc3*t;
+										timeChartTemp.increaseChart();
+									}
+								}
+							}
+						}
+					}
+				}else{
+					timer.stop();
+				}
+				index++;
+				
+			}
+			protected function getRate(loc:Number):int{
+				var loc2:int=0;
+				if(loc==0){
+					loc2=0;
+				}else{
+					var loc1:int=int(loc/200);
+					loc2=loc1+1;
+				}
+				
+				return loc2;
+			}
+			
+			protected function onFlashComplete(e:TimerEvent):void
+			{
+				Timer(e.target).stop();
+			}
+			
+			
+			protected function button4():void{
+				
+				if(flag==true){
+					this.timer.start();
+					flag=false;
+				}else{
+					if(timer!=null){
+						timer.stop();
+						timer=null;
+					}
+					
+					init();
+					this.timer.start();
+				}
+			}
+			protected function measureLine():void{
+				if(measureObj==null){
+					measureObj=new Measure();
+				}
+				if(measureObj!=null){
+					measureObj.imsmap=this.imsmap;
+					measureObj.setMeasureType('len');
+				}
+			}
+			protected function measurePolygon():void{
+				if(measureObj==null){
+					measureObj=new Measure();
+				}
+				if(measureObj!=null){
+					measureObj.imsmap=this.imsmap;
+					measureObj.setMeasureType('area');
+				}
+			}
+			
+			public function reDrawChart():void{
+			if(chartArr!=null&&chartArr.length>0){
+				for(var i:int=0;i<chartArr.length;i++){
+					var ch:NewChartColumn=chartArr[i];
+					ch.fillColor=this.fillColor;
+					ch.fillAlpha=this.fillAlpha;
+					ch.borderColor=this.borderColor;
+					ch.borderAlpha=this.borderAlpha;
+					ch.borderThickness=this.borderThickness;
+					ch.txtBorderColor=this.fillColor;
+					ch.txtBorderAlpha=this.fillAlpha;
+					ch.reDrawChart();
+				}
+				}
+			}
+			protected function clearAll():void{
+				if(chartArr!=null){
+					if(chartArr.length>0){
+						for(var k:int=0;k<chartArr.length;k++){
+							if(chartArr[k]!=null){
+								var newChartTemp:NewChartColumn=chartArr[k] as NewChartColumn;
+								newChartTemp.clearChart();
+							}
+						}
+					}
+					chartArr=null;	
+					if(timer!=null){
+						timer.removeEventListener(TimerEvent.TIMER,onFlashTimer);
+						timer.removeEventListener(TimerEvent.TIMER_COMPLETE,onFlashComplete);
+					}
+					timer=null;
+					flag=false;
+				}
+			}
+			
+			//鼠标移入到绘制的图标上改变颜色的效果
+			private function rollOverHandler(event:Event):void{
+				event.currentTarget.filters=[glower];
+			}
+			//鼠标移出到绘制的图标上恢复原始效果
+			private function rollOutHandler(event:Event):void{
+				event.currentTarget.filters=[];
+			}
+		]]>
+	</fx:Script>
+	
+<map:IMSMap   x="0" y="0" id="imsmap" initShowLevel="5" levelNum="8" width="100%" height="100%"
+			  xMinMap="-181.18399779022" xMaxMap="188.619962766591" yMinMap="-90.7340663245236" yMaxMap="279.069894232288"
+			  restoreCenterX="108.89904060554068" restoreCenterY="33.361525419943575" 
+			  enableProgressBar="false" >
+		<!--基于K9系列平台显示瓦片地图-->
+		<!--<map:TileLayer x="0" y="0" id="tilelayer" autoGetMapBound="true" autoGetMapInfo="true" hdfName="world.hdf"   >
+		</map:TileLayer>-->
+		
+		<!--显示瓦片地图-->
+		<map:TileLayer x="0" y="0" id="tilelayer" autoGetMapBound="true" autoGetMapInfo="true" hdfName="world"   >
+		</map:TileLayer>
+	</map:IMSMap>
+	<!--<s:Button x="302" y="10" label="时态"  click="button4()" />
+	<s:Button x="401" y="10" label="清除" click="clearAll()"/>
+	<s:Button x="483" y="10" label="测距" click="measureLine()"/>
+	<s:Button x="598" y="10" label="测面" click="measurePolygon()"/>-->
+	<s:BorderContainer id="container" width="420" height="120" borderColor="0x333333" borderAlpha="0" 
+					   left="20"  top="10" >
+		<mx:Image x="11" y="0" source="images/MyGIS/GISbanner.png" />                                  
+		<mx:Image x="15" y="60" source="images/MyGIS/GIS.png" click="button4()" rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)" buttonMode="true" useHandCursor="true"  />
+		<mx:Image x="129" y="58" source="images/MyGIS/clear.png" click="clearAll()" rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)" buttonMode="true" useHandCursor="true"/>
+		<mx:Image x="229" y="60" source="images/MyGIS/MeasureM.png" click="measureLine()" rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)" buttonMode="true" useHandCursor="true"/>
+		<mx:Image x="327" y="60" source="images/MyGIS/MeasureP.png" click="measurePolygon()" rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)" buttonMode="true" useHandCursor="true"/>
+	</s:BorderContainer>	
+	<compants:SelectProperty right="10"  top="10" id="selPro" flexTimeObj="{this}">
+	</compants:SelectProperty>
+	
+</s:Application>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="400" height="300"
+		   implements="IClass.BasicInterFace" xmlns:ns="$$tools$$.tool004.*">
+	<fx:Script>
+		<![CDATA[
+			import IClass.BasicInterFace;
+			
+			import controls.NavigationControl;
+			import controls.NavigationPosition;
+			import controls.NavigationZoom;
+			
+			import mx.events.FlexEvent;
+			
+			import zdims.event.IMSMapEvent;
+			import zdims.map.IMSMap;
+			import zdims.util.IMSOperType;
+			
+			private var basicIMSMap:IMSMap;
+			private var toolid:String="";
+			protected var navigationZoom:NavigationZoom;
+			private var navigationControl:NavigationControl; 
+			
+			
+			private function onUp():void{
+				this.basicIMSMap.moveMapView(0,-1,100);
+			}
+			private function onDown():void{
+				this.basicIMSMap.moveMapView(0,1,100);
+			}
+			private function onLeft():void{
+				this.basicIMSMap.moveMapView(-1,0,100);
+			}
+			private function onRight():void{
+				this.basicIMSMap.moveMapView(1,0,100);
+			}
+			private function onCenter():void{
+				this.basicIMSMap.operType=IMSOperType.Drag;
+			}
+			
+			private function zoomIn():void
+			{
+				this.basicIMSMap..zoomIn();
+			}
+			private function zoomOut():void
+			{
+				this.basicIMSMap.zoomOut();
+			}
+			
+			private function zoom(level:int):void
+			{
+				this.basicIMSMap.setLevel(level);
+			}
+			
+			
+			
+			public	function loadInit(basicApp:FlexVecModuleDemo,toolId:String):void{
+				
+				
+				this.basicIMSMap=basicApp.imsmap;
+				this.toolid = toolId;
+				
+				if(navigationControl==null)
+				{
+					var navigationPosition:NavigationPosition = new NavigationPosition(onUp,onDown,onLeft,onRight,onCenter);
+					navigationZoom = new NavigationZoom(0,15,true,zoom,zoomIn,zoomOut);
+					navigationControl = new NavigationControl(navigationPosition,navigationZoom);
+					navigationControl.x=10;
+					navigationControl.y=100;
+					navigationControl.visible=true;
+					basicApp.addElement(navigationControl);
+					navigationZoom.setSliderPosition(1);
+				}
+				else{
+					if(navigationControl.visible)
+					{
+						//隐藏导航控件
+						navigationControl.visible=false;
+					}else{
+						//显示导航控件
+						navigationControl.visible=true;
+					}
+				}
+				
+				
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+</mx:Module>

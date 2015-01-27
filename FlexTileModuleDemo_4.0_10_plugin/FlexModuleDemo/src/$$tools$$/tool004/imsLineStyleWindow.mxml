@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:BasicTileWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+							xmlns:s="library://ns.adobe.com/flex/spark" 
+							xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:components="components.*" 
+							width="242" height="200" x="950" y="200" title="预定义线样式属性">
+	<components:layout>
+		<s:BasicLayout/>
+	</components:layout>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import config.ServerIP;
+			
+			import mx.controls.Alert;
+			import mx.events.ColorPickerEvent;
+			import mx.events.FlexEvent;
+			
+			import spark.events.IndexChangeEvent;
+			
+			import utilEvent.ReadURLEvent;
+			
+			import zdims.drawing.GraphicsLayer;
+			import zdims.map.IMSMap;
+			
+			import zdimsExtends.styles.*;
+			import zdimsExtends.util.LineType;
+			private var style:IMSPredefinedLineStyle;
+			private var chose:Boolean;
+			
+			public var mapContainer:IMSMap;
+			public var basicFlexApp:FlexModuleDemo=null;
+			public var imsLineModule:IMSLineStyleModule=null;
+			
+			private var graphicsLayer:GraphicsLayer=null;
+			
+		
+			public function application1_creationCompleteHandler():void
+			{
+				if(mapContainer==null){
+					Alert.show("未给地图容器赋值");
+					return;
+				}
+				if(graphicsLayer){
+					graphicsLayer.removeAllElements();
+					this.mapContainer.removeElement(graphicsLayer);
+					graphicsLayer=null;
+				}
+				if(graphicsLayer==null){
+					graphicsLayer=new GraphicsLayer();
+					this.mapContainer.addElement(graphicsLayer);
+				}
+				
+				//添加地图容器的鼠标弹起事件，处理取消选择对象
+				this.mapContainer.addEventListener(MouseEvent.MOUSE_UP,Cancle)
+				//new线样式显示对象
+				var line:IMSPredefinedLineStyle;
+				//设置线的坐标
+				var pnts:Vector.<Point>=new Vector.<Point>();		
+				var p:Point;
+				p=new Point(41.99847059269956 , -10.922859993414875);
+				pnts.push(p);
+				p=new Point(53.19370767986862 ,-40.95311797584719);
+				pnts.push(p);
+				p=new Point(90.39078574368858 ,10.023067459998288);
+				pnts.push(p);				
+				line=new IMSPredefinedLineStyle();
+				//将线对象添加到绘图层中
+				this.graphicsLayer.addGraphics(line);
+				//设置线显示样式：虚线
+				line.lineType=zdimsExtends.util.LineType.SYMBOL_DASH;
+				//线坐标
+				line.points=pnts;
+				//线颜色
+				line.color=16711935;
+				//线宽度
+				line.thinkness=4;
+				//添加点击线回调事件：用于选择线对象
+				line.mouseDownCallback=call;
+				//绘制线
+				line.draw();
+				//设置线的坐标
+				pnts=new Vector.<Point>();
+				p=new Point(-42.68808092153128 , 39.0945702186148555);
+				pnts.push(p);
+				p=new Point(-57.49468481101299 ,10.189887541385886);
+				pnts.push(p);
+				p=new Point(-18.311355005921143, 0.8110329469395197);
+				pnts.push(p);
+				p=new Point(-14.88055654372414 , 26.996491430867593);
+				pnts.push(p);
+				p=new Point(-8.380096299561444,  23.38512462855499);
+				pnts.push(p);
+				//new线样式显示对象
+				line=new IMSPredefinedLineStyle();
+				//将线对象添加到绘图层中
+				this.graphicsLayer.addGraphics(line);
+				//设置线显示样式：实线
+				line.lineType=LineType.SYMBOL_SOLID;
+				//线宽度
+				line.thinkness=10;
+				//线坐标
+				line.points=pnts;
+				//添加点击线回调事件：用于选择线对象
+				line.mouseDownCallback=call;
+				//绘制线
+				line.draw();
+			}
+			//点击地图处理事件：清楚鼠标选择的线对象
+			private function Cancle(e:MouseEvent):void
+			{
+				if(!this.chose)
+				{
+					if(this.style!=null&&this.style.enableEdit)
+					{						
+						//将上次选择的线对象设为不可编辑
+						this.style.enableEdit=false;
+						//当前选择对象设为null
+						this.style=null;
+					}
+				}
+				else
+				{
+					this.chose=false;
+				}
+			}
+			//线对象点击监听事件：将鼠标点的线设为当前选择的对象
+			public function call(obj:IMSPredefinedLineStyle):void
+			{		
+				this.chose=true;
+				if(this.style!=null)
+				{
+					//将上次选择的线对象设为不可编辑
+					this.style.enableEdit=false;
+				}
+				//将鼠标选择的线设为当前选择
+				style=obj;
+				//将当前选择的线对象设为可编辑
+				style.enableEdit=true;
+			}
+			//设置线的宽度
+			protected function lineWeight_changeHandler(event:Event):void
+			{
+				setlineWeight();
+			}
+			
+			protected function lineWeight_clickHandler(event:MouseEvent):void
+			{
+				setlineWeight();
+			}
+			protected function setlineWeight():void
+			{
+				if(checkStyle(style))
+				{
+					//设置线的宽度
+					this.style.thinkness=this.lineWeight.value;		
+				}
+				
+			}
+			
+			//设置线的透明度
+			protected function lineAlpha_changeHandler(event:Event):void
+			{
+				setlineAlpha();
+			}
+			protected function lineAlpha_clickHandler(event:MouseEvent):void
+			{
+				setlineAlpha();
+			}
+			
+			protected function setlineAlpha():void
+			{
+				if(checkStyle(style))
+				{
+					//设置线的透明度
+					this.style.alpha=this.lineAlpha.value;
+				}
+			}
+			//设置线的显示样式
+			protected function lineSymbol_changeHandler(event:IndexChangeEvent):void
+			{
+				SetLineSymbol();
+			}
+			protected function lineSymbol_clickHandler(event:MouseEvent):void
+			{
+				SetLineSymbol();
+			}
+			private function SetLineSymbol():void
+			{
+				if(checkStyle(style))
+				{
+					//设置线的显示样式
+					this.style.lineType=this.lineSymbol.selectedItem;
+				}
+			}
+			//设置线端点样式
+			protected function lineCap_changeHandler(event:IndexChangeEvent):void
+			{
+				setCap();
+			}
+			protected function lineCap_clickHandler(event:MouseEvent):void
+			{
+				setCap();
+			}
+			protected function setCap():void
+			{
+				if(checkStyle(style))
+				{
+					//设置线端点显示样式
+					this.style.cap=this.lineCap.selectedItem;
+				}
+			}
+			//设置线拐角显示样式
+			protected function lineJoin_clickHandler(event:MouseEvent):void
+			{
+				SetLineJoin();
+			}
+			
+			protected function lineJoin_changeHandler(event:IndexChangeEvent):void
+			{
+				SetLineJoin();
+			}
+			private function SetLineJoin():void
+			{
+				//设置线拐角显示样式
+				if(checkStyle(style))
+				{
+					this.style.join=this.lineJoin.selectedItem;
+				}
+			}
+			//设置线颜色
+			protected function lineColor_changeHandler(event:ColorPickerEvent):void
+			{
+				if(checkStyle(style))
+				{
+					this.style.color=this.lineColor.selectedItem as uint;
+				}
+			}
+			//检测当前是否选择了线对象
+			public function checkStyle(obj:*):Boolean
+			{
+				if(obj==null)
+				{
+					Alert.show("请选择线！");
+					return false;
+				}
+				else
+				{
+					return true;
+				}
+			}
+			
+			public override function close():void{
+				if(graphicsLayer){
+					graphicsLayer.removeAllElements();
+					this.mapContainer.removeElement(graphicsLayer);
+					graphicsLayer=null;
+				}
+				if(imsLineModule){
+					if(imsLineModule.imsLineWindow){
+						this.basicFlexApp.main.removeElement(imsLineModule.imsLineWindow);
+						imsLineModule.imsLineWindow=null;
+					}
+				}
+			}
+			public override function onMouseUp(e:MouseEvent):void{
+				this.basicFlexApp.main.removeElement(this);
+				this.basicFlexApp.main.addElement(this);
+			}
+		]]>
+	</fx:Script>
+			<mx:Form  paddingBottom="5"
+					  paddingTop="5"
+					  width="100%">
+				<mx:FormItem label="颜色:">
+					<mx:ColorPicker id="lineColor" change="lineColor_changeHandler(event)" selectedColor="0xcc6666"/>
+				</mx:FormItem>
+				<mx:FormItem label="宽度:">
+					<s:HSlider id="lineWeight"
+							   liveDragging="true"
+							   maximum="20"
+							   focusEnabled="false"
+							   minimum="0"
+							   click="lineWeight_clickHandler(event)"
+							   change="lineWeight_changeHandler(event)"
+							   snapInterval="1"
+							   value="4"
+							   width="100"/>
+				</mx:FormItem>
+				<mx:FormItem label="透明度:">
+					<s:HSlider id="lineAlpha"
+							   liveDragging="true"
+							   maximum="1"
+							   minimum="0"
+							   click="lineAlpha_clickHandler(event)"
+							   change="lineAlpha_changeHandler(event)"
+							   focusEnabled="false"
+							   snapInterval="0.01"
+							   value="1"
+							   width="100"/>
+				</mx:FormItem>
+				<mx:FormItem label="线符号:">
+					<s:DropDownList id="lineSymbol"
+									width="100" 
+									fontWeight="normal"
+									horizontalCenter="0"
+									selectedIndex="0"
+									top="35"
+									click="lineSymbol_clickHandler(event)"
+									change="lineSymbol_changeHandler(event)"
+									>
+						<s:ArrayList>
+							<fx:String>dash</fx:String>
+							<fx:String>dashdot</fx:String>
+							<fx:String>dashdotdot</fx:String>
+							<fx:String>dot</fx:String>
+							<fx:String>solid</fx:String>
+							<fx:String>coustom</fx:String>
+						</s:ArrayList>
+					</s:DropDownList>
+				</mx:FormItem>
+				<mx:FormItem label="端点类型:">
+					<s:DropDownList id="lineCap"
+									 width="100"
+									fontWeight="normal"
+									horizontalCenter="0"
+									click="lineCap_clickHandler(event)"
+									change="lineCap_changeHandler(event)"
+									selectedIndex="0"
+									top="35">
+						<s:ArrayList>
+							<fx:String>round</fx:String>
+							<fx:String>square</fx:String>
+						</s:ArrayList>
+					</s:DropDownList>
+				</mx:FormItem>
+				<mx:FormItem label="拐角类型:">
+					<s:DropDownList id="lineJoin"
+									 width="100"
+									fontWeight="normal"
+									horizontalCenter="0"
+									change="lineJoin_changeHandler(event)"
+									click="lineJoin_clickHandler(event)"
+									selectedIndex="2"
+									top="35">
+						<s:ArrayList>
+							<fx:String>bevel</fx:String>
+							<fx:String>miter</fx:String>
+							<fx:String>round</fx:String>
+						</s:ArrayList>
+					</s:DropDownList>
+				</mx:FormItem>
+				
+			</mx:Form>
+
+</components:BasicTileWindow>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="400" height="300"
+		   implements="IClass.BasicInterFace" >
+	<fx:Script>
+		<![CDATA[
+			import IClass.BasicInterFace;
+			
+			import mx.controls.Image;
+			
+			import zdims.drawing.CoordinateType;
+			import zdims.mark.IMSMark;
+			
+			
+			public var hot:HotSpots=null;
+			public var mark:IMSMark=null;
+			
+			public	function loadInit(basicApp:FlexVecModuleDemo,toolId:String):void{
+				
+				if(mark==null){
+					
+					//初始化标注的图片对象
+					var img:Image = new Image();
+					img.source = "$$tools$$/"+toolId+"/markImg/china.png";
+					img.height = 50;
+					img.width = 40;		
+					// 初始化标注对象
+					mark = new IMSMark(img,CoordinateType.Logic);
+					// 设置标注对象的坐标
+					mark.x = 12957973;
+					mark.y = 4982478;			
+					basicApp.marklayer.enableMarkHiden = false;
+					// 将标注添加到绘图图层中	
+					basicApp.marklayer.addMark(mark);
+					
+					if(hot){
+						basicApp.imsmap.removeElement(hot);
+						hot=null;
+					}
+					
+					if(hot==null){
+						hot=new HotSpots();
+						
+						hot.hotLabelText="中国的首都——北京欢迎您！";
+						var area:Array = new Array();
+						area = [new Point(12534231,5100000),new Point(12534231,4688978),new Point(13067422,4688978),new Point(13067422,5100000)];	
+						// 设置热点区域坐标
+						hot.hotAreaDots = area;
+						
+						hot.imsmap =basicApp.imsmap;
+						hot.basicFlexApp = basicApp;
+						hot.hotSpotModule = this;
+						hot.toolId=toolId;
+						basicApp.imsmap.addElement(hot);
+					}
+					
+					basicApp.imsmap.panTo(12957973,3582478);	
+					
+				}else
+				{
+					basicApp.marklayer.removeMark(mark);
+					mark=null;
+					if(hot)
+					{
+						hot.hotArea.removeEventListener(MouseEvent.MOUSE_OVER,hot.onMouseOver);
+						hot.hotArea.removeEventListener(MouseEvent.MOUSE_MOVE,hot.onMouseOver);
+						hot.hotArea.removeEventListener(MouseEvent.MOUSE_OUT,hot.onMouseOut); 
+						basicApp.imsmap.removeElement(hot);
+						hot=null;
+						basicApp.imsmap.refresh();
+					}
+					
+				}
+				
+				
+				
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+</mx:Module>

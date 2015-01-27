@@ -1,0 +1,145 @@
+﻿{"id":"a75749662f714e938c11169d4e9fc44a",
+"name":"FirstWebApp",
+"description":"",
+"version":"v1.0",
+"author":"",
+"default":"",
+"sitePort":59000,
+"webContainer":"6",
+"operationVersion":"Windows 7",
+"netFramework":"4.0",
+"dbType":null,
+"isFrame":true,
+"tools":[
+        { 
+		"id":"tool004",
+		"btnName":"地图导航",
+		"imgSource":"btn01.png",
+		"version":"1.0",
+		"type":"menulist",
+		"checkID":"cloudCheckID",	
+		"serviceurl":"",
+		"swfpage":"NavigationModule.swf"
+		},
+		{ 
+		"id":"tool001",
+		"btnName":"目录树",
+		"imgSource":"btn02.png",
+		"version":"1.0",
+		"type":"menulist",
+		"checkID":"RaincheckID",
+		"serviceurl":"",
+		"swfpage":"CatologModule.swf"
+		},
+
+		{ 
+		"id":"tool002",
+		"btnName":"矢量叠加",
+		"imgSource":"btn03.png",
+		"version":"1.0",
+		"type":"menulist",
+		"checkID":"waterCheckID",	
+		"serviceurl":"",
+		"swfpage":"StackMapModule.swf"
+		},
+		{ 
+		"id":"tool003",
+		"btnName":"添加热点",
+		"imgSource":"btn04.png",
+		"version":"1.0",
+		"type":"menulist",
+		"checkID":"windCheckID",	
+		"serviceurl":"",
+		"swfpage":"HotSpotModule.swf"
+		},
+		{ 
+		"id":"tool005",
+		"btnName":"几何查询",
+		"imgSource":"btn06.png",
+		"version":"1.0",
+		"type":"menulist",
+		"checkID":"contourLineId",	
+		"serviceurl":"",
+		"swfpage":"QueryByGeometryModule.swf"
+		},
+		{ 
+		"id":"tool006",
+		"btnName":"属性条件查询",
+		"imgSource":"btn05.png",
+		"version":"1.0",
+		"type":"menulist",
+		"checkID":"contourPolygonId",	
+		"serviceurl":"",
+		"swfpage":"QueryBySQLModule.swf"
+		}
+			
+		,
+		{ 
+		"id":"tool007",
+		"btnName":"复合查询",
+		"imgSource":"btn07.png",
+		"version":"1.0",
+		"type":"menulist",
+		"checkID":"RaincheckID",
+		"serviceurl":"",
+		"swfpage":"QueryByBothModule.swf"
+		},
+
+
+
+		{ 
+		"id":"tool008",
+		"btnName":"添加要素",
+		"imgSource":"btn17.png",
+		"version":"1.0",
+		"type":"menulist",
+		"checkID":"RaincheckID",
+		"serviceurl":"",
+		"swfpage":"AddDotFeatureModule.swf"
+		},
+		
+		{ 
+		"id":"tool009",
+		"btnName":"缓冲分析",
+		"imgSource":"btn12.png",
+		"version":"1.0",
+		"type":"menulist",
+		"checkID":"waterCheckID",	
+		"serviceurl":"",
+		"swfpage":"BufferModule.swf"
+		},
+		{ 
+		"id":"tool010",
+		"btnName":"裁剪分析",
+		"imgSource":"btn14.png",
+		"version":"1.0",
+		"type":"menulist",
+		"checkID":"windCheckID",	
+		"serviceurl":"",
+		"swfpage":"ClipAnalyseModule.swf"
+		}
+		,
+		{ 
+		"id":"tool011",
+		"btnName":"拓扑分析",
+		"imgSource":"btn16.png",
+		"version":"1.0",
+		"type":"menulist",
+		"checkID":"cloudCheckID",	
+		"serviceurl":"",
+		"swfpage":"TopAnalyseModule.swf"
+		},
+		{ 
+		"id":"tool012",
+		"btnName":"地图打印",
+		"imgSource":"btn15.png",
+		"version":"1.0",
+		"type":"menulist",
+		"checkID":"cloudCheckID",	
+		"serviceurl":"",
+		"swfpage":"PrintMapModule.swf"
+		}
+
+		
+]
+}

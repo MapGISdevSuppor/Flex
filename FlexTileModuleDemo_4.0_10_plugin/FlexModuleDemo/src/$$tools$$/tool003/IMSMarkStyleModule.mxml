@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="400" height="300" implements="IClass.BasicInterFace">
+	<fx:Script>
+		<![CDATA[
+			import IClass.BasicInterFace;
+			
+			import zdims.mark.MarkLayer;
+			public var imsMarkStyleTile:imsMarkStyleWindow=null;
+			public var drawMarkLayer:MarkLayer=null;
+			public	function loadInit(basicApp:FlexModuleDemo,toolId:String):void{
+				
+				if(drawMarkLayer){
+					drawMarkLayer.removeAllElements();
+					drawMarkLayer=null;
+				}
+				if(drawMarkLayer==null){
+					drawMarkLayer=new MarkLayer();
+					basicApp.imsmap.addElement(drawMarkLayer);
+				}
+				if(imsMarkStyleTile){
+					basicApp.main.removeElement(imsMarkStyleTile);
+					imsMarkStyleTile=null;
+				}
+				
+				if(imsMarkStyleTile==null){
+					imsMarkStyleTile=new imsMarkStyleWindow();
+					imsMarkStyleTile.mapContainer=basicApp.imsmap;
+					imsMarkStyleTile.markLayer=drawMarkLayer;
+					imsMarkStyleTile.basicFlexApp=basicApp;
+					imsMarkStyleTile.imsMarkStyleModule=this;
+					imsMarkStyleTile.toolId=toolId;
+					basicApp.main.addElement(imsMarkStyleTile);
+					imsMarkStyleTile.showDotStyleMark();
+				}
+				
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+</mx:Module>

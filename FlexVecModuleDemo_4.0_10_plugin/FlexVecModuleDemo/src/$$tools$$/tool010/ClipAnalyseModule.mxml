@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="400" height="300"
+		   implements="IClass.BasicInterFace" >
+	<fx:Script>
+		<![CDATA[
+			import IClass.BasicInterFace;
+			public var clipAnalyseWindow:ClipAnalyseWindow=null;
+			public	function loadInit(basicApp:FlexVecModuleDemo,toolId:String):void{
+				if(clipAnalyseWindow){
+					clipAnalyseWindow.clearall();
+					clipAnalyseWindow=null;
+				}
+				
+				if(clipAnalyseWindow==null){
+					clipAnalyseWindow=new ClipAnalyseWindow();
+					clipAnalyseWindow.mymap=basicApp.imsmap;
+					clipAnalyseWindow.mapDoc=basicApp.mapdoclayer;
+					clipAnalyseWindow.basicApp=basicApp;
+					clipAnalyseWindow.clipAnalyseModule=this;
+					clipAnalyseWindow.initWindow();
+					basicApp.main.addElement(clipAnalyseWindow);
+					
+				}
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+</mx:Module>

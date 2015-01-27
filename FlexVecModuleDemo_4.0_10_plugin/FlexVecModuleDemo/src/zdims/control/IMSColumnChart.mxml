@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<OverlayObject xmlns="zdims.map.*" 
+			   xmlns:mx="http://www.adobe.com/2006/mxml"
+			   enableUpdatePosition="false"
+			   width="150" height="150"
+			   horizontalScrollPolicy="off" verticalScrollPolicy="off"
+			   creationComplete="init()">
+	<mx:Label id="chartLabel" text="{this.chartlabel}" color="0xff0000" fontFamily="微软雅黑" fontSize="12" y="3"/>
+	<mx:ColumnChart x="0" y="10"  id="chartObj"  
+					width="{this.control.wSlider.value}" height="{this.control.hSlider.value}"  alpha="{this.control.alphaSlider.value}"
+					fontSize="12"  color="0x000000" 
+				    showLabelVertically="true" showDataTips="true" 
+					itemRollOverColor="green">
+			<mx:horizontalAxis>
+                <mx:CategoryAxis id="labelx" categoryField="x" displayName="x" labelFunction="labelFormat"/>
+            </mx:horizontalAxis>
+            
+            <mx:verticalAxis>
+                <mx:LinearAxis id="labely" displayName="y" baseAtZero="true" maximumLabelPrecision="10" />
+            </mx:verticalAxis>
+            <mx:series>
+                <mx:ColumnSeries id="columSeries"
+                    xField="x" 
+                    yField="y" 
+                    displayName="y" 
+					fill="{fillcolor}"
+                    labelPosition="outside"
+				    >				
+				</mx:ColumnSeries>
+            </mx:series>
+	</mx:ColumnChart>
+	<mx:SolidColor id="fillcolor" color="{this.control.cPicker.selectedColor}" />
+	<mx:Script>
+		<![CDATA[
+			import components.ChartControl;
+			
+			import mx.containers.Canvas;
+			import mx.graphics.SolidColor;
+			
+			
+			private var _data:Object=null;
+			private var _width:Number=100;
+			private var _height:Number=100;
+			private var _alpha:Number=1.0;
+			private var _control:ChartControl;
+			private var _chartlabel:String;
+			private var _fillColor:uint;
+			
+	     	override	public function get height():Number
+			{
+				return _height;
+			}
+
+	    	override	public function set height(value:Number):void
+			{
+				if(this.chartObj!=null)
+				{
+					this.chartObj.height=value;
+				}
+				_height = value;
+			}
+
+			public function get fillColor():uint
+			{
+				return _fillColor;
+			}
+
+			public function set fillColor(value:uint):void
+			{
+				if(this.chartObj!=null)
+				{
+					this.fillcolor.color=value;
+				}
+				_fillColor = value;
+			}
+
+			/**
+			 *关联到样式设置控件
+			 */
+
+			public function get chartlabel():String
+			{
+				return _chartlabel;
+			}
+
+			public function set chartlabel(value:String):void
+			{
+				_chartlabel = value;
+			}
+
+			[Inspectable]
+			public function get control():components.ChartControl
+			{
+				return _control;
+			}
+
+			public function set control(value:ChartControl):void
+			{
+				_control = value;
+			}
+
+			/**
+			 *设置数据源
+			 */
+			public function set dataProvider(value:Object):void
+			{
+				if(this.chartObj!=null)
+				{
+					this.chartObj.dataProvider=value;
+				}
+				this._data=value;
+			}
+			public function get dataProvider():Object
+			{
+				return this._data;
+			}
+			
+			/**
+			 *设置统计图宽度
+			 */
+			override public function set width(value:Number):void
+			{
+				if(this.chartObj!=null)
+					this.chartObj.width=value;
+				this._width=value;
+			}
+			override public function get width():Number
+			{
+				return this._width;
+			}
+			
+			/**
+			 *设置统计图的透明度
+			 */
+			override	public function set alpha(value:Number):void
+			{
+				if(this.chartObj!=null)
+				{
+					this.chartObj.alpha=value;
+				}
+				this._alpha=value;
+			}
+			override	public function get alpha():Number
+			{
+				return this._alpha;
+			}
+			
+			/**
+			 *统计图初始化
+			 */
+			public function init():void
+			{
+				this.chartObj.dataProvider=this._data;
+				this.chartObj.alpha=this.control.alphaSlider.value;
+				this.chartObj.width=this.control.wSlider.value;
+				this.chartObj.height=this.control.hSlider.value;
+				this.fillcolor.color=this.control.cPicker.selectedColor;
+				this.chartLabel.x=this.chartObj.width/2;
+				this.chartlabel=this.name;
+				this.chartObj.showDataTips=true;
+			}
+			
+			/**
+			 * 显示文本的处理函数
+			 */
+			private function labelFormat(categoryValue:Object, previousCategoryValue:Object, axis:CategoryAxis, categoryItem:Object):String
+			{
+				categoryValue=categoryValue.toString().substring(categoryValue.toString().indexOf(":")+1);
+				if(categoryValue.toString().length > 8)
+				{
+					return categoryValue.toString().substring(0,5) + "…";
+				}
+				else
+				{
+					return categoryValue.toString();
+				}
+			}
+		]]>
+	</mx:Script>
+</OverlayObject>

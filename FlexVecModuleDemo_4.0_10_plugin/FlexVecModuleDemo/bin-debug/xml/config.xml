@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+	<MapURLConfig>
+		<config>
+		<HDFName>VECTORWORLDDEMO-87DA-4EB7-96F90</HDFName>
+		<MapDocName>worldVecDemo-4319-9F16-1481381E058</MapDocName>
+		<XMinMap>-20040262.133826327</XMinMap>
+		<XMaxMap>20037508.342789248</XMaxMap>
+		<YMinMap>-20037508.342789248</YMinMap>
+		<YMaxMap>20037508.342789248</YMaxMap>
+		<SXMinMap>-2800000</SXMinMap>
+		<SXMaxMap>2800000</SXMaxMap>
+		<SYMinMap>-2800000</SYMinMap>
+		<SYMaxMap>2800000</SYMaxMap>
+		<LevelNum>8</LevelNum>
+		<InitShowLevel>3</InitShowLevel>
+		<RestoreCenterX>0</RestoreCenterX>
+		<RestoreCenterY>0</RestoreCenterY>
+		</config>
+	</MapURLConfig>

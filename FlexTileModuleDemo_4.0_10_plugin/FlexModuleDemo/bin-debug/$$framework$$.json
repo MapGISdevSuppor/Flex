@@ -1,0 +1,123 @@
+﻿{
+"id":"e3c93029725b4aeead7cf6c43c430001",
+"name":"FlexModule_v1.0",
+"description":"Flex综合示例瓦片插件集合",
+"version":"v3.0",
+"author":"ZL",
+"default":"",
+"sitePort":59000,"webContainer":"7",
+"appPoolMode":"集成",
+"operationVersion":"Windows 7",
+"netFramework":"4.0",
+"dbType":null,
+"isFrame":true,
+"tools":[
+
+		{ 
+		"id":"tool001",
+		"name":"ToolApp1",
+		"author":"ZL",
+		"description":"",
+		"default":"",
+		"btnName":"叠加图层",
+		"imgSource":"iconImg/overLayer.png",
+		"version":"1.0",
+		"btnID":"RaincheckID",
+		"serviceurl":"",
+		"swfpage":"ShowStackMapModule.swf"
+		},
+		{ 
+		"id":"tool002",
+		"name":"ToolApp2",
+		"author":"ZL",
+		"description":"",
+		"default":"",
+		"btnName":"图形绘制",
+		"imgSource":"iconImg/DrawPic.png",
+		"version":"1.0",
+		"btnID":"waterCheckID",	
+		"serviceurl":"",
+		"swfpage":"DrawGraphicsModule.swf"
+		},
+		{ 
+		"id":"tool003",
+		"name":"ToolApp3",
+		"author":"ZL",
+		"description":"",
+		"default":"",
+		"btnName":"点样式",
+		"imgSource":"iconImg/PointStyle.png",
+		"version":"1.0",
+		"btnID":"windCheckID",	
+		"serviceurl":"",
+		"swfpage":"IMSMarkStyleModule.swf"
+		},
+		{ 
+		"id":"tool004",
+		"name":"ToolApp4",
+		"author":"ZL",
+		"description":"",
+		"default":"",
+		"btnName":"线样式",
+		"imgSource":"iconImg/LineStyle.png",
+		"version":"1.0",
+		"btnID":"cloudCheckID",	
+		"serviceurl":"",
+		"swfpage":"IMSLineStyleModule.swf"
+		},
+		{ 
+		"id":"tool005",
+		"name":"ToolApp5",
+		"author":"ZL",
+		"description":"",
+		"default":"",
+		"btnName":"填充样式",
+		"imgSource":"iconImg/FillStyle.png",
+		"version":"1.0",
+		"btnID":"contourLineId",	
+		"serviceurl":"",
+		"swfpage":"IMSFillStyleModule.swf"
+		},
+		{ 
+		"id":"tool006",
+		"name":"ToolApp6",
+		"author":"ZL",
+		"description":"",
+		"default":"",
+		"btnName":"标绘",
+		"imgSource":"iconImg/DrawArrow.png",
+		"version":"1.0",
+		"btnID":"contourPolygonId",	
+		"serviceurl":"",
+		"swfpage":"MilitaryStandardModule.swf"
+		}
+		,
+		{ 
+		"id":"tool007",
+		"name":"ToolApp7",
+		"author":"ZL",
+		"description":"",
+		"default":"",
+		"btnName":"聚合标注",
+		"imgSource":"iconImg/Polymeric.png",
+		"version":"1.0",
+		"btnID":"RaincheckID",
+		"serviceurl":"",
+		"swfpage":"PolymericModule.swf"
+		},
+		{ 
+		"id":"tool008",
+		"name":"ToolApp8",
+		"author":"ZL",
+		"description":"",
+		"default":"",
+		"btnName":"统计图",
+		"imgSource":"iconImg/TeMatic.png",
+		"version":"1.0",
+		"btnID":"waterCheckID",	
+		"serviceurl":"",
+		"swfpage":"TeMaticModule.swf"
+		}
+		
+]
+}

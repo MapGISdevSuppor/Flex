@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<OverlayObject xmlns="zdims.map.*" creationComplete="init()" visible="false" show="onShow()" fontSize="12" xmlns:mx="http://www.adobe.com/2006/mxml" >
+<!--	<mx:Label id="hotLabel" x="10"  text=""/>-->
+	<mx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import mx.controls.Image;
+			import mx.controls.Text;
+			import mx.core.IVisualElementContainer;
+			import mx.core.UIComponent;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			import spark.components.Group;
+			import spark.components.Label;
+			import spark.components.TextArea;
+			
+			import zdims.control.IMSRoad;
+			
+			public var basicFlexApp:FlexVecModuleDemo;
+			public var hotSpotModule:HotSpotModule;
+			public var toolId:String="";
+			
+			
+			public var hotArea:IMSRoad=new IMSRoad();
+			public var fillColor:int=0x0BC821;
+			public var hotLabelText:String="";
+			
+		
+			public function set hotAreaDots(value:Array):void
+			{
+				hotArea.setDots(value);
+			}
+			public function init():void
+			{
+				if( hotArea){
+					
+				hotArea.enableFill=true;
+				hotArea.fillColor=0xffffff;
+				hotArea.borderSize=2;
+				if(basicFlexApp.imsmap!=null)
+				{
+					this.hotArea.contextMenu=basicFlexApp.imsmap.contextMenu;
+					basicFlexApp.imsmap.addChild(hotArea);
+					if(basicFlexApp.imsmap.contains(this))
+						basicFlexApp.imsmap.setChildIndex(this,basicFlexApp.imsmap.getChildren().length-1);
+					hotArea.addEventListener(MouseEvent.MOUSE_DOWN,basicFlexApp.imsmap.onMouseDown);
+					hotArea.addEventListener(MouseEvent.MOUSE_MOVE,basicFlexApp.imsmap.onMouseMove);
+					hotArea.addEventListener(MouseEvent.MOUSE_UP,basicFlexApp.imsmap.onMouseUp);
+					hotArea.addEventListener(MouseEvent.DOUBLE_CLICK,basicFlexApp.imsmap.onDoubleClick);
+					hotArea.addEventListener(MouseEvent.MOUSE_WHEEL,basicFlexApp.imsmap.onMouseWheel);
+				}
+				hotArea.addEventListener(MouseEvent.MOUSE_OVER,onMouseOver);
+				hotArea.addEventListener(MouseEvent.MOUSE_MOVE,onMouseOver);
+				hotArea.addEventListener(MouseEvent.MOUSE_OUT,onMouseOut);
+				this.hotArea.alpha=0;
+//				this.hotLabel.text=this.hotLabelText;
+				}else{
+				
+					hotArea.removeEventListener(MouseEvent.MOUSE_OVER,onMouseOver);
+					hotArea.removeEventListener(MouseEvent.MOUSE_MOVE,onMouseOver);
+					hotArea.removeEventListener(MouseEvent.MOUSE_OUT,onMouseOut);
+				}
+
+			}
+			public function onMouseOver(e:Event):void
+			{
+				this.x=this.hotArea.contentMouseX+60;
+				this.y=this.hotArea.contentMouseY;
+				this.visible=true;
+				this.hotArea.alpha=1;
+			}
+			public function onMouseOut(e:Event):void
+			{
+				this.visible=false;
+				this.hotArea.alpha=0;
+			}
+			public function onShow():void
+			{
+								
+				this.graphics.clear();
+				this.graphics.lineStyle(1,0x6CA6CD);
+				this.graphics.beginFill(0xffffff,0.8);
+				this.graphics.moveTo(0,15);
+				this.graphics.lineTo(25,0);
+				this.graphics.lineTo(400,0);
+				this.graphics.lineTo(400,300);
+				this.graphics.lineTo(25,300);
+				this.graphics.lineTo(25,50);
+				this.graphics.moveTo(0,15);
+				this.graphics.endFill();	
+				
+				var txtInfo:Label = new Label();
+				txtInfo.x = 50;
+				txtInfo.y = 20;
+				txtInfo.text = this.hotLabelText;
+				txtInfo.height = 20;               
+				this.addChild(txtInfo);
+				
+				var img:Image = new Image();
+				img.x = 28;
+				img.y = 50;
+				img.width = 370;
+				img.height = 270;
+				img.source = "$$tools$$/"+toolId+"/markImg/beijing.jpg";
+				this.addChild(img);	
+			}
+			
+			
+		]]>
+	</mx:Script>
+</OverlayObject>

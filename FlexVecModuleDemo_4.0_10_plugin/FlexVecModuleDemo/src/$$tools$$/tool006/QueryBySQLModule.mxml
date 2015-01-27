@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="400" height="300"
+		   implements="IClass.BasicInterFace">
+	<fx:Script>
+		<![CDATA[
+			import IClass.BasicInterFace;
+			
+			import utilEvent.ReadURLEvent;
+			
+			import zdims.drawing.GraphicsLayer;
+			import zdims.map.VectorLayer;
+			import zdims.map.VectorLayerBase;
+			import zdims.map.VectorLayerDataCfg;
+			import zdims.map.VectorLayerSource;
+			import zdims.util.IMSOperType;
+			
+			public var queryBySqlWindow:queryBySQLWindow=null;
+			public var graphicsLayer1:GraphicsLayer=null;
+			public var graphicsLayer2:GraphicsLayer=null;
+			public var vectlayer:VectorLayer=null;
+			
+			public	function loadInit(basicApp:FlexVecModuleDemo,toolId:String):void{
+				
+				//将鼠标状态设置为移动
+				basicApp.imsmap.setCurOper(IMSOperType.Drag);
+				
+				if(graphicsLayer1==null)
+				{
+					graphicsLayer1=new GraphicsLayer();
+					graphicsLayer1.id="graphicsly1";
+					basicApp.imsmap.addElement(graphicsLayer1);
+				}
+				if(graphicsLayer2==null)
+				{
+					graphicsLayer2=new GraphicsLayer();
+					graphicsLayer2.id="graphicsly2";
+					basicApp.imsmap.addElement(graphicsLayer2);
+				}
+				
+				if(vectlayer==null)
+				{
+					initLayerShow(basicApp);
+				}else{
+					
+					basicApp.imsmap.removeElement(vectlayer);
+					initLayerShow(basicApp);		
+				}	
+				
+				
+				if(queryBySqlWindow==null){
+					initQueryWindow(basicApp);
+				}else{
+					queryBySqlWindow.close();
+					//basicApp.main.removeElement(queryBySqlWindow);
+					initQueryWindow(basicApp);
+				}			
+			}
+			
+			public function initQueryWindow(basicApp:FlexVecModuleDemo):void{
+				queryBySqlWindow=new queryBySQLWindow();
+				queryBySqlWindow.basicApp=basicApp;
+				queryBySqlWindow.imsmap=basicApp.imsmap;
+				queryBySqlWindow.queryBySQLModule=this;
+				basicApp.main.addElement(queryBySqlWindow);
+			}
+			
+			
+			public function initLayerShow(basicApp:FlexVecModuleDemo):void{
+				var vectorSource:VectorLayerSource=new VectorLayerSource();
+				vectorSource.layerName="世界政区.WP";
+				vectorSource.layerType="简单要素类";
+				var vecDataCfg:VectorLayerDataCfg=new VectorLayerDataCfg();
+				vecDataCfg.GDBName=basicApp.hdfDataName;
+				vecDataCfg.GDBServerName="MapGisLocal";
+				vecDataCfg.layerInfos=[vectorSource];
+				vectlayer=new VectorLayer();
+				vectlayer.layerInfoArr=[vecDataCfg];
+				vectlayer.serverAddress=basicApp.serverAddress;
+				vectlayer.display=false;
+				basicApp.imsmap.addElement(vectlayer);
+				basicApp.imsmap.refresh();
+			}	
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+</mx:Module>

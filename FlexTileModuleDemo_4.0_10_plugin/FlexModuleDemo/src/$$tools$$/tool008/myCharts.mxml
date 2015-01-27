@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<OverlayObject xmlns="zdims.map.*" xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx"
+		   xmlns:components="com.fusioncharts.components.*"
+		   xmlns:ns1="components.mychart.*"
+		   width="440" height="362"
+		   creationComplete="init()" borderStyle="none">
+	<mx:Label id="chartLabel" text="{this.chartlabel}" color="0xff0000" fontFamily="微软雅黑" fontSize="11" width="50%" y="-5"/>
+	<components:FusionCharts  id="chartObj" x="0" y="12"
+							 width="{this.teMatiControl.wSlider.value}" height="{this.teMatiControl.hSlider.value}" alpha="{this.teMatiControl.alphaSlider.value}">
+		
+	</components:FusionCharts>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			
+			import spark.events.IndexChangeEvent;
+			
+			import zdims.event.IMSMapMoveEvent;
+			import zdims.event.IMSMapZoomEvent;
+			import zdims.util.IMSOperType;
+			
+			/**
+			 * _chartType用以标志统计图的类型
+			 */
+			private var _chartType:String="Column2D";
+			private var _chartlabel:String;
+			private var _width:Number;
+			private var _height:Number;
+			private var _alpha:Number=1.0;
+			private var _data:ArrayCollection;
+			private var oldX:Number=0;
+			private var oldY:Number=0;
+			public var teMatiControl:TeMaticTileWindow;
+			
+			/**
+			 *关联到样式设置控件
+			 */
+			
+			public function get chartlabel():String
+			{
+				return _chartlabel;
+			}
+			
+			public function set chartlabel(value:String):void
+			{
+				_chartlabel = value;
+			}
+			
+	
+	
+			/**
+			 *设置数据源
+			 */
+			public function set dataProvider(value:ArrayCollection):void
+			{
+				if(this.chartObj!=null)
+				{
+					this.chartObj.FCData(value);
+				}
+				this._data=value;
+			}
+			public function get dataProvider():ArrayCollection
+			{
+				return this._data;
+			}
+			
+			/**
+			 *设置统计图宽度
+			 */
+			override public function set width(value:Number):void
+			{
+				if(this.chartObj!=null)
+					this.chartObj.width=value;
+				this._width=value;
+			}
+			override public function get width():Number
+			{
+				return this._width;
+			}
+			
+			/**
+			 *设置统计图的透明度
+			 */
+			override	public function set alpha(value:Number):void
+			{
+				if(this.chartObj!=null)
+				{
+					this.chartObj.alpha=value;
+				}
+				this._alpha=value;
+			}
+			override	public function get alpha():Number
+			{
+				return this._alpha;
+			}
+			
+			/**
+			 *统计参数的初始化
+			 */
+			private function initial_param():ArrayCollection
+			{
+				var chartParams:ArrayCollection=new ArrayCollection([
+					{subcaption:''},
+					{showvalues:'1'},
+					{bgAlpha:1},
+					{shadowAlpha:"100"},
+					{bgBorderStyle:'none'},
+					{canvasBorderThickness:'1'},
+					{anchorBgColor:'0xff0000'},
+					{hoverCapBorderColor:'0x00ff00'},
+					{baseFontColor:'0xff0000'},
+					{outCnvBaseFontColor:'0x000000'},
+					
+				]);
+				return chartParams;
+			}
+			
+
+			/**
+			 *统计图初始化
+			 */
+			public function init():void
+			{
+				//统计图样式初始化
+				this.chartObj.alpha=this.teMatiControl.alphaSlider.value;
+				this.chartObj.width=this.teMatiControl.wSlider.value;
+				this.chartObj.height=this.teMatiControl.hSlider.value;
+				this.chartLabel.x=this.chartObj.x+this.chartObj.width/2-13;
+				this.chartlabel=this.name;
+				//统计图数据设置
+				this.chartObj.FCData(this._data);
+				this.chartObj.FCChartType=this._chartType;
+				this.chartObj.FCParams(initial_param());
+				this.chartObj.FCStyles('');
+				this.chartObj.FCRender();
+				this.teMatiControl.myChartType.addEventListener(IndexChangeEvent.CHANGE,onTypeChange);//统计图类型改变事件监听
+			}
+			/**
+			 *统计图类型改变事件处理函数
+			 */
+			private function onTypeChange(evt:IndexChangeEvent):void
+			{
+				if(this.teMatiControl.myChartType.selectedIndex!=-1)
+				{
+					this._chartType=this.teMatiControl.myChartType.selectedItem.data;
+					this.chartObj.FCChartType=this._chartType;
+					this.chartObj.FCRender();
+				}
+			}
+
+		]]>
+	</fx:Script>	
+	
+</OverlayObject>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="400" height="300"
+		   implements="IClass.BasicInterFace" >
+	<fx:Script>
+		<![CDATA[
+			import IClass.BasicInterFace;
+			
+			import mx.controls.Alert;
+			public var bufferTileWindow:BufferTileWindow;
+			public	function loadInit(basicApp:FlexVecModuleDemo,toolId:String):void{
+				
+				if(bufferTileWindow){
+					if(bufferTileWindow.SuccessFlag==true){
+						bufferTileWindow.close();
+						bufferTileWindow=null;
+					}else{
+						Alert.show("正在缓冲分析...请在缓冲分析完成后操作!");	
+						return;
+					}
+					
+				}
+				if(bufferTileWindow==null){
+					bufferTileWindow=new BufferTileWindow();
+					bufferTileWindow.mymap=basicApp.imsmap;
+					bufferTileWindow.mapDoc=basicApp.mapdoclayer;
+					bufferTileWindow.bufferModule=this;
+					bufferTileWindow.basicApp=basicApp;
+					bufferTileWindow.initWindow();
+					basicApp.main.addElement(bufferTileWindow);
+				}
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+</mx:Module>

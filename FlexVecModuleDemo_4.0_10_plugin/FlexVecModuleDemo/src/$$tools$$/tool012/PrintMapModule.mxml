@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="400" height="300"
+		   implements="IClass.BasicInterFace">
+	<fx:Script>
+		<![CDATA[
+			import IClass.BasicInterFace;
+			public var printTileWindow:PrintTileWindow;
+			public	function loadInit(basicApp:FlexVecModuleDemo,toolId:String):void{
+				if(printTileWindow){
+					printTileWindow.close();
+					printTileWindow=null;
+				}
+				if(printTileWindow==null){
+					printTileWindow=new PrintTileWindow();
+					printTileWindow.basicApp=basicApp;
+					printTileWindow.imsmap=basicApp.imsmap;
+					printTileWindow.printMapmodule=this;
+					basicApp.main.addElement(printTileWindow);
+				}
+				
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+</mx:Module>

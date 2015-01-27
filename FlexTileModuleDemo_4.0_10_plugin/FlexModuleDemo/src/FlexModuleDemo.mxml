@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"  minWidth="955" minHeight="600" 
+			   xmlns:map="zdims.map.*"
+			   xmlns:othermap="zdims.othermap.*" xmlns:compants="compants.*"
+			   initialize="application1_initializeHandler(event)"
+			   creationComplete="application1_creationCompleteHandler(event)" xmlns:drawing="zdims.drawing.*" xmlns:mark="zdims.mark.*">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<s:GlowFilter id="glower" alpha="1.0" blurX="6.0" blurY="6.0" color="#000000" inner="false"
+					  knockout="false" quality="2" strength="1"/>
+		<s:GlowFilter id="golowerRight" alpha="1.0" blurX="6.0" blurY="6.0" color="#D70301" inner="false"
+					  knockout="false" quality="2" strength="1"/>
+		<!--收缩的效果-->
+		<s:Resize id="resizerIn" widthTo="0" heightTo="0" target="{btnContainer}"/> 
+		<s:Resize id="resizerOut" widthTo="240" heightTo="364" target="{btnContainer}"/> 
+		<mx:Move id="moveEffect" target="{imgToolContainer}"/> 
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import IClass.BasicInterFace;
+			
+			import com.adobe.serialization.json.JSON;
+			import com.adobe.serialization.json.JSONDecoder;
+			import com.fusioncharts.components.FusionCharts;
+			
+			import components.BasicIMSWindow;
+			
+			import config.ServerIP;
+			
+			import mx.containers.Form;
+			import mx.containers.FormItem;
+			import mx.containers.TabNavigator;
+			import mx.controls.Alert;
+			import mx.controls.CheckBox;
+			import mx.controls.ColorPicker;
+			import mx.controls.NumericStepper;
+			import mx.controls.sliderClasses.Slider;
+			import mx.core.IVisualElement;
+			import mx.events.ColorPickerEvent;
+			import mx.events.FlexEvent;
+			import mx.events.ModuleEvent;
+			import mx.managers.BrowserManager;
+			import mx.managers.IBrowserManager;
+			import mx.managers.PopUpManager;
+			import mx.modules.IModuleInfo;
+			import mx.modules.ModuleManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.http.HTTPService;
+			import mx.utils.URLUtil;
+			
+			import spark.components.Button;
+			import spark.components.ComboBox;
+			import spark.components.DropDownList;
+			import spark.components.HSlider;
+			import spark.components.NavigatorContent;
+			import spark.components.TitleWindow;
+			import spark.layouts.VerticalLayout;
+			
+			import utilEvent.ReadURLEvent;
+			
+			import zdims.control.Measure;
+			import zdims.map.OverlayObject;
+			import zdims.mark.IMSMark;
+			import zdims.util.IMSOperType;
+			
+			import zdimsExtends.Interface.myMarkLayer;
+			import zdimsExtends.mymark.IMSMark;
+			import zdimsExtends.styles.IMSPictureFillStyle;
+			import zdimsExtends.styles.IMSPredefinedFillStyle;
+			import zdimsExtends.styles.IMSPredefinedLineStyle;
+			
+			//------此处声明是为了调用swf里使用了对应的类报错的问题
+			private var temp_Alert:Alert;
+			private var temp_pop:PopUpManager;
+			private var temp_chk:CheckBox;
+			private var temp_basicIWindow:BasicIMSWindow;
+			private var temp_drapdownList:DropDownList;
+			private var temp_imsPredefinedLineStyle:IMSPredefinedLineStyle;
+			private var temp_IMSPredefinedFillStyle:IMSPredefinedFillStyle;
+			private var temp_titleWindow:TitleWindow;
+			private var temp_TabNavigator:TabNavigator;
+			private var temp_Form:Form;
+			private var temp_NavigatorContent:NavigatorContent;
+			private var temp_layerout:VerticalLayout;
+			private var temp_FormItem:FormItem;
+			private var temp_ColorPicker:ColorPicker;
+			private var temp_HSlider:HSlider;
+			private var temp_IMSPictureFillStyle:IMSPictureFillStyle;
+			private var temp_NumericStepper:NumericStepper;
+			private var temp_Button:Button;
+			private var temp_myMarkLayer:myMarkLayer;
+			private var temp_IMSMarkExtends:zdimsExtends.mymark.IMSMark;
+			private var temp_IMSMarkZdims:zdims.mark.IMSMark;
+			private var temp_ComboBox:ComboBox;
+			private var temp_OverlayObject:OverlayObject;
+			private var temp_FusionCharts:FusionCharts;
+			
+			//-----------------------------------------------
+
+			
+			private var viewConfig:ServerIP;
+			
+			/**
+			 * 鼠标点击开始箭头的按钮的标志参数
+			 */ 
+			private var btnContainerFlag:Boolean=true;
+			/**
+			 * 存储json读取出来的插件信息
+			 */
+			private var toolBtnArr:Array=null;
+			/**
+			 * 当前第几页
+			 */
+			private var clickIndex:int=0;
+			/**
+			 * 总的页数
+			 */
+			private var sumPages:int=0;
+			/**
+			 * 存储所有点击了的插件继承的接口对象
+			 */ 
+			private var moudobjArr:Array=new Array();
+			/**
+			 * 存储所有点击了的插件的id
+			 */ 
+			private var toolidArr:Array=new Array();
+			/**
+			 * 调用模块SWF的类
+			 */ 
+			private var _moduleInfo:IModuleInfo;
+			/**
+			 * 当前点击的插件的id
+			 */ 
+			private var sfToolid:String="";
+			/**
+			 * 测量的方法
+			 */ 
+			private var measureObj:Measure=new Measure();
+			
+			private var bm:IBrowserManager;
+			public var serverAddress:String="";
+			private var serverIP:String="127.0.0.1";
+			private var serverPort:String="6163";
+			private var serverLastURL:String="/igs/rest/ims/relayhandler";
+			
+			
+			/**
+			 *加载页面时获取配置文件xml/config.xml里的地址 
+			 */
+			protected function application1_initializeHandler(event:FlexEvent):void
+			{
+				viewConfig=new ServerIP();
+				viewConfig.mapConfig1(this);
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, readURLCompelte);
+			}
+			/**
+			 * 加载配置文件返回的回调函数
+			 */
+			private function readURLCompelte(event:ReadURLEvent):void
+			{
+				
+				bm=BrowserManager.getInstance();
+				bm.init();
+				var url:String = bm.url;
+				if(URLUtil.getServerName(url)!=""&&URLUtil.getServerName(url)!=null){
+					serverIP = URLUtil.getServerName(url);
+				}
+				serverAddress="http://"+serverIP+":"+serverPort+serverLastURL;
+				this.imsmap.xMinMap=viewConfig.XMinMap;
+				this.imsmap.xMaxMap=viewConfig.XMaxMap;
+				this.imsmap.yMinMap=viewConfig.YMinMap;
+				this.imsmap.yMaxMap=viewConfig.YMaxMap;
+				this.imsmap.levelNum=viewConfig.LevelNum;
+				this.imsmap.initShowLevel=viewConfig.InitShowLevel;
+				this.imsmap.restoreCenterX=viewConfig.RestoreCenterX;
+				this.imsmap.restoreCenterY=viewConfig.RestoreCenterY;
+				this.tilelayer.serverAddress=serverAddress;
+				this.tilelayer.hdfName=viewConfig.HDFName;
+				this.eagleEye.levelNum=8;
+				this.eagleTileLayer.hdfName=viewConfig.HDFName;
+				this.eagleTileLayer.serverAddress=serverAddress;
+				this.imsmap.refresh();
+				
+			}
+			
+			//鼠标移入到绘制的图标上改变颜色的效果
+			private function rollOverHandler(event:Event):void{
+				event.currentTarget.filters=[glower];
+			}
+			//鼠标移出到绘制的图标上恢复原始效果
+			private function rollOutHandler(event:Event):void{
+				event.currentTarget.filters=[];
+			}
+			
+			//鼠标移入到绘制的图标上改变颜色的效果
+			private function rollRightOverHandler(event:Event):void{
+				event.currentTarget.filters=[golowerRight];
+			}
+			
+			/**
+			 * 页面加载完成后执行的事件
+			 * 
+			 */ 
+			protected function application1_creationCompleteHandler(event:FlexEvent):void
+			{
+				
+				var jsonService:HTTPService=new HTTPService();  
+				jsonService.url ="$$framework$$.json"; 
+				jsonService.useProxy=false;
+				jsonService.showBusyCursor=true;
+				jsonService.addEventListener(ResultEvent.RESULT, ResultFunc); 
+				jsonService.send();
+				
+				this.eagleEye.switchEagleEye();
+			}
+			/**
+			 * 加载该页面时执行HTTPService读取json格式的文件的回调方法 
+			 * e 结果事件
+			 */ 
+			protected function ResultFunc(e:ResultEvent):void{  
+				// 获取数据 
+				toolBtnArr=new Array();
+				if(e!=null){
+					var dataStr:String=e.result.toString();
+					if(dataStr!=""){
+						var jsonObj:Object = new Object();
+						if(jsonObj!=null){
+							jsonObj = JSON.decode(dataStr);
+							if(jsonObj.tools!=null){
+								if(jsonObj.tools.length>0){
+									for(var i:int=0;i<jsonObj.tools.length;i++){
+										var imgUrl:String=jsonObj.tools[i].imgSource;
+										if(imgUrl!=""){
+											var toolObj:Object=jsonObj.tools[i];
+											toolBtnArr.push(toolObj);
+											if(toolBtnArr.length<=12){
+												createImg(toolObj,toolBtnArr.length);
+											}
+											if(i==jsonObj.tools.length-1){
+												var sumtoolsNum:int=toolBtnArr.length;
+												sumPages=Math.ceil(sumtoolsNum/12);
+											}
+										}
+									}
+								}else{
+									btnContainer.visible=false;
+								}
+							}
+						}
+					}
+				}
+			}
+			/**
+			 * 动态在框架中创建插件按钮的方法
+			 */ 
+			protected function createImg(toolObj:Object,toolIndex:Number):void{
+				//var 
+				var t_Index:int=toolIndex-(this.clickIndex*12);
+				var imgX:int=0;
+				var imgY:int=0;
+				var nindex:int=t_Index%3;
+				var nsum:int=Math.floor((t_Index-1)/3);
+				if(nindex==0){
+					imgX=164;
+					imgY=nsum*80+10;
+				}else if(nindex==1){
+					imgX=10;
+					imgY=nsum*80+10;
+				}else if(nindex==2){
+					imgX=87;
+					imgY=nsum*80+10;
+				}
+				var img:Image=new Image();
+				img.source="$$tools$$/"+toolObj.id+"/"+toolObj.imgSource;
+				img.width=75;
+				img.height=75;
+				img.x=imgX;
+				img.y=imgY;
+				img.buttonMode=true;
+				img.toolTip=toolObj.btnName;
+				img.addEventListener(MouseEvent.ROLL_OUT,rollOutHandler);
+				img.addEventListener(MouseEvent.ROLL_OVER,rollOverHandler);
+				img.addEventListener(MouseEvent.CLICK,function():void{
+					onImgClickHander(toolObj.id,toolObj.swfpage);
+					
+				});
+				imgToolContainer.addElement(img);
+				
+			}
+			
+			/**
+			 * 点击功能按钮
+			 * 
+			 */
+			protected function onImgClickHander(toolID:String,pageUrl:String):void{
+				if(toolID==""){
+					return;
+				}
+				sfToolid=toolID;
+				if(pageUrl!=""){
+					var toolidIndex:int=toolidArr.indexOf(toolID);
+					if(toolidIndex<0){
+						toolidArr.push(toolID);
+						moudobjArr.push(null);
+						_moduleInfo = ModuleManager.getModule("$$tools$$/"+toolID+"/"+pageUrl); 
+						_moduleInfo.addEventListener(ModuleEvent.READY,moduleLoadHandler ); 
+						_moduleInfo.load(); 
+					}else{
+						var moudObj:BasicInterFace=moudobjArr[toolidIndex];
+						if(moudObj!=null){
+								moudObj.loadInit(this,sfToolid);
+						}
+					}
+				}
+			}
+			
+			/**
+			 * 调用对应的swf时的回调函数 
+			 * Parameters:
+			 * event 模块事件
+			 */ 
+			private function moduleLoadHandler(event:ModuleEvent ):void 
+			{ 
+				
+				var moudobj:BasicInterFace=_moduleInfo.factory.create() as BasicInterFace;
+				this.imsmap.addElement( moudobj as  IVisualElement);
+				moudobj.loadInit(this,sfToolid);
+				var toolidIndex:int=toolidArr.indexOf(sfToolid);
+				moudobjArr[toolidIndex]=moudobj;
+			}
+			/**
+			 * 鼠标点击开始箭头标志位的处理方法
+			 */ 
+			protected function startBar_clickHandler(event:MouseEvent):void
+			{
+				if(btnContainerFlag==true){
+					resizerIn.end();
+					resizerIn.play();
+					startBar.source="images/imageBase/TabularUndo.png";
+					btnContainerFlag=false;
+					
+				}else{
+					resizerOut.end();
+					resizerOut.play();
+					startBar.source="images/imageBase/TabularRedo.png";
+					btnContainerFlag=true;
+				}
+				
+			}
+			/**
+			 * 上一页
+			 */ 
+			protected function fowardPage():void{
+				if(clickIndex>0){
+					clickIndex=clickIndex-1;
+					imgToolContainer.removeAllElements();
+					imgToolContainer.x=-240;
+					imgToolContainer.y=0;
+					rePages();
+					moveEffect.end(); 
+					moveEffect.xTo=0; 
+					moveEffect.yTo=0; 
+					moveEffect.play(); 
+					pageIndexLabel.text=(clickIndex+1).toString();
+				}
+			}
+			/**
+			 * 下一页
+			 */ 
+			protected function nextPage():void{
+				
+				if(clickIndex<sumPages-1){
+					
+					clickIndex=clickIndex+1;
+					imgToolContainer.removeAllElements();
+					imgToolContainer.x=240;
+					imgToolContainer.y=0;
+					rePages();
+					moveEffect.end(); 
+					moveEffect.xTo=0; 
+					moveEffect.yTo=0; 
+					moveEffect.play(); 
+					pageIndexLabel.text=(clickIndex+1).toString();
+				}
+			}
+			
+			/**
+			 * 分页重新创建按钮
+			 */ 
+			protected function rePages():void{
+				if(toolBtnArr){
+					var startIndex:int=clickIndex*12;
+					var endIndex:int=(clickIndex+1)*12;
+					for(var i:int=startIndex;i<endIndex;i++){
+						if(toolBtnArr[i]){
+							createImg(toolBtnArr[i],i+1);
+						}
+					}					
+				}
+				
+			}
+			protected function measureLine():void{
+				if(measureObj==null){
+					measureObj=new Measure();
+				}
+				if(measureObj!=null){
+					measureObj.imsmap=this.imsmap;
+					measureObj.setMeasureType('len');
+				}
+			}
+			
+			protected function measurePolygon():void{
+				if(measureObj==null){
+					measureObj=new Measure();
+				}
+				if(measureObj!=null){
+					measureObj.imsmap=this.imsmap;
+					measureObj.setMeasureType('area');
+				}
+			}
+		
+			
+		]]>
+	</fx:Script>
+	<s:BorderContainer x="0" y="0" id="main" width="100%" height="100%">
+		<map:IMSMap   x="0" y="0" id="imsmap" width="100%" height="100%"
+					  enableProgressBar="false" >
+			
+			
+			<!--显示瓦片地图-->
+			<map:TileLayer x="0" y="0" id="tilelayer" autoGetMapBound="true"   >
+			</map:TileLayer>
+			<map:IMSEagleEye bottom="0"   id="eagleEye" right="0" borderThickness="4"  imsmap="{imsmap}" eagleLocation="右下"
+							 levelDiff="1">
+				<!-- 鹰眼地图-->
+				<map:TileLayer x="0" y="0" id="eagleTileLayer"  >
+				</map:TileLayer>
+			</map:IMSEagleEye>
+			<drawing:GraphicsLayer x="464" y="162" id="graphicsLayer">
+			</drawing:GraphicsLayer>
+			<mark:MarkLayer x="464" y="104" id="markLayer">
+			</mark:MarkLayer>
+		</map:IMSMap>
+		<!--右侧的快捷功能按钮-->
+		<mx:Canvas bottom="200" right="0" width="40" height="320"   borderStyle="solid" borderThickness="1" borderColor="gray" backgroundColor="gray"  backgroundAlpha="0.3" >
+			<mx:Image  right="0" y="0"  width="38" height="38" toolTip="放大" buttonMode="true"  source="images/btnImages/zoom1.png"  
+					   click="{this.imsmap.zoomIn()}"  rollOut="rollOutHandler(event)" rollOver="rollRightOverHandler(event)"/>
+			<mx:Image  right="0" y="40" width="38" height="38" toolTip="缩小" buttonMode="true"   source="images/btnImages/zoom2.png"  
+					   click="{this.imsmap.zoomOut()}"   rollOut="rollOutHandler(event)" rollOver="rollRightOverHandler(event)"/>
+			<mx:Image  right="0" y="80" width="38" height="38"  toolTip="移动"  buttonMode="true"  source="images/btnImages/yidong.png"  
+					   click="{this.imsmap.setCurOper(IMSOperType.Drag)}"  rollOut="rollOutHandler(event)" rollOver="rollRightOverHandler(event)"/>
+			<mx:Image  right="0" y="120" width="38" height="38" toolTip="复位" buttonMode="true"  source="images/btnImages/fuwei.png"  
+					   click="{this.imsmap.restore()}"  rollOut="rollOutHandler(event)" rollOver="rollRightOverHandler(event)"/>
+			<mx:Image  right="0" y="160" width="38" height="38" toolTip="刷新" buttonMode="true"   source="images/btnImages/shuaxin.png"  
+					   click="{this.imsmap.refresh()}"   rollOut="rollOutHandler(event)" rollOver="rollRightOverHandler(event)"/>
+			<mx:Image  right="0" y="200" width="38" height="38"  toolTip="鹰眼" buttonMode="true"   source="images/btnImages/eye.png"  
+					   click="{this.eagleEye.switchEagleEye()}"  rollOut="rollOutHandler(event)" rollOver="rollRightOverHandler(event)"/>
+			<mx:Image  right="0" y="240" width="38" height="38"  toolTip="测距" buttonMode="true"   source="images/btnImages/ceju.png"    
+					   click="measureLine()" rollOut="rollOutHandler(event)" rollOver="rollRightOverHandler(event)"/>
+			<mx:Image  right="0" y="280"  width="38" height="38" toolTip="测面积" buttonMode="true"   source="images/btnImages/cemianji.png"    
+					   click="measurePolygon()" rollOut="rollOutHandler(event)" rollOver="rollRightOverHandler(event)"/>
+			
+		</mx:Canvas>
+		
+		<!--标题栏，开始按钮栏，功能栏-->
+		<s:Group left="0" top="10">
+			<mx:Image  x="0" y="0"  source="images/imageBase/logo.png"  />
+			<mx:Image  id="startBar" x="20" y="65" source="images/imageBase/TabularRedo.png"  
+					   click="startBar_clickHandler(event)" buttonMode="true"  />
+			
+			<mx:Canvas x="40" y="90"  id="btnContainer"  width="250" height="364"  verticalScrollPolicy="off" 
+					   horizontalScrollPolicy="off" backgroundColor="gray" backgroundAlpha="0.4" borderStyle="solid"
+					   borderThickness="3" borderColor="gray">
+				<s:Group id="imgToolContainer"  x="0" y="0">
+				</s:Group>
+				<mx:Image x="10" y="326" alpha="0.5" buttonMode="true" source="images/imageBase/query_left.png"
+						  rollOut="rollOutHandler(event)" rollOver="rollRightOverHandler(event)" click="fowardPage()"/>
+				<mx:Image x="192" y="326" alpha="0.5" buttonMode="true" source="images/imageBase/query_right.png"
+						  rollOut="rollOutHandler(event)" rollOver="rollRightOverHandler(event)" click="nextPage()"/>
+				<mx:Canvas backgroundAlpha="0.8"  horizontalCenter="0" width="30" height="29"   bottom="4" backgroundImage="images/imageBase/numBack.png">
+					<s:Label id="pageIndexLabel"   horizontalCenter="0"  verticalCenter="0" fontSize="14" textAlign="center"   text="1" fontWeight="bold">				
+					</s:Label>	
+				</mx:Canvas>
+			</mx:Canvas>
+		</s:Group>
+		
+	</s:BorderContainer>
+</s:Application>

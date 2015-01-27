@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+	<MapURLConfig>
+		<config>
+		<VectorUrl>http://192.168.17.78:6163/igs/rest/ims/relayhandler</VectorUrl>
+		<TileURL>http://192.168.17.78:6163/igs/rest/ims/relayhandler</TileURL>
+		</config>
+	</MapURLConfig>

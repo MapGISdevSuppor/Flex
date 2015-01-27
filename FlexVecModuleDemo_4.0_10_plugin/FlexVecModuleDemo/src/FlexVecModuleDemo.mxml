@@ -1,0 +1,619 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" xmlns:map="zdims.map.*"
+			   initialize="application1_initializeHandler(event)"
+			   creationComplete="application1_creationCompleteHandler(event)" xmlns:mark="zdims.mark.*">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<s:GlowFilter id="glower" alpha="1.0" blurX="6.0" blurY="6.0" color="#000000" inner="false"
+					  knockout="false" quality="2" strength="1"/>
+		<s:GlowFilter id="golowerRight" alpha="1.0" blurX="6.0" blurY="6.0" color="#D70301" inner="false"
+					  knockout="false" quality="2" strength="1"/>
+		
+		<!--收缩的效果-->
+		<s:Resize id="resizerIn" widthTo="0" heightTo="0" target="{btnContainer}"/> 
+		<s:Resize id="resizerOut" widthTo="940" heightTo="120" target="{btnContainer}"/> 
+		
+		<mx:Move id="moveEffect" target="{imgToolContainer}"/> 
+		
+	</fx:Declarations>
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		@namespace map "zdims.map.*";	
+		mx|ToolTip { 
+			backgroundColor: black; 
+			backgroundAlpha: 0.5; 
+			cornerRadius: 0; 
+			color: white; 
+			fontSize: 12; 
+			borderColor: white;
+		} 
+	</fx:Style>
+	
+	<fx:Script>
+		<![CDATA[
+			import $$tools$$.tool003.HotSpots;
+			import $$tools$$.tool008.AddDotFeatureWindow;
+			
+			import IClass.BasicInterFace;
+			
+			import com.adobe.serialization.json.JSON;
+			import com.adobe.serialization.json.JSONDecoder;
+			
+			import components.BasicIMSWindow;
+			
+			import config.ServerIP;
+			
+			import mx.collections.ArrayList;
+			import mx.containers.Form;
+			import mx.containers.FormItem;
+			import mx.containers.HBox;
+			import mx.containers.TabNavigator;
+			import mx.controls.AdvancedDataGrid;
+			import mx.controls.Alert;
+			import mx.controls.Button;
+			import mx.controls.CheckBox;
+			import mx.controls.ColorPicker;
+			import mx.controls.ComboBase;
+			import mx.controls.ComboBox;
+			import mx.controls.DataGrid;
+			import mx.controls.HRule;
+			import mx.controls.Label;
+			import mx.controls.LinkButton;
+			import mx.controls.NumericStepper;
+			import mx.controls.ProgressBar;
+			import mx.controls.Text;
+			import mx.controls.TextInput;
+			import mx.controls.advancedDataGridClasses.AdvancedDataGridColumn;
+			import mx.controls.dataGridClasses.DataGridColumn;
+			import mx.controls.sliderClasses.Slider;
+			import mx.core.IVisualElement;
+			import mx.core.UIComponent;
+			import mx.events.ColorPickerEvent;
+			import mx.events.FlexEvent;
+			import mx.events.ModuleEvent;
+			import mx.managers.PopUpManager;
+			import mx.modules.IModuleInfo;
+			import mx.modules.ModuleManager;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.http.HTTPService;
+			
+			import myControls.IMSWindow;
+			import myControls.SuperPanel;
+			
+			import spark.components.Button;
+			import spark.components.CheckBox;
+			import spark.components.ComboBox;
+			import spark.components.DropDownList;
+			import spark.components.HGroup;
+			import spark.components.HSlider;
+			import spark.components.Label;
+			import spark.components.NavigatorContent;
+			import spark.components.RadioButton;
+			import spark.components.TextArea;
+			import spark.components.TextInput;
+			import spark.components.TitleWindow;
+			import spark.components.VGroup;
+			import spark.layouts.VerticalLayout;
+			
+			import utilEvent.ReadURLEvent;
+			
+			import zdims.Marker;
+			import zdims.control.HotSpot;
+			import zdims.control.IMSCatalog;
+			import zdims.control.Marker;
+			import zdims.control.Measure;
+			import zdims.control.NavigationBar;
+			import zdims.control.layer.LayerDataViewer;
+			import zdims.mark.MarkBase;
+			import zdims.util.IMSOperType;
+			import zdims.util.RectBound;
+			
+			//------此处声明是为了调用swf里使用了对应的类报错的问题
+			private var temp_Alert:Alert;
+			private var temp_pop:PopUpManager;
+			//private var temp_chk:CheckBox;
+			public var temp_chk:mx.controls.CheckBox;
+			public var temp_check:spark.components.CheckBox;
+			public var temp_basicIWindow:BasicIMSWindow;
+			public var temp_drapdownList:DropDownList;
+			public var temp_titleWindow:TitleWindow;
+			public var temp_TabNavigator:TabNavigator;
+			private var temp_Form:Form;
+			private var temp_NavigatorContent:NavigatorContent;
+			private var temp_layerout:VerticalLayout;
+			private var temp_FormItem:FormItem;
+			private var temp_ColorPicker:ColorPicker;
+			private var temp_HSlider:HSlider;
+			private var temp_NumericStepper:NumericStepper;
+			public var temp_btn:mx.controls.Button;
+			public var temp_Label:mx.controls.Label;
+			private var temp_ComboBox:mx.controls.ComboBox;
+			private var temp_ArrayList:ArrayList;
+			private var temp_UI:UIComponent;
+			private var temp_DataGrid:DataGrid;
+			private var temp_IMSWindow:IMSWindow;
+			public var temp_TextInput:mx.controls.TextInput;
+			public var temp_LinkButton:LinkButton;
+			private var temp_DropDownList:DropDownList;
+			
+			
+			
+			private var temp_IMSCatalog:IMSCatalog;
+			private var temp_HotPot:HotSpot;
+			private var temp_HotPots:HotSpots;
+			private var temp_Marker:zdims.control.Marker;
+			private var temp_Navigation:NavigationBar;
+			private var temp_LayerDataViewer:LayerDataViewer;
+			private var temp_SuperPanel:SuperPanel;
+			
+			
+			private var temp_VGroup:VGroup;
+			private var temp_HGroup:HGroup;
+			private var temp_SparkButton:spark.components.Button;
+			private var temp_sparkTextInput:spark.components.TextInput;
+			
+			private var temp_ProgressBar:ProgressBar;
+			
+			private var temp_RadioButton:RadioButton;
+			private var temp_HBox:HBox;
+			private var temp_MXTextInput:mx.controls.TextInput;
+			private var temp_HRule:HRule;
+			
+			private var temp_TextArea:TextArea;
+			//	private var temp_:AddDotFeatureWindow;
+			
+			//private var DataGridColumn:DataGridColumn;
+			private var temp_AdvancedDataGrid:AdvancedDataGrid;
+			private var temp_AdvancedDataGridColumn:AdvancedDataGridColumn;
+			
+			
+			//-----------------------------------------------
+			
+			
+			
+			
+			
+			/**
+			 *访问地图的地址 
+			 */
+			public var serverAddress:String="";
+			
+			private var viewConfig:ServerIP;
+			
+			/**
+			 * 鼠标点击开始箭头的按钮的标志参数
+			 */ 
+			private var btnContainerFlag:Boolean=true;
+			/**
+			 * 存储json读取出来的插件信息
+			 */
+			private var toolBtnArr:Array=null;
+			/**
+			 * 当前第几页
+			 */
+			private var clickIndex:int=0;
+			/**
+			 * 总的页数
+			 */
+			private var sumPages:int=0;
+			/**
+			 * 当前页图标
+			 */
+			private var actImg:Image=null;
+			/**
+			 * 存储所有点击了的插件继承的接口对象
+			 */ 
+			private var moudobjArr:Array=new Array();
+			/**
+			 * 存储所有点击了的插件的id
+			 */ 
+			private var toolidArr:Array=new Array();
+			/**
+			 * 调用模块SWF的类
+			 */ 
+			private var _moduleInfo:IModuleInfo;
+			/**
+			 * 当前点击的插件的id
+			 */ 
+			private var sfToolid:String="";
+			/**
+			 * 测量的方法
+			 */ 
+			private var measureObj:Measure=new Measure();
+			
+			public var hdfDataName:String="VECTORWORLDDEMO-87DA-4EB7-96F901";
+			
+			
+			/**
+			 *加载页面时获取配置文件xml/config.xml里的地址 
+			 */
+			protected function application1_initializeHandler(event:FlexEvent):void
+			{
+				viewConfig=new ServerIP();
+				viewConfig.mapConfig1(this);
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, readURLCompelte);
+			}
+			/**
+			 * 加载配置文件返回的回调函数
+			 */
+			private function readURLCompelte(event:ReadURLEvent):void
+			{
+				serverAddress=viewConfig.vectorURL;
+				this.imsmap.xMinMap=viewConfig.XMinMap;
+				this.imsmap.xMaxMap=viewConfig.XMaxMap;
+				this.imsmap.yMinMap=viewConfig.YMinMap;
+				this.imsmap.yMaxMap=viewConfig.YMaxMap;
+				if(mapdoclayer){
+					this.mapdoclayer.mapDocName=viewConfig.MapDocName;
+					this.mapdoclayer.serverAddress=viewConfig.vectorURL;				
+				}
+				
+				//	this.eagleMapDocLayer.serverAddress=viewConfig.vectorURL;
+				//	this.eagleMapDocLayer.mapDocName=viewConfig.MapDocName;
+				this.hdfDataName=viewConfig.HDFName;
+			
+				this.imsmap.refresh();
+				
+			}
+			
+			
+			
+			
+			//鼠标移入到绘制的图标上改变颜色的效果
+			private function rollOverHandler(event:Event):void{
+				event.currentTarget.filters=[glower];
+			}
+			//鼠标移出到绘制的图标上恢复原始效果
+			private function rollOutHandler(event:Event):void{
+				event.currentTarget.filters=[];
+			}
+			
+			//鼠标移入到绘制的图标上改变颜色的效果
+			private function rollRightOverHandler(event:Event):void{
+				event.currentTarget.filters=[golowerRight];
+			}
+			
+			/**
+			 * 页面加载完成后执行的事件
+			 * 
+			 */ 
+			protected function application1_creationCompleteHandler(event:FlexEvent):void
+			{
+				var jsonService:HTTPService=new HTTPService();  
+				jsonService.url ="$$framework$$.json"; 
+				jsonService.useProxy=false;
+				jsonService.showBusyCursor=true;
+				jsonService.addEventListener(ResultEvent.RESULT, ResultFunc); // 省略ResultFunc方法 
+				jsonService.send();
+				//初始加载自定义范围的矢量地图
+				var rect:RectBound = new RectBound();
+				rect.xMax=viewConfig.SXMaxMap;
+				rect.xMin=viewConfig.SXMinMap;;
+				rect.yMax=viewConfig.SYMaxMap;
+				rect.yMin=viewConfig.SYMinMap;
+				this.imsmap.jumpByRectBound(rect);
+				this.eagleEye.switchEagleEye();//鹰眼
+			}
+			
+			/**
+			 * 加载该页面时执行HTTPService读取json格式的文件的回调方法 
+			 * e 结果事件
+			 */ 
+			protected function ResultFunc(e:ResultEvent):void{  
+				// 获取数据 
+				toolBtnArr=new Array();
+				if(e!=null){
+					var dataStr:String=e.result.toString();
+					if(dataStr!=""){
+						var jsonObj:Object = new Object();
+						if(jsonObj!=null){
+							jsonObj = JSON.decode(dataStr);
+							if(jsonObj.tools!=null){
+								if(jsonObj.tools.length>0){
+									for(var i:int=0;i<jsonObj.tools.length;i++){
+										var imgUrl:String=jsonObj.tools[i].imgSource;
+										if(imgUrl!=""){
+											var toolObj:Object=jsonObj.tools[i];
+											toolBtnArr.push(toolObj);
+											if(toolBtnArr.length<=7){
+												createImg(toolObj,toolBtnArr.length);
+											}
+											if(i==jsonObj.tools.length-1){
+												var sumtoolsNum:int=toolBtnArr.length;
+												sumPages=Math.ceil(sumtoolsNum/7);
+											}
+										}
+									}
+								}else{
+									this.visible=false;
+								}
+							}
+						}
+					}
+				}
+				for (var j:int=0;j<sumPages;j++)
+				{
+					createFlag(j);//加载页面图标
+				}
+				createActFlag();//加载当前页面图标
+				
+			}
+			
+			/**
+			 * 动态在框架中创建框架页面图标的方法
+			 */ 
+			protected function createFlag(pageIndex:Number):void{
+				var imgX:int=0;
+				var imgY:int=0;
+				imgX = (pageIndex-1)*32;
+				var img:Image=new Image();
+				img.source="images/imageBase/d22.png";
+				img.width=32;
+				img.height=20;
+				img.x=imgX;
+				img.y=imgY;
+				page.addElement(img);	
+			}
+			
+			
+			/**
+			 * 动态在框架中创建框架当前页面图标的方法
+			 */ 
+			protected function createActFlag():void{
+				var imgX:int=0;
+				var imgY:int=0;
+				imgX = (clickIndex-1)*32;
+				actImg =new Image();
+				actImg.x = imgX;
+				actImg.y = imgY;
+				actImg.source="images/imageBase/d11.png";
+				actImg.width=32;
+				actImg.height=20;
+				page.addElement(actImg);
+			}
+			
+			
+			/**
+			 * 动态在框架中创建插件按钮的方法
+			 */ 
+			protected function createImg(toolObj:Object,toolIndex:Number):void{
+				//var 
+				var t_Index:int=toolIndex-(this.clickIndex*7);
+				var imgX:int=0;
+				var imgY:int=0;
+				imgX = (t_Index-1)*100+t_Index*22; //图标的x值
+				var img:Image=new Image();
+				img.source="images/icon/"+toolObj.imgSource;
+				img.width=100;
+				img.height=100;
+				img.x=imgX;
+				img.y=imgY;
+				img.buttonMode=true;
+				img.toolTip=toolObj.btnName;
+				img.addEventListener(MouseEvent.ROLL_OUT,rollOutHandler);
+				img.addEventListener(MouseEvent.ROLL_OVER,rollOverHandler);
+				img.addEventListener(MouseEvent.CLICK,function():void{
+					
+					onImgClickHander(toolObj.id,toolObj.swfpage);
+					
+				});
+				imgToolContainer.addElement(img);
+				
+			}
+			
+			/**
+			 * 点击功能按钮
+			 * 
+			 */
+			protected function onImgClickHander(toolID:String,pageUrl:String):void{
+				
+				if(imsmap){
+					this.imsmap.setCurOper(IMSOperType.Drag);
+				}
+				
+				
+				if(toolID==""){
+					return;
+				}
+				sfToolid=toolID;
+				if(pageUrl!=""){
+					var toolidIndex:int=toolidArr.indexOf(toolID);
+					if(toolidIndex<0){
+						toolidArr.push(toolID);
+						moudobjArr.push(null);
+						_moduleInfo = ModuleManager.getModule("$$tools$$/"+toolID+"/"+pageUrl); 
+						_moduleInfo.addEventListener(ModuleEvent.READY,moduleLoadHandler ); 
+						_moduleInfo.load(); 
+					}else{
+						var moudObj:BasicInterFace=moudobjArr[toolidIndex];
+						if(moudObj!=null){
+							moudObj.loadInit(this,sfToolid);
+						}
+					}
+				}
+			}
+			
+			/**
+			 * 调用对应的swf时的回调函数 
+			 * Parameters:
+			 * event 模块事件
+			 */ 
+			private function moduleLoadHandler(event:ModuleEvent ):void 
+			{ 
+				
+				var moudobj:BasicInterFace=_moduleInfo.factory.create() as BasicInterFace;
+				this.imsmap.addElement( moudobj as  IVisualElement);
+				moudobj.loadInit(this,sfToolid);
+				var toolidIndex:int=toolidArr.indexOf(sfToolid);
+				moudobjArr[toolidIndex]=moudobj;
+			}
+			
+			
+			
+			
+			/**
+			 * 鼠标点击开始箭头标志位的处理方法
+			 */ 
+			protected function startBar_clickHandler(event:MouseEvent):void
+			{
+				if(btnContainerFlag==true){
+					resizerIn.end();
+					resizerIn.play();
+					startBar.source="images/imageBase/bottom.png";
+					btnContainerFlag=false;
+					
+				}else{
+					resizerOut.end();
+					resizerOut.play();
+					startBar.source="images/imageBase/up.png";
+					btnContainerFlag=true;
+				}
+				
+			}
+			/**
+			 * 上一页
+			 */ 
+			protected function fowardPage():void{
+				if(clickIndex>0){
+					clickIndex=clickIndex-1;
+					imgToolContainer.removeAllElements();
+					page.removeElement(actImg);
+					//imgToolContainer.x=-240;
+					//imgToolContainer.y=0;
+					rePages();
+					moveEffect.end(); 
+					moveEffect.xTo=0; 
+					moveEffect.yTo=0; 
+					moveEffect.play(); 
+				}
+			}
+			/**
+			 * 下一页
+			 */ 
+			protected function nextPage():void{
+				
+				if(clickIndex<sumPages-1){
+					
+					clickIndex=clickIndex+1;
+					imgToolContainer.removeAllElements();
+					page.removeElement(actImg);
+					//imgToolContainer.x=240;
+					//imgToolContainer.y=0;
+					rePages();
+					
+					moveEffect.end(); 
+					moveEffect.xTo=0; 
+					moveEffect.yTo=0; 
+					moveEffect.play(); 
+					
+				}
+			}
+			
+			/**
+			 * 分页重新创建按钮
+			 */ 
+			protected function rePages():void{
+				if(toolBtnArr){
+					var startIndex:int=clickIndex*7;
+					var endIndex:int=(clickIndex+1)*7;
+					for(var i:int=startIndex;i<endIndex;i++){
+						if(toolBtnArr[i]){
+							createImg(toolBtnArr[i],i+1);
+						}
+					}
+					createActFlag();
+					
+				}		
+			}
+			/**
+			 * 距离测量
+			 */
+			protected function measureLine():void{
+				if(measureObj==null){
+					measureObj=new Measure();
+				}
+				if(measureObj!=null){
+					measureObj.imsmap=this.imsmap;
+					measureObj.setMeasureType('len');
+				}
+			}
+			/**
+			 * 面积测量
+			 */
+			protected function measurePolygon():void{
+				if(measureObj==null){
+					measureObj=new Measure();
+				}
+				if(measureObj!=null){
+					measureObj.imsmap=this.imsmap;
+					measureObj.setMeasureType('area');
+				}
+			}
+			
+			
+			
+			//导航条
+			
+			
+			
+		]]>
+	</fx:Script>
+	
+	<s:BorderContainer  x="0" y="0" id="main" width="100%" height="100%">
+		<s:BorderContainer id="printBorder" x="0" y="0" height="100%" width="100%" >
+			<map:IMSMap x="0" y="0" width="100%" height="100%" id="imsmap" enableProgressBar="true">
+				<!-- 加载矢量地图文档-->
+				<map:VectorMapDoc x="0" y="0" id="mapdoclayer" autoGetMapBound="true" >
+				</map:VectorMapDoc>
+				<map:IMSEagleEye bottom="0"   id="eagleEye" right="0" borderThickness="4"  imsmap="{imsmap}" eagleLocation="右上"
+								 levelDiff="1">
+					<!-- 鹰眼地图-->
+					
+				</map:IMSEagleEye>
+				<mark:MarkLayer x="0" y="0" id="marklayer">
+				</mark:MarkLayer>
+				
+			</map:IMSMap>
+		</s:BorderContainer>
+		<!--左侧的快捷功能按钮-->
+		<mx:Canvas width="55" height="340" right="0" verticalCenter="0">
+			<mx:Image  right="0" y="0"  toolTip="放大" buttonMode="true"  source="images/btnImages/01.png"  
+					   click="{this.imsmap.zoomIn()}"  rollOut="rollOutHandler(event)" rollOver="rollRightOverHandler(event)"/>
+			<mx:Image  right="0" y="40"  toolTip="缩小" buttonMode="true"   source="images/btnImages/02.png"  
+					   click="{this.imsmap.zoomOut()}"   rollOut="rollOutHandler(event)" rollOver="rollRightOverHandler(event)"/>
+			<mx:Image  right="0" y="80"  toolTip="移动"  buttonMode="true"  source="images/btnImages/03.png"  
+					   click="{this.imsmap.setCurOper(IMSOperType.Drag)}"  rollOut="rollOutHandler(event)" rollOver="rollRightOverHandler(event)"/>
+			<mx:Image  right="0" y="120"  toolTip="复位" buttonMode="true"  source="images/btnImages/04.png"  
+					   click="{this.imsmap.restore()}"  rollOut="rollOutHandler(event)" rollOver="rollRightOverHandler(event)"/>
+			<mx:Image  right="0" y="160"  toolTip="刷新" buttonMode="true"   source="images/btnImages/05.png"  
+					   click="{this.imsmap.refresh()}"   rollOut="rollOutHandler(event)" rollOver="rollRightOverHandler(event)"/>
+			<mx:Image  right="0" y="200"  toolTip="鹰眼" buttonMode="true"   source="images/btnImages/06.png"  
+					   click="{this.eagleEye.switchEagleEye()}"  rollOut="rollOutHandler(event)" rollOver="rollRightOverHandler(event)"/>
+			<mx:Image  right="0" y="240"  toolTip="测距" buttonMode="true"   source="images/btnImages/07.png"    
+					   click="measureLine()" rollOut="rollOutHandler(event)" rollOver="rollRightOverHandler(event)"/>
+			<mx:Image  right="0" y="280"  toolTip="测面积" buttonMode="true"   source="images/btnImages/08.png"    
+					   click="measurePolygon()" rollOut="rollOutHandler(event)" rollOver="rollRightOverHandler(event)"/>
+			
+		</mx:Canvas>
+		<!--底部工具面板-->
+		<mx:Image  x="0" y="0"  source="images/imageBase/logo.png"  />
+		
+		<mx:Canvas  bottom="20" id="btnContainer"  width="940" height="120"  verticalScrollPolicy="off" 
+					horizontalScrollPolicy="off"  borderColor="gray" backgroundImage="@Embed(source='images/imageBase/bg2.png')" horizontalCenter="0">
+			<s:Group id="imgToolContainer" bottom="25" left="30">
+				
+			</s:Group>
+			<mx:Image  alpha="0.5" buttonMode="true" source="images/imageBase/lf.png"
+					   rollOut="rollOutHandler(event)" rollOver="rollRightOverHandler(event)" click="fowardPage()" left="20" bottom="15"/>
+			<mx:Image alpha="0.5" buttonMode="true" source="images/imageBase/rt.png"
+					  rollOut="rollOutHandler(event)" rollOver="rollRightOverHandler(event)" click="nextPage()" right="20" bottom="15"/>
+			<s:Group id="page" horizontalCenter="0"  bottom="5" >
+			</s:Group>
+		</mx:Canvas>
+		<mx:Image  id="startBar" horizontalCenter="0"  bottom="0" source="images/imageBase/up.png"  
+				   click="startBar_clickHandler(event)" buttonMode="true"  />
+	</s:BorderContainer>
+</s:Application>

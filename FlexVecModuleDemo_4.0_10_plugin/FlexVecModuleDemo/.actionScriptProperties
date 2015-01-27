@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<actionScriptProperties mainApplicationPath="FlexVecModuleDemo.mxml" projectUUID="0c118672-087f-41d2-b0f4-f94610eb293c" version="6">
+  <compiler additionalCompilerArguments="-locale zh_CN" autoRSLOrdering="true" copyDependentFiles="true" fteInMXComponents="false" generateAccessible="true" htmlExpressInstall="true" htmlGenerate="true" htmlHistoryManagement="true" htmlPlayerVersionCheck="true" includeNetmonSwc="false" outputFolderPath="bin-debug" sourceFolderPath="src" strict="true" targetPlayerVersion="0.0.0" useApolloConfig="false" useDebugRSLSwfs="true" verifyDigests="true" warn="true">
+    <compilerSourcePath/>
+    <libraryPath defaultLinkType="0">
+      <libraryPathEntry kind="4" path="">
+        <excludedEntries>
+          <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/flex.swc" useDefaultLinkType="false"/>
+        </excludedEntries>
+      </libraryPathEntry>
+      <libraryPathEntry kind="1" linkType="1" path="libs"/>
+    </libraryPath>
+    <sourceAttachmentPath/>
+  </compiler>
+  <theme themeIsDefault="false" themeIsSDK="true" themeLocation="${SDK_THEMES_DIR}/frameworks/themes/Halo"/>
+  <applications>
+    <application path="FlexVecModuleDemo.mxml"/>
+  </applications>
+  <modules>
+    <module destPath="$$tools$$/tool001/CatologModule.swf" optimize="false" sourcePath="src/$$tools$$/tool001/CatologModule.mxml"/>
+    <module destPath="$$tools$$/tool002/StackMapModule.swf" optimize="false" sourcePath="src/$$tools$$/tool002/StackMapModule.mxml"/>
+    <module destPath="$$tools$$/tool003/HotSpotModule.swf" optimize="false" sourcePath="src/$$tools$$/tool003/HotSpotModule.mxml"/>
+    <module destPath="$$tools$$/tool004/NavigationModule.swf" optimize="false" sourcePath="src/$$tools$$/tool004/NavigationModule.mxml"/>
+    <module destPath="$$tools$$/tool005/QueryByGeometryModule.swf" optimize="false" sourcePath="src/$$tools$$/tool005/QueryByGeometryModule.mxml"/>
+    <module destPath="$$tools$$/tool006/QueryBySQLModule.swf" optimize="false" sourcePath="src/$$tools$$/tool006/QueryBySQLModule.mxml"/>
+    <module destPath="$$tools$$/tool007/QueryByBothModule.swf" optimize="false" sourcePath="src/$$tools$$/tool007/QueryByBothModule.mxml"/>
+    <module destPath="$$tools$$/tool008/AddDotFeatureModule.swf" optimize="false" sourcePath="src/$$tools$$/tool008/AddDotFeatureModule.mxml"/>
+    <module destPath="$$tools$$/tool009/BufferModule.swf" optimize="false" sourcePath="src/$$tools$$/tool009/BufferModule.mxml"/>
+    <module destPath="$$tools$$/tool010/ClipAnalyseModule.swf" optimize="false" sourcePath="src/$$tools$$/tool010/ClipAnalyseModule.mxml"/>
+    <module destPath="$$tools$$/tool011/TopAnalyseModule.swf" optimize="false" sourcePath="src/$$tools$$/tool011/TopAnalyseModule.mxml"/>
+    <module destPath="$$tools$$/tool012/PrintMapModule.swf" optimize="false" sourcePath="src/$$tools$$/tool012/PrintMapModule.mxml"/>
+  </modules>
+  <buildCSSFiles/>
+</actionScriptProperties>

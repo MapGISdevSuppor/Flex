@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:BasicTileWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+							xmlns:s="library://ns.adobe.com/flex/spark" 
+							xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:components="components.*"
+							width="260" height="235" x="950" y="150" title="拓扑分析窗口" fontFamily="宋体" fontSize="12">
+	<components:layout>
+		<s:BasicLayout/>
+	</components:layout>
+	<fx:Declarations>
+		<s:RadioButtonGroup id="radiogroup1"/>
+		<s:RadioButtonGroup id="radiogroup2"/>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import Mapgis7.WebService.BasLib.AnyLine;
+			import Mapgis7.WebService.BasLib.Arc;
+			import Mapgis7.WebService.BasLib.CGetObjByID;
+			import Mapgis7.WebService.BasLib.CLayerAccessInfo;
+			import Mapgis7.WebService.BasLib.CLayerInfo;
+			import Mapgis7.WebService.BasLib.CRegionRelationAnalyse;
+			import Mapgis7.WebService.BasLib.Dot_2D;
+			import Mapgis7.WebService.BasLib.GRegion;
+			import Mapgis7.WebService.BasLib.SFeatureGeometry;
+			
+			import config.ServerIP;
+			
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			
+			import utilEvent.ReadURLEvent;
+			
+			import zdims.drawing.CoordinateType;
+			import zdims.drawing.GraphicsLayer;
+			import zdims.drawing.IMSPolygon;
+			import zdims.interfaces.IGraphics;
+			import zdims.map.IMSMap;
+			import zdims.map.VectorMapDoc;
+			import zdims.util.SpacialAnalyse;
+			private var _firstFeature:SFeatureGeometry;
+			private var _secondFeature:SFeatureGeometry;
+			private var _firstPoly:IMSPolygon;
+			private var _secondPoly:IMSPolygon;
+			private var _spatial:SpacialAnalyse;
+			private var secondNum:Number=0;
+		
+			private var graphicsLayer:GraphicsLayer;
+			public var mymap:IMSMap;
+			public var mapDoc:VectorMapDoc;
+			public var basicApp:FlexVecModuleDemo;
+			public var topAnalyseModule:TopAnalyseModule;
+			private var topLayerName:String="世界政区.wp";
+			private var topFeatureLayerIndex:int=-1;
+			private function getFeatureLayerIndex(layerNameStr:String):int{
+				
+				var  layerNodeCount:int = mapDoc.loadMapResult.LayerCount;
+				var layerAccessArry:Array = new Array(layerNodeCount);
+				layerAccessArry = mapDoc.loadMapResult.LayerAccessInfo.LayerAccessInfo;
+				var mapLayerInfoArry:Array = mapDoc.loadMapResult.MapLayerInfo;
+				var layerIndex:int=-1;
+				for (var i:int = 0; i < layerNodeCount; i++)
+				{
+					
+					var layerAccess:CLayerAccessInfo = layerAccessArry[i] as CLayerAccessInfo;
+					var layerInfo:CLayerInfo = layerAccess.LayerInfoList[0] as CLayerInfo;
+					var layerName:String = layerInfo.LayerDataName;
+					if(layerName==layerNameStr){
+						layerIndex=i;
+						break;
+					}
+					
+				}
+				return layerIndex;
+			}
+			
+			//初始化激活水系图层
+			public function initWindow():void{
+				
+				 topFeatureLayerIndex=getFeatureLayerIndex(topLayerName);
+				if(topFeatureLayerIndex==-1){
+					Alert.show("该地图文档中没有"+topLayerName+"的图层");
+					return;
+				}
+				
+				this.mymap.activeMapDoc=this.mapDoc;
+				this.mymap.activeMapDoc.activeLayerIndex=topFeatureLayerIndex;
+				if(graphicsLayer==null){
+					graphicsLayer=new GraphicsLayer();
+					this.mymap.addElement(graphicsLayer);
+				}
+			this.mymap.panTo(-591904.0479760105 , 289655.1724137929 );
+			}
+			//拓扑分析
+			public function onclick():void{
+				var selectStr:String=radiogroup2.selectedValue as String;
+			
+				var firstFeatID:Number=selectStr.split(",")[0];
+				var secondFeatID:Number=selectStr.split(",")[1];
+				//清除绘图图层上的所有要素
+				this.graphicsLayer.removeAllElements();
+				//实例化第一个拓扑分析的要素
+				_firstFeature=new SFeatureGeometry();
+				//实例化第二个拓扑分析的要素
+				_secondFeature=new SFeatureGeometry();
+				//实例化第一个拓扑分析要素的显示区的对象
+				_firstPoly=new IMSPolygon();
+				//实例化第二个拓扑分析要素的显示区的对象
+				_secondPoly=new IMSPolygon();
+				//根据要素id获取需要的数据
+				var targetObj:CGetObjByID=new CGetObjByID();
+				//设置第一个要素的id
+				targetObj.FeatureID=firstFeatID;
+				//设置第一个要素所在的图层号
+				targetObj.LayerIndex=topFeatureLayerIndex;
+				//拓扑分析第二个要素的id
+				this.secondNum=secondFeatID;
+				//获取第一个要素空间信息 
+				this.mapDoc.getGeomByID(targetObj,FirstgetGemos);
+			}
+			//获取第一个要素回调函数
+			public function FirstgetGemos(e:Event):void{
+				//简单要素类
+				var FirstresutltGemo:SFeatureGeometry=this.mapDoc.onGetGeomByID(e);
+				if(FirstresutltGemo!=null){
+					this._firstFeature=FirstresutltGemo;
+					//显示拓扑分析的第一个要素
+					this._firstPoly=drawGetFeatrue(0xFFFF00,0x00FFCC,FirstresutltGemo);
+					//获取第二个要素空间信息 
+					var targetObj2:CGetObjByID=new CGetObjByID();
+					//设置拓扑分析的第二个要素的id
+					targetObj2.FeatureID=this.secondNum;
+					//设置第二个要素所在的图层号
+					targetObj2.LayerIndex=topFeatureLayerIndex;
+					this.mapDoc.getGeomByID(targetObj2,SelectgetGemos);
+				}else{
+					Alert.show("获取第一个要素失败!");
+					return;
+				}
+			}
+			//获取第二个要素回调函数
+			public function SelectgetGemos(e:Event):void{
+				var SelectresutltGemo:SFeatureGeometry=this.mapDoc.onGetGeomByID(e);
+				if(SelectresutltGemo!=null){
+					this._secondFeature=SelectresutltGemo;
+					//显示拓扑分析的第二个要素
+					this._secondPoly=drawGetFeatrue(0x00FF00,0xFFFF66,SelectresutltGemo);
+					
+					//拓扑分析
+					onTopSpanalyse();
+				}else{
+					Alert.show("获取第二要素失败!");
+					return;
+				}
+			}
+			
+			//拓扑分析
+			public function onTopSpanalyse():void{
+				//闪烁拓扑分析的第一个要素
+				this._firstPoly.draw();
+				this._firstPoly.flicker();
+				//闪烁拓扑分析的第二个要素
+				this._secondPoly.draw();
+				this._secondPoly.flicker();
+				//判断区与区之间的拓扑关系
+				var obj:CRegionRelationAnalyse = new CRegionRelationAnalyse();
+				//设置第一个区信息 
+				obj.Reg0 = this._firstFeature.RegGeom[0];
+				//设置第二个区信息 
+				obj.Reg1 = this._secondFeature.RegGeom[0];
+				obj.NearDis = 0.002;
+				this._spatial = new SpacialAnalyse(this.mymap.activeMapDoc);
+				//regionRelationAnalyse()区拓扑关系判断
+				this._spatial.regionRelationAnalyse(obj, onSubmit);
+			}
+			// 获取拓扑分析结果
+			public function onSubmit(e:Event):void
+			{
+				//获取两个区拓扑分析结果
+				var data:String=this._spatial.onRegionRelationAnalyse(e);
+				switch(data)
+				{
+					case "Unknown":
+						data="未知类型";
+						break;
+					case "Intersect":
+						data="相交";
+						break;
+					case "Disjoin":
+						data="相离";
+						break;
+					case "Include":
+						data="包含";
+						break;
+					case "Adjacent":
+						data="相邻";
+						break;
+					default:
+						data="未知类型";
+						break;
+				}
+				
+				this.TopStyle.text=data;
+			}
+			
+			//绘制显示要素
+			public function drawGetFeatrue(boderColor:uint,colorTemo:uint,sfeatureTemp:SFeatureGeometry):IMSPolygon{
+				var reg:GRegion=sfeatureTemp.GetRegGeom(0);
+				var arcLine:AnyLine=reg.GetRings(0);
+				var arc:Arc=arcLine.GetArcs(0);
+				var poly:IMSPolygon;
+				//获取要素边界的点
+				var ArcPnt:Array=arc.Dots;
+				if(ArcPnt!=null){
+					var ArcPntNum:int=arc.Dots.length;
+					//绘制多边形
+					poly=new IMSPolygon(CoordinateType.Logic);
+					graphicsLayer.addGraphics(poly);
+					for(var i:int=0;i<ArcPntNum;i++){
+						poly.points.push(new Point(arc.GetDots(i).x, arc.GetDots(i).y));
+					}
+					//设置边界线颜色及大小
+					poly.lineStyle(2,boderColor);
+					//设置填充区的颜色及透明度
+					poly.beginFill(colorTemo,0.8);
+					//绘制图形
+				//	poly.draw();
+					//poly.flicker();
+				}else{
+					Alert.show("获取要素边界失败!");
+					
+				}
+				
+				return poly;
+			}
+			
+			//停止闪烁,清除绘制的图形
+			public function clear():void{
+				if(this._firstPoly){
+					this._firstPoly.flickerStop();
+				}
+				if(this._secondPoly){
+					this._secondPoly.flickerStop();
+				}
+				this.graphicsLayer.removeAllElements();
+				this.TopStyle.text="";
+			}
+			
+			//进度条end	
+			public override function close():void{
+				clear();
+				if(topAnalyseModule){
+					this.basicApp.main.removeElement(topAnalyseModule.topAnalyseWindow);
+					topAnalyseModule.topAnalyseWindow=null;
+				}
+			}
+			public override function onMouseUp(e:MouseEvent):void{
+				this.basicApp.main.removeElement(this);
+				this.basicApp.main.addElement(this);
+			}
+			
+		]]>
+	</fx:Script>
+
+	<mx:VBox width="255" height="191" label="裁剪分析">
+		<s:Group width="246" height="183">
+			<s:VGroup  width="244" height="199">
+				<s:HGroup width="100%" height="30" gap="10" verticalAlign="middle" paddingLeft="20"  >
+					<s:Label fontWeight="bold" fontSize="13" fontFamily="黑体"    text="分析图层:"   width="90" height="16"/> 
+					<s:Label  text="世界政区.wp" fontSize="13"  /> 
+				</s:HGroup>
+				<s:HGroup width="100%" height="70" gap="10" verticalAlign="middle" paddingLeft="20">
+					<s:Label fontWeight="bold" fontSize="13" fontFamily="黑体"  text="分析要素ID:"  width="90" height="16"/> 
+					<s:VGroup fontFamily="宋体" fontSize="12">
+						<s:RadioButton label="150,176" groupName="radiogroup2" selected="true"/>
+						<s:RadioButton label="150,157" groupName="radiogroup2"/>
+						<s:RadioButton label="150,159" groupName="radiogroup2"/>
+					</s:VGroup>
+				</s:HGroup>
+				<s:HGroup width="100%" height="30" gap="10" verticalAlign="middle" paddingLeft="20"  >
+					<s:Label fontWeight="bold" fontSize="13" fontFamily="黑体"    text="分析结果:"   width="90" height="16"/> 
+					<s:Label  text="类型" id="TopStyle" color="0xff0000" fontSize="15"  fontWeight="bold" fontFamily="宋体"/>
+				</s:HGroup>
+				<s:HGroup width="100%" height="35" gap="40" verticalAlign="middle" paddingLeft="20">
+					<s:Button  label="拓扑分析"  click="onclick()" height="30"  fontSize="13" fontWeight="bold"/>
+					<s:Button  label="清除"  click="clear()" height="30"  fontSize="13" fontWeight="bold"/>
+				</s:HGroup>
+			</s:VGroup>
+		</s:Group>
+	</mx:VBox>
+</components:BasicTileWindow>

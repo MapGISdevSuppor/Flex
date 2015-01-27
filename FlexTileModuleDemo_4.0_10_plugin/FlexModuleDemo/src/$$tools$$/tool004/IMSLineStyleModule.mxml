@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="400" height="300" implements="IClass.BasicInterFace">
+	<fx:Script>
+		<![CDATA[
+			import IClass.BasicInterFace;
+			public var imsLineWindow:imsLineStyleWindow=null;
+			public	function loadInit(basicApp:FlexModuleDemo,toolId:String):void{
+				if(imsLineWindow){
+					imsLineWindow.close();
+					imsLineWindow=null;
+				}
+				if(imsLineWindow==null){
+					imsLineWindow=new imsLineStyleWindow();
+					imsLineWindow.mapContainer=basicApp.imsmap;
+					imsLineWindow.basicFlexApp=basicApp;
+					imsLineWindow.imsLineModule=this;
+					imsLineWindow.application1_creationCompleteHandler();
+					basicApp.main.addElement(imsLineWindow);
+				}
+				
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+</mx:Module>

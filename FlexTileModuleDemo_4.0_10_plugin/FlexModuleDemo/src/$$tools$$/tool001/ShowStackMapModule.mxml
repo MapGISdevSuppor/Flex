@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="400" height="300"
+		   xmlns:control="zdims.control.*"  implements="IClass.BasicInterFace" xmlns:ns="$$tools$$.tool001.*">
+	<fx:Script>
+		<![CDATA[
+			import IClass.BasicInterFace;
+			
+			import mx.controls.Alert;
+			private var clickStackMapFlag:int=0;
+			public var stMapWindow:stackMapWindow=null;
+			public	function loadInit(basicApp:FlexModuleDemo,toolId:String):void{
+				if(stMapWindow==null){
+					stMapWindow=new stackMapWindow();
+					stMapWindow.basicApp=basicApp;
+					stMapWindow.imsmap=basicApp.imsmap;
+					stMapWindow.showStackModule=this;
+					basicApp.main.addElement(stMapWindow);
+				}else{
+					
+					stMapWindow.visible=true;
+					basicApp.main.removeElement(stMapWindow);
+					basicApp.main.addElement(stMapWindow);
+					
+					//					basicApp.removeElement(stMapWindow);
+					//
+					
+				}
+				
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+</mx:Module>

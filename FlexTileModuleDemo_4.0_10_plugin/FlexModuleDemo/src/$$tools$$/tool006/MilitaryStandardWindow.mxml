@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:BasicTileWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+							xmlns:s="library://ns.adobe.com/flex/spark" 
+							xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:components="components.*" 
+							width="260" height="344" x="950" y="300" title="标绘">
+	<components:layout>
+		<s:BasicLayout/>
+	</components:layout>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<s:GlowFilter id="glowerArrow" alpha="1.0" blurX="6.0" blurY="6.0" color="#FF5800" inner="false"
+					  knockout="false" quality="2" strength="1"/>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import zdims.map.IMSMap;
+			
+			import zdimsExtends.drawingArrow.DrawingBase;
+			import zdimsExtends.drawingArrow.DrawingBaseType;
+			//选中的颜色值
+			private var selectColorFill:uint=0xff0000;
+			//选中的alpha值
+			private var selectAlphaFill:Number=1;
+			private var selectStrokeColor:uint=0x333333;
+			private var selectStrokeAlpha:Number=1;
+			private var selectStrokeWeight:Number=0;
+			
+			public var drawingBase:DrawingBase=new  DrawingBase();
+			public var mapContainer:IMSMap;
+			public var basicFlexApp:FlexModuleDemo=null;
+			public var militaryStandModule:MilitaryStandardModule=null;
+			
+			private function DrawArrow(drawType:String):void{
+			
+			if(drawingBase){
+				drawingBase.mymap=this.mapContainer;
+				drawingBase.initDrawArrow(drawType);
+			}
+		}
+			private function changeStyle(num:Number,event:Event=null):void{
+				selectColorFill=new uint("0x"+this.fillColor.selectedColor.toString(16));
+				selectAlphaFill=fillAlpha.value;
+				selectStrokeColor=new uint("0x"+this.SelectlineColor.selectedColor.toString(16));
+				selectStrokeAlpha=this.SelectlineAlpha.value;
+				selectStrokeWeight=this.SelectlineWeight.value;
+				if(drawingBase!=null){
+					drawingBase.FillColor=selectColorFill;
+					drawingBase.Fillalpha=selectAlphaFill;
+					drawingBase.StrokeColor=selectStrokeColor;
+					drawingBase.StrokeAlpha=selectStrokeAlpha;
+					drawingBase.StrokeWeight=selectStrokeWeight;
+					
+					if(num==1){
+						drawingBase.reDrawByColor(new uint("0x"+this.fillColor.selectedColor.toString(16)));
+					}else if(num==2){
+						drawingBase.reDrawByAlpha(fillAlpha.value);
+					}else if(num==3){
+						drawingBase.reDrawByStrokeColor(new uint("0x"+this.SelectlineColor.selectedColor.toString(16)));
+					}else if(num==4){
+						drawingBase.reDrawByStrokeAlpha(SelectlineAlpha.value);
+					}else if(num==5){
+						drawingBase.reDrawByStrokeWeight(SelectlineWeight.value);
+					}
+				}	
+			}
+				
+		private function rollOutHandlerArrow(event:Event):void{
+			event.currentTarget.filters=[];
+		}
+		private function rollOverHandlerArrow(event:Event):void{
+			event.currentTarget.filters=[glowerArrow];
+		}
+
+			protected function image1_clickHandler(event:MouseEvent):void
+			{
+				// TODO Auto-generated method stub
+				if(drawingBase){
+					drawingBase.removeAllElement();
+				}
+			}
+			public override function close():void{
+				if(drawingBase){
+					drawingBase.removeAllElement();
+					drawingBase=null;
+				}
+				if(militaryStandModule.militaryWindow){
+					this.basicFlexApp.main.removeElement(militaryStandModule.militaryWindow);
+					militaryStandModule.militaryWindow=null;
+				}
+			}
+			public override function onMouseUp(e:MouseEvent):void{
+				this.basicFlexApp.main.removeElement(this);
+				this.basicFlexApp.main.addElement(this);
+			}
+
+		]]>
+	</fx:Script>
+	<mx:TabNavigator x="0" y="0" width="253" height="306"  >
+		<s:NavigatorContent label="标绘" width="100%" height="100%" >
+			<mx:Grid width="229" height="268" paddingBottom="10" paddingLeft="10" paddingRight="10"
+					 paddingTop="10" >
+				<mx:GridRow>
+					<mx:GridItem>
+						<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.SimpleArrow)"
+								  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+								  source="@Embed('ArrowIcon/arrow.png')" toolTip="简单箭头" useHandCursor="true"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.TailedArrow)"
+								  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+								  source="@Embed('ArrowIcon/tail_arrow.png')" toolTip="燕尾箭头"
+								  useHandCursor="true"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.CustomArrow)"
+								  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+								  source="@Embed('ArrowIcon/custom_arrow.png')" toolTip="自定义箭头"
+								  useHandCursor="true"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Image buttonMode="true"
+								  click="DrawArrow(DrawingBaseType.CustomTailedArrow)"
+								  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+								  source="@Embed('ArrowIcon/custom_tail_arrow.png')" toolTip="自定义燕尾箭头"
+								  useHandCursor="true"/>
+					</mx:GridItem>
+				</mx:GridRow>
+				<mx:GridRow>
+					<mx:GridItem>
+						<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.StraightArrow)"
+								  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+								  source="@Embed('ArrowIcon/stright_arrow.png')" toolTip="直箭头"
+								  useHandCursor="true"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.DoubleArrow)"
+								  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+								  source="@Embed('ArrowIcon/double_arrow.png')" toolTip="双箭头"
+								  useHandCursor="true"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.AssemblyArea)"
+								  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+								  source="@Embed('ArrowIcon/assembly.png')" toolTip="集结地域" useHandCursor="true"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.Circle)"
+								  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+								  source="@Embed('ArrowIcon/circle.png')" toolTip="圆形区域" useHandCursor="true"/>
+					</mx:GridItem>
+				</mx:GridRow>
+				<mx:GridRow>
+					<mx:GridItem>
+						<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.CurveFlag)"
+								  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+								  source="@Embed('ArrowIcon/curve_flag.png')" toolTip="曲线旗标"
+								  useHandCursor="true"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.RectFlag)"
+								  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+								  source="@Embed('ArrowIcon/rect_flag.png')" toolTip="直角旗标"
+								  useHandCursor="true"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.TriangleFlag)"
+								  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+								  source="@Embed('ArrowIcon/triangle_flag.png')" toolTip="三角旗标"
+								  useHandCursor="true"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.ClosedangleCompass)"
+								  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+								  source="@Embed('ArrowIcon/closedangle.png')" toolTip="尖角指北针"
+								  useHandCursor="true"/>
+					</mx:GridItem>
+				</mx:GridRow>
+				<mx:GridRow>
+					<mx:GridItem>
+						<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.FourstarCompass)"
+								  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+								  source="@Embed('ArrowIcon/fourstar.png')" toolTip="四角指北针"
+								  useHandCursor="true"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.RhombusCompass)"
+								  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+								  source="@Embed('ArrowIcon/rhombus.png')" toolTip="菱形指北针"
+								  useHandCursor="true"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.TriangleCompass)"
+								  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+								  source="@Embed('ArrowIcon/triangle.png')" toolTip="三角指北针"
+								  useHandCursor="true"/>
+					</mx:GridItem>	
+					<mx:GridItem>
+						<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.ArrowcrossCompass)"
+								  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+								  source="@Embed('ArrowIcon/arrowcross.png')" toolTip="十字箭头指北针"
+								  useHandCursor="true"/>
+					</mx:GridItem>
+				</mx:GridRow>
+				<mx:GridRow>
+					<mx:GridItem>
+						<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.CircleClosedangleCompass)"
+								  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+								  source="@Embed('ArrowIcon/CircleClosedangleCompass.png')" toolTip="圆形尖角指北针"
+								  useHandCursor="true"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.DoubleClosedangleCompass)"
+								  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+								  source="@Embed('ArrowIcon/DoubleClosedangleCompass.png')" toolTip="双向尖角指北针"
+								  useHandCursor="true"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.SameDirectionClosedangleCompass)"
+								  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+								  source="@Embed('ArrowIcon/SameDirectionClosedangleCompass.png')" toolTip="同向尖角指北针"
+								  useHandCursor="true"/>
+					</mx:GridItem>
+					<mx:GridItem>
+						<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.VaneCompass)"
+								  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+								  source="@Embed('ArrowIcon/VaneCompass.png')" toolTip="风向标指北针"
+								  useHandCursor="true"/>
+					</mx:GridItem>
+				</mx:GridRow>
+			</mx:Grid>	
+		</s:NavigatorContent>
+		<s:NavigatorContent label="样式属性" width="100%" height="100%">
+			<mx:VBox width="100%" height="100%" label="填充">
+				<s:Group width="100%" height="100%">
+					<s:VGroup  width="100%" height="100%">
+						<s:HGroup width="100%" height="20" gap="16" verticalAlign="middle" paddingLeft="20"  >
+							<s:Label fontWeight="bold" fontSize="15" fontFamily="黑体"    text="填充设置:"   width="128" height="16"/> 
+						</s:HGroup>
+						<s:HGroup width="100%" height="43" gap="16" verticalAlign="middle" paddingLeft="60">
+							<s:Label  text="颜   色:" /> 
+							<mx:ColorPicker  id="fillColor" selectedColor="0xff0000" change="changeStyle(1,event)" />
+						</s:HGroup>
+						<s:HGroup width="100%" gap="16" verticalAlign="middle" paddingLeft="60">
+							<s:Label  text="透明度:"  /> 
+							<mx:NumericStepper  id="fillAlpha" value="1"  maximum="1.0" minimum="0" stepSize="0.1"  change="changeStyle(2,event)" />
+						</s:HGroup>
+						
+						<s:HGroup width="100%" height="20" gap="16" verticalAlign="middle" paddingLeft="20">
+							<s:Label fontWeight="bold" fontSize="15" fontFamily="黑体"    text="边框设置:"  width="128" height="16"/> 
+						</s:HGroup>
+						<s:HGroup width="100%" gap="16" verticalAlign="middle" height="27" paddingLeft="60">
+							<s:Label text="颜   色"/>
+							<mx:ColorPicker id="SelectlineColor" change="changeStyle(3,event)"
+											selectedColor="0x000000"/>
+						</s:HGroup>
+						<s:HGroup width="100%" gap="16" verticalAlign="middle"  paddingLeft="60">
+							<s:Label text="透明度"/>
+							<mx:NumericStepper id="SelectlineAlpha" change="changeStyle(4,event)" maximum="1"
+											   minimum="0.1" stepSize="0.1" value="1"/>
+						</s:HGroup>
+						<s:HGroup width="100%" gap="16" verticalAlign="middle" paddingLeft="60">
+							<s:Label text="宽   度"/>
+							<mx:NumericStepper id="SelectlineWeight"  stepSize="1"
+											   change="changeStyle(5,event)" maximum="10" minimum="1"
+											   value="1"/>
+						</s:HGroup>
+						
+						<s:HGroup width="100%" gap="16" height="40" verticalAlign="middle" paddingLeft="20">
+			
+							<s:Label fontWeight="bold" fontSize="15" fontFamily="黑体"   text="清 除:" height="19"/>
+							<mx:Image buttonMode="true"  source="@Embed('ArrowIcon/clear1.png')"  toolTip="清空标绘"
+									  rollOut="rollOutHandlerArrow(event)" rollOver="rollOverHandlerArrow(event)"
+									  click="image1_clickHandler(event)">
+								
+							</mx:Image>
+						</s:HGroup>
+					</s:VGroup>
+				</s:Group>
+			</mx:VBox>
+		
+		</s:NavigatorContent>	
+	</mx:TabNavigator>	
+</components:BasicTileWindow>

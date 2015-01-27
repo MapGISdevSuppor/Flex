@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" width="100%"
+		   height="100%"
+		   fontSize="12"
+		   creationComplete="init()">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			
+			import spark.events.IndexChangeEvent;
+			private var datacolorArray:ArrayCollection=new ArrayCollection([{color:"黑色"},{color:"红色"},{color:"黄色"},{color:"绿色"},{color:"蓝色"},{color:"紫色"}]);
+			private var datapatternArray:ArrayCollection=new ArrayCollection([{id:"514"},{id:"515"},{id:"516"},{id:"517"},{id:"518"},{id:"519"}]);
+			
+			
+
+			protected function patternID_changeHandler(event:IndexChangeEvent):void
+			{
+				// TODO Auto-generated method stub
+				var strID:String=this.featureIconID.selectedItem.id;
+				var sid:String=strID.split("_")[1];
+				this.patternID.text=sid;
+			}
+
+
+			protected function patternColor_changeHandler(event:IndexChangeEvent):void
+			{
+				// TODO Auto-generated method stub
+				var Str_color:String=this.featureColorNum.selectedItem.color;
+				var Color_ID:int=1;
+				switch(Str_color){
+				case "黑色":
+					Color_ID=1;
+					break;
+				case "红色":
+					Color_ID=175;
+					break;
+				case "黄色":
+					Color_ID=4;
+					break;
+				case "绿色":
+					Color_ID=7;
+					break;
+				case "蓝色":
+					Color_ID=5;
+					break;
+				case "紫色":
+					Color_ID=3;
+					break;
+				default:
+					Color_ID=1;
+					break;
+				}
+				this.patternColor.text=Color_ID.toString();
+			}
+
+		]]>
+	</fx:Script>
+	
+	<mx:Label x="10"
+			  y="28"
+			  text="子图号："/>
+	<mx:Label x="11"
+			  y="58"
+			  text="子图宽："/>
+	<mx:TextInput id="patternWidth"
+				  x="74"
+				  y="56"
+				  text="10"
+				  width="138"/>
+	<mx:Label x="10"
+			  y="88"
+			  text="子图高："/>
+	<mx:TextInput id="patternHeight"
+				  x="74"
+				  y="86"
+				  text="10"
+				  width="138"/>
+	<mx:Label x="10"
+			  y="148"
+			  text="子图颜色："/>
+	<mx:TextInput id="patternAngle"
+				  x="74"
+				  y="116"
+				  text="0"
+				  width="138"/>
+	<mx:Label x="10"
+			  y="0"
+			  text="点要素参数设置:"
+			  width="102"
+			  color="#5164DD"/>
+	<mx:Label x="10"
+			  y="120"
+			  text="角度："
+			  height="20"/>
+	
+	<s:DropDownList id="featureColorNum"
+					x="74"
+					y="141" selectedIndex="3" width="70"
+					height="30" labelField="color" 
+					dataProvider="{datacolorArray}"
+					 change="patternColor_changeHandler(event)"  >
+		
+		
+	</s:DropDownList>
+	<s:Label x="150"  y="150" text="7" id="patternColor" color="gray">
+		
+	</s:Label>
+	
+	
+	<!--<mx:ComboBox id="patternColor"
+	x="64"
+	y="156"
+	width="137"
+	dataProvider="['1:黑色','175:红色','4:黄色','7:绿色','5:蓝色','3:紫色']"
+	editable="true"
+	change="setColor(this.patternColor)">
+	</mx:ComboBox>-->
+	
+	<s:DropDownList id="featureIconID"
+		x="74"
+		y="21" selectedIndex="0" width="60"
+		height="30"
+		itemRenderer="spark.skins.spark.DefaultComplexItemRenderer"
+		skinClass="skins.CustomDropDownListSkin" change="patternID_changeHandler(event)"
+		labelField="id">
+		<s:dataProvider>
+			<s:ArrayList>
+				<s:BitmapImage source="@Embed('images/PntIcon/198.jpg')" id="Img_198"/>
+				<s:BitmapImage source="@Embed('images/PntIcon/4.jpg')" id="Img_4"/>
+				<s:BitmapImage source="@Embed('images/PntIcon/30.jpg')" id="Img_30"/>
+				<s:BitmapImage source="@Embed('images/PntIcon/55.jpg')" id="Img_55"/>
+				<s:BitmapImage source="@Embed('images/PntIcon/86.jpg')" id="Img_86"/>
+				<s:BitmapImage source="@Embed('images/PntIcon/197.jpg')" id="Img_197"/>
+				
+			</s:ArrayList>
+		</s:dataProvider>
+		
+	</s:DropDownList>
+	<s:Label x="140"  y="28" text="198" id="patternID" color="gray">
+		
+	</s:Label>
+	
+	<!--<mx:ComboBox id="patternID"
+				 x="64"
+				 y="36"
+				 width="137"
+				 dataProvider="['514','515','516','517','518','519']"
+				 editable="true">
+	</mx:ComboBox>-->
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			
+			import Mapgis7.WebService.BasLib.GInfoType;
+			import Mapgis7.WebService.BasLib.WebGraphicsInfo;
+			private var gInfo:WebGraphicsInfo;
+			/**
+			 * 获取样式信息的类型：点样式信息
+			 */ 
+			public function getFeatureGinfoType():String
+			{
+				return GInfoType.PntInfo;
+			}
+			/**
+			 * 设置样式信息
+			 */ 
+			public function setGraphicStyle(style:WebGraphicsInfo):void
+			{
+				this.gInfo = style;
+			}
+			/**
+			 * 窗口初始化函数
+			 */ 
+			public function init():void
+			{
+				if (gInfo == null)
+					return;
+			    
+				this.patternColor.text = gInfo.PntInfo.Color.toString();
+				this.patternHeight.text = gInfo.PntInfo.SymHeight.toString();
+				this.patternAngle.text = gInfo.PntInfo.Angle.toString();
+				this.patternID.text = gInfo.PntInfo.SymID.toString();
+				this.patternWidth.text = gInfo.PntInfo.SymWidth.toString();
+			}
+			/**
+			 * 设置颜色
+			 */ 
+			public function setColor(list:DropDownList):void
+			{
+				
+				
+			//	list.text = list.text.split(":")[0];
+			
+			}
+		]]>
+	</fx:Script>
+</mx:Canvas>

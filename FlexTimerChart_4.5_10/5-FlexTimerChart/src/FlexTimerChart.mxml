@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   minWidth="955" minHeight="600" 
+			   xmlns:map="zdims.map.*"
+			   xmlns:othermap="zdims.othermap.*"
+			   initialize="tile_creationCompleteHandler()"
+			   creationComplete="init()" 
+			   xmlns:compants="compants.*">
+	
+	<!--2014-08-07升级到4.5的库   测试通过    by liuruoli-->
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:GlowFilter id="glower" alpha="1.0" blurX="6.0" blurY="6.0" color="#FF5800" inner="false"
+					  knockout="false" quality="2" strength="1"/>
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			
+			import utilEvent.ReadURLEvent;
+			import config.ServerIP;
+			import zdims.event.IMSMapEvent;
+			import zdims.util.IMSOperType;
+			import zdimsExtends.chart.NewChartColumn;
+			import compants.IMSMeasure;
+			
+			private var chartColumn:NewChartColumn;
+			private var timer:Timer;
+			private var chartArr:Array=null;
+			private var t:int=1;
+			private var measureObj:IMSMeasure=new IMSMeasure();
+			/**
+			 * 中国省会城市坐标，用于确定加载统计图的位置
+			 */
+			public var pntArray:Array=new Array(
+				new Point(13949740.676038,5447094.069151),
+				new Point(13734939.037752,5131390.210917),
+				new Point(13044999.735843,4740082.526069),
+				new Point(12752728.320089,4590322.487161),
+				new Point(12529198.422473,4564329.062182),
+				new Point(13020713.144056,4391201.184051),
+				new Point(11532654.063406,4316240.414082),
+				new Point(12650544.752777,4130999.769073),
+				new Point(12120840.393262,4064534.747485),
+				new Point(13221294.097880,3769661.163792),
+				new Point(13522274.239056,3664981.726812),
+				new Point(13376715.206093,3536063.876055),
+				new Point(12900750.323964,3333868.409487),
+				new Point(12575594.000042,3273914.773934),
+				new Point(13280807.118803,3007879.279669),
+				new Point(12611786.932935,2643655.975022),
+				new Point(12242917.971136,4960853.233926),
+				new Point(13526067.214260,2880055.428055),
+				new Point(12706641.887835,2563038.790300),
+				new Point(11432748.319537,2882014.183901),
+				new Point(11877823.299935,3070092.519092),
+				new Point(11858051.588618,3445082.193813),
+				new Point(11585161.206036,3589975.009109),
+				new Point(9750086.509975,5431870.500235),
+				new Point(10144777.598529,3458729.580657),
+				new Point(14095567.238601,5741209.210038),
+				new Point(11252089.475755,4339516.507605),
+				new Point(11812815.614563,4615675.863742),
+				new Point(12061083.752191,2589385.669328),
+				new Point(12267407.885419,2275400.352111),
+				new Point(12721504.643335,3577353.481787)
+			);
+			/**
+			 * 各城市人口数据，用于生成统计图
+			 */
+			private var chartInfo1:Array=new Array(120,1232,3312,4422,5532,6674,7232,6342,5876,5102,5465,5676);
+			private var chartInfo2:Array=new Array(232,1345,2894,3503,4105,5507,5232,4876,5234,4565,4822,5211);
+			private var chartInfo3:Array=new Array(325,824,1323,2012,3789,4405,5100,6342,7800,9121,11232,14832);
+			private var chartInfo4:Array=new Array(1400,1567,2500,3212,3333,4321,5321,6841,7231,10234,15212,18321);
+			private var chartInfo5:Array=new Array(823,1234,1872,2567,3100,3898,4300,4512,4801,5321,5898,6810);
+			private var chartInfo6:Array=new Array(432,1430,2682,3123,4476,5898,5321,4832,4222,4523,5321,7143);
+			private var chartInfo7:Array=new Array(523,898,1234,1675,2201,2678,3245,3785,4232,5543,6123,7908);
+			private var chartInfo8:Array=new Array(786,1563,1987,2432,2876,3423,3678,4321,5565,8782,10213);
+			private var chartInfo9:Array=new Array(920,1456,2522,2981,3898,4543,5600,6789,7892,8121,8142,15212);
+			private var chartInfo10:Array=new Array(1000,1543,2312,3242,3678,4543,5674,6321,7897,8904,10430,13321);
+			private var chartInfo11:Array=new Array(1500,2676,3456,4321,5323,6543,7653,9789,9223,8212,9300,12561);
+			private var chartInfo12:Array=new Array(867,1234,2453,3456,5432,6453,6890,8324,9876,10233,14561,17678);
+			private var chartInfo13:Array=new Array(1464,2878,4832,4245,6890,7898,8967,9431,12321,14562,17896,21122);
+			private var chartInfo14:Array=new Array(1232,1856,2322,3212,4534,5465,6723,6208,9876,11232,14545,17898);
+			private var chartInfo15:Array=new Array(589,1232,2321,3421,4321,5343,6564,7654,8275,8453,9234,12321);
+			private var chartInfo16:Array=new Array(634,1898,1343,2343,3421,3898,4563,5463,6543,7890,8785,10232);
+			private var chartInfo17:Array=new Array(832,1230,2202,3323,4034,4898,5400,6400,7543,9765,11879,13231);
+			private var chartInfo18:Array=new Array(1450,3212,4532,5879,6345,7898,9943,12323,14534,18975,23221,27545);
+			private var chartInfo19:Array=new Array(1032,1454,2345,4323,5465,6787,8767,9898,12323,14345,20567,18789);
+			private var chartInfo20:Array=new Array(454,1232,2245,3454,5323,6454,7453,8234,8523,9234,9890,11240);
+			private var chartInfo21:Array=new Array(780,1232,1504,2210,3400,3500,5000,6010,6787,7687,8906,10222);
+			private var chartInfo22:Array=new Array(1232,2543,3245,4565,7643,8798,9899,11023,13223,14345,16787,19875);
+			private var chartInfo23:Array=new Array(343,804,1432,2343,3432,4345,5456,6567,7156,7989,8232,8999);
+			private var chartInfo24:Array=new Array(232,1324,865,898,532,1789,2211,2898,3234,4545,4878,5565);
+			private var chartInfo25:Array=new Array(323,754,1234,2343,3122,3876,4565,5676,6123,6454,6875,7121);
+			private var chartInfo26:Array=new Array(102,767,498,289,454,656,967,1823,1567,2321,3764,3345);
+			private var chartInfo27:Array=new Array(342,1208,878,1342,1875,2434,3878,3212,3454,3989,4354,4987);
+			private var chartInfo28:Array=new Array(545,1121,1454,1654,1967,2434,2676,2987,3454,3876,4412,5821);
+			private var chartInfo29:Array=new Array(654,789,832,1832,1678,2421,3465,3212,3822,4232,4676,5012);
+			private var chartInfo30:Array=new Array(789,1320,1787,2343,3564,4343,5454,6545,7234,7878,8343,8912);
+			private var chartInfo31:Array=new Array(1121,2343,3454,5543,4454,6565,7436,8784,9878,12121,14323,18987);
+			/**
+			 * 构造统计图的datasource
+			 */
+			private var chartInfoArr:Array=new Array(chartInfo1,chartInfo2,chartInfo3,chartInfo4,chartInfo5,chartInfo6,chartInfo7,chartInfo8,chartInfo9,chartInfo10,
+				chartInfo11,chartInfo12,chartInfo13,chartInfo14,chartInfo15,chartInfo16,chartInfo17,chartInfo18,chartInfo19,chartInfo20,
+				chartInfo21,chartInfo22,chartInfo23,chartInfo24,chartInfo25,chartInfo26,chartInfo27,chartInfo28,chartInfo29,chartInfo30,chartInfo31);
+			
+			private var charInfoLength:Number;
+			private var index:int=0;
+			private var flag:Boolean=true;
+			public var fillColor:uint=0x3399FF;
+			public var fillAlpha:Number=1;
+			public var borderColor:uint=0xFFFFFF;
+			public var borderAlpha:Number=1;
+			public var txtBorderColor:uint=0x0033FF;
+			public var borderThickness:Number=1;
+			private var viewConfig:ServerIP;
+			
+			/**
+			 * 初始化
+			 */
+			private function tile_creationCompleteHandler():void{
+				viewConfig=new ServerIP();
+				viewConfig.mapConfig1(this);
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, readURLCompelte);
+			}
+			//获取服务地址
+			private function readURLCompelte(event:ReadURLEvent):void
+			{
+				this.tilelayer.serverAddress=viewConfig.TileURL;
+				this.imsmap.refresh();
+			}
+			protected function init():void
+			{
+				if(chartArr!=null){
+					if(chartArr.length>0){
+						for(var k:int=0;k<chartArr.length;k++){
+							if(chartArr[k]!=null){
+								var newChartTemp:NewChartColumn=chartArr[k] as NewChartColumn;
+								newChartTemp.clearChart();
+							}
+						}
+					}
+					chartArr=null;	
+					timer=null;
+				}
+				if(chartArr==null){
+					chartArr=new Array();
+					for(var i:int=0;i<this.pntArray.length;i++){
+						chartColumn=new NewChartColumn();
+						chartColumn.imsmap=this.imsmap;
+						chartColumn.chartWidth=20;
+						chartColumn.chartHeight=12;
+						chartColumn.logicCenterX=this.pntArray[i].x;
+						chartColumn.logicCenterY=this.pntArray[i].y;
+						chartColumn.rateHeiht=0;
+						chartColumn.rate=t;
+						chartColumn.fillColor=fillColor;
+						chartColumn.fillAlpha=this.fillAlpha;
+						chartColumn.borderColor=borderColor;
+						chartColumn.borderAlpha=this.borderAlpha;
+						chartColumn.txtBorderColor=txtBorderColor;
+						chartColumn.borderThickness=borderThickness;
+						chartColumn.txtContent="0";
+						chartColumn.initDraw();
+						chartArr.push(chartColumn);
+					}
+					
+					this.charInfoLength=chartInfo5.length;
+					index=0;
+					if(timer!=null){
+						timer=null;
+					}
+					if(timer==null){
+					timer = new Timer(1000);
+					timer.removeEventListener(TimerEvent.TIMER,onFlashTimer);
+					timer.removeEventListener(TimerEvent.TIMER_COMPLETE,onFlashComplete);
+					timer.addEventListener(TimerEvent.TIMER,onFlashTimer);
+					timer.addEventListener(TimerEvent.TIMER_COMPLETE,onFlashComplete);
+					}
+				}
+			}
+			
+			
+			protected function onFlashTimer(e:TimerEvent):void{
+				if(index==0){
+					if(chartInfoArr!=null&&chartInfoArr.length>0){
+						for(var i:int=0;i<chartInfoArr.length;i++){
+							if(chartInfoArr[i]!=null){
+								if(chartInfoArr[i][index]>0){
+									var loc0:int=getRate(chartInfoArr[i][index]);
+									var chartTemp:NewChartColumn=chartArr[i] as NewChartColumn;
+									if(chartTemp!=null){
+										chartTemp.txtContent=chartInfoArr[i][index].toString();
+										chartTemp.rate=loc0*t;
+										chartTemp.increaseChart();
+									}
+								}
+							}
+						}
+					}
+				}else if(index<charInfoLength){
+					if(chartInfoArr!=null&&chartInfoArr.length>0){
+						for(var j:int=0;j<chartInfoArr.length;j++){
+							if(chartInfoArr[j]!=null){
+								if(chartInfoArr[j][index]!=null&&chartInfoArr[j][index-1]!=null){
+									var loc1:int=getRate(chartInfoArr[j][index-1]);
+									var loc2:int=getRate(chartInfoArr[j][index]);
+									var loc3:int=loc2-loc1;
+									var timeChartTemp:NewChartColumn=chartArr[j] as NewChartColumn;
+									if(timeChartTemp!=null){
+										timeChartTemp.txtContent=chartInfoArr[j][index].toString();
+										timeChartTemp.rate=loc3*t;
+										timeChartTemp.increaseChart();
+									}
+								}
+							}
+						}
+					}
+				}else{
+					timer.stop();
+				}
+				index++;
+				
+			}
+			protected function getRate(loc:Number):int{
+				var loc2:int=0;
+				if(loc==0){
+					loc2=0;
+				}else{
+					var loc1:int=int(loc/200);
+					loc2=loc1+1;
+				}
+				
+				return loc2;
+			}
+			
+			protected function onFlashComplete(e:TimerEvent):void
+			{
+				Timer(e.target).stop();
+			}
+			
+           /**
+		   * 时态GIS
+		   */
+			protected function timerChart():void
+			{
+				if(flag==true)
+				{
+					this.timer.start();
+					flag=false;
+				}else
+				{
+					if(timer!=null)
+					{
+						timer.stop();
+						timer=null;
+					}
+					
+					init();
+					this.timer.start();
+				}
+			}
+			
+			/**
+			 * 测量长度
+			 */
+			protected function measureLine():void{
+				if(measureObj==null){
+					measureObj=new IMSMeasure();
+				}
+				if(measureObj!=null){
+					measureObj.imsmap=this.imsmap;
+					measureObj.setMeasureType('len');
+				}
+			}
+			
+			/**
+			 * 测量面积
+			 */
+			protected function measurePolygon():void{
+				if(measureObj==null){
+					measureObj=new IMSMeasure();
+				}
+				if(measureObj!=null){
+					measureObj.imsmap=this.imsmap;
+					measureObj.setMeasureType('area');
+				}
+			}
+			
+			public function reDrawChart():void{
+			if(chartArr!=null&&chartArr.length>0){
+				for(var i:int=0;i<chartArr.length;i++){
+					var ch:NewChartColumn=chartArr[i];
+					ch.fillColor=this.fillColor;
+					ch.fillAlpha=this.fillAlpha;
+					ch.borderColor=this.borderColor;
+					ch.borderAlpha=this.borderAlpha;
+					ch.borderThickness=this.borderThickness;
+					ch.txtBorderColor=this.fillColor;
+					ch.txtBorderAlpha=this.fillAlpha;
+					ch.reDrawChart();
+				}
+				}
+			}
+			protected function clearAll():void{
+				if(chartArr!=null){
+					if(chartArr.length>0){
+						for(var k:int=0;k<chartArr.length;k++){
+							if(chartArr[k]!=null){
+								var newChartTemp:NewChartColumn=chartArr[k] as NewChartColumn;
+								newChartTemp.clearChart();
+							}
+						}
+					}
+					chartArr=null;	
+					if(timer!=null){
+						timer.removeEventListener(TimerEvent.TIMER,onFlashTimer);
+						timer.removeEventListener(TimerEvent.TIMER_COMPLETE,onFlashComplete);
+					}
+					timer=null;
+					flag=false;
+				}
+			}
+			
+			//鼠标移入到绘制的图标上改变颜色的效果
+			private function rollOverHandler(event:Event):void{
+				event.currentTarget.filters=[glower];
+			}
+			//鼠标移出到绘制的图标上恢复原始效果
+			private function rollOutHandler(event:Event):void{
+				event.currentTarget.filters=[];
+			}
+		]]>
+	</fx:Script>
+	
+<map:IMSMap   x="0" y="0" id="imsmap" initShowLevel="4" levelNum="8" width="100%" height="100%"
+			  restoreCenterX="12721504.643335" restoreCenterY="3577353.481787" 
+			  enableProgressBar="false" >
+		
+		<!--显示瓦片地图-->
+		<map:TileLayerEx x="0" y="0" id="tilelayer" autoGetMapBound="true" autoGetMapInfo="true" hdfName="NewWorldTile"   >
+		</map:TileLayerEx>
+	</map:IMSMap>
+	<s:BorderContainer id="container" width="420" height="120" borderColor="0x333333" borderAlpha="0" 
+					   left="20"  top="10" >
+		<mx:Image x="11" y="0" source="images/MyGIS/GISbanner.png" />     
+		<!--时态GIS-->
+		<mx:Image x="15" y="60" source="images/MyGIS/GIS.png" click="timerChart()" rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)" buttonMode="true" useHandCursor="true"  />
+		<!--删除时态GIS图-->
+		<mx:Image x="129" y="58" source="images/MyGIS/clear.png" click="clearAll()" rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)" buttonMode="true" useHandCursor="true"/>
+		<!--测量长度-->
+		<mx:Image x="229" y="60" source="images/MyGIS/MeasureM.png" click="measureLine()" rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)" buttonMode="true" useHandCursor="true"/>
+		<!--测量面积-->
+		<mx:Image x="327" y="60" source="images/MyGIS/MeasureP.png" click="measurePolygon()" rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)" buttonMode="true" useHandCursor="true"/>
+	</s:BorderContainer>	
+	<compants:SelectProperty right="10"  top="10" id="selPro" flexTimeObj="{this}">
+	</compants:SelectProperty>
+	
+</s:Application>

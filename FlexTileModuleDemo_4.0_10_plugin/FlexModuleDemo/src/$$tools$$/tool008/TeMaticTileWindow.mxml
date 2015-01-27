@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:BasicTileWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+							xmlns:s="library://ns.adobe.com/flex/spark" 
+							xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:components="components.*"
+							width="292" height="214" x="950" y="400"   title="统计图" >
+	<components:layout>
+		<s:BasicLayout/>
+	</components:layout>
+	<fx:Script>
+		<![CDATA[
+			import mx.charts.ColumnChart;
+			import mx.charts.chartClasses.ChartBase;
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.core.UIComponent;
+			import mx.events.ColorPickerEvent;
+			import mx.events.FlexEvent;
+			
+			import spark.events.IndexChangeEvent;
+			
+			import zdims.event.IMSMapEvent;
+			import zdims.event.IMSMapMouseEvent;
+			import zdims.map.IMSMap;
+			import zdims.map.OverlayObject;
+			include "myData.as";
+			private var _mapContainer:IMSMap;
+			private var charts:Array=new Array();
+			private var _chartType:String;
+			private var mychart:myCharts;
+			
+			public var teMaticModule:TeMaticModule=null;
+			public var basicFlexApp:FlexModuleDemo=null;
+			
+			[Inspectable]
+			public function get mapContainer():IMSMap
+			{
+				return _mapContainer;
+			}
+			
+			public function set mapContainer(value:IMSMap):void
+			{
+				_mapContainer = value;
+			}
+	
+			
+			private var chartType:ArrayCollection=new ArrayCollection([
+				{label:"二维柱状图",data:"Column2D"},
+				{label:"三维柱状图",data:"Column3D"},
+				{label:"二维饼状图",data:"Pie2D"},
+				{label:"三维饼状图",data:"Pie3D"},
+				{label:"曲线图",data:"Line"},
+				{label:"二维锯齿图",data:"Bar2D"},
+				{label:"二维面状图",data:"Area2D"},
+				{label:"二维环状图",data:"Doughnut2D"},
+				{label:"三维环状图",data:"Doughnut3D"},
+				{label:"平滑曲线图",data:"Spline"},
+				{label:"平滑面状图",data:"SplineArea"},
+				{label:"漏斗图",data:"Funnel"},
+				{label:"金字塔图",data:"Pyramid"}]); 
+		
+			
+			//添加统计图
+			private function addChart_clickHandler():void
+			{				
+				var i:int=0;
+				clearChart();
+				while(i<labelInfo[0].length)
+				{  
+					addchart(labelInfo[0][i],positionInfo[0][i].x,positionInfo[0][i].y,dataInfo);
+					hSlider.addEventListener(Event.CHANGE,onStyleChange);
+					wSlider.addEventListener(Event.CHANGE,onStyleChange);
+					alphaSlider.addEventListener(Event.CHANGE,onStyleChange);
+					i++;
+				}
+			}
+			
+			private  function addchart(label:String,x:Number,y:Number,data:ArrayCollection):void
+			{
+				mychart=new myCharts();
+				mychart.name="点";
+				mychart.chartlabel=label;
+				mychart.teMatiControl=this;
+				mychart.logicX=x;
+				mychart.logicY=y;
+				mychart.dataProvider=data;
+				mychart.enableUpdatePosition=true;
+				mychart.imsmap=this.mapContainer;
+				this.mapContainer.addChild(mychart);
+			}
+			
+			//删除统计图
+			public function clearChart():void
+			{
+				var chart:Array=this.mapContainer.getChildren();
+				//清除地图上的统计图
+				for (var i:int=0;i<chart.length;i++)
+				{
+					if(UIComponent(chart[i]).name=="点")
+						//调用地图容器的清除方法
+						this.mapContainer.removeChild(chart[i]);   
+				}
+			}
+			//颜色设置
+			private function onColorChange(e:ColorPickerEvent):void
+			{	
+				addChart_clickHandler();
+			}
+			
+			//统计图样式设置
+			private function onStyleChange(evt:Event):void
+			{
+				var chart:Array=this.mapContainer.getChildren();
+				//清除地图上的统计图
+				for (var i:int=0;i<chart.length;i++)
+				{
+					if(UIComponent(chart[i]).name=="点")
+					{
+						UIComponent(chart[i]).scaleX=wSlider.value/162;
+						UIComponent(chart[i]).scaleY=hSlider.value/120;
+						UIComponent(chart[i]).alpha=alphaSlider.value;
+					}
+				}
+			}
+			
+			
+			protected function application1_creationCompleteHandler(event:FlexEvent):void
+			{
+				this.mapContainer.addEventListener(IMSMapEvent.MAP_CHANGE,MoveTo);
+			}
+			
+			protected function MoveTo(e:Event):void{
+				this.mapContainer.panTo(-31.67341217447779,0.6335137739854986);
+				this.mapContainer.removeEventListener(IMSMapEvent.MAPEVENT_MAPCHANGE,MoveTo);
+			}
+			//位置判断及更新
+			private  function newpositon(x:Number,y:Number):void
+			{
+				var oldx:Number=0;
+				var oldy:Number=0;
+				var coor:Point=this.mapContainer.logicToScreen(x,y);
+			}
+			public override function close():void{
+				clearChart();
+				if(teMaticModule.teMaticTileWindow){
+					this.basicFlexApp.main.removeElement(teMaticModule.teMaticTileWindow);
+					teMaticModule.teMaticTileWindow=null;
+				}
+			}
+			public override function onMouseUp(e:MouseEvent):void{
+				this.basicFlexApp.main.removeElement(this);
+				this.basicFlexApp.main.addElement(this);
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<mx:Canvas  minHeight="214" minWidth="214"	
+				fontFamily="微软雅黑" color="0x000000"
+				backgroundColor="0xFFFFFF" backgroundAlpha="1"
+				borderStyle="solid" borderColor="0xCCCCCC" 
+				cornerRadius="5" borderThickness="2" width="290" height="181">
+		<!--统计图类型选择-->
+		<s:Label text="请选择统计图类型：" x="10" y="40" height="26" fontWeight="normal" fontFamily="微软雅黑" fontSize="12"/>
+		<s:ComboBox id="myChartType" x="126" y="40" dataProvider="{chartType}" selectedIndex="0" color="0X000000" />
+		
+		<!--统计图高度设置-->
+		<s:Label x="12" y="75" text="统计图高度：" fontFamily="微软雅黑"/>
+		<s:HSlider id="hSlider" x="126" y="75" value="120" minimum="120" maximum="220" width="126"/>
+		
+		<!--统计图宽度设置-->
+		<s:Label x="12" y="110" text="统计图宽度：" fontFamily="微软雅黑"/>
+		<s:HSlider id="wSlider" x="126" y="110" minimum="162" maximum="262" width="126" value="162"
+				   />
+		
+		<!--统计图透明度设置-->
+		<s:Label x="11" y="144" text="统计图透明度：" fontFamily="微软雅黑"/>
+		<s:HSlider id="alphaSlider" x="126" y="144" snapInterval="0.1" minimum="0.1" maximum="1.0" width="126" value="1.0" />
+		<s:Button x="52" y="10" label="添加统计图"  click="addChart_clickHandler()" fontSize="13"  fontWeight="bold" fontFamily="宋体"/>
+		<s:Button x="162" y="9" label="清除统计图" click="clearChart()" fontSize="13"  fontWeight="bold" fontFamily="宋体"/>
+
+	</mx:Canvas>
+	
+</components:BasicTileWindow>

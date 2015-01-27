@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" width="211"
+		   height="216"
+		   fontSize="12"
+		   creationComplete="init()">
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.ArrayCollection;
+			
+			import spark.events.IndexChangeEvent;
+			private var linePolygonType:ArrayCollection=new ArrayCollection([{id:"1"},{id:"2"},{id:"3"},{id:"4"},{id:"5"},{id:"6"}]);
+			private var datacolorArray:ArrayCollection=new ArrayCollection([{color:"黑色"},{color:"红色"},{color:"黄色"},{color:"绿色"},{color:"蓝色"},{color:"紫色"}]);
+			
+			protected function patternTempID_changeHandler(event:IndexChangeEvent):void
+			{
+				// TODO Auto-generated method stub
+				this.patternID.text=patternTempID.selectedItem.id.toString();
+			}
+			protected function colorTemp_changeHandler(event:IndexChangeEvent):void
+			{
+				// TODO Auto-generated method stub
+				var Str_color:String=this.colorTemp.selectedItem.color;
+				var Color_ID:int=1;
+				switch(Str_color){
+					case "黑色":
+						Color_ID=1;
+						break;
+					case "红色":
+						Color_ID=175;
+						break;
+					case "黄色":
+						Color_ID=4;
+						break;
+					case "绿色":
+						Color_ID=7;
+						break;
+					case "蓝色":
+						Color_ID=5;
+						break;
+					case "紫色":
+						Color_ID=3;
+						break;
+					default:
+						Color_ID=1;
+						break;
+				}
+				this.patternColor.text=Color_ID.toString();
+			}
+
+
+		
+
+			protected function fillcolorTemp_changeHandler(event:IndexChangeEvent):void
+			{
+				// TODO Auto-generated method stub
+				var Str_color:String=this.fillcolorTemp.selectedItem.color;
+				var Color_ID:int=1;
+				switch(Str_color){
+					case "黑色":
+						Color_ID=1;
+						break;
+					case "红色":
+						Color_ID=175;
+						break;
+					case "黄色":
+						Color_ID=4;
+						break;
+					case "绿色":
+						Color_ID=7;
+						break;
+					case "蓝色":
+						Color_ID=5;
+						break;
+					case "紫色":
+						Color_ID=3;
+						break;
+					default:
+						Color_ID=1;
+						break;
+				}
+				this.fillcolor.text=Color_ID.toString();
+			}
+
+		]]>
+	</fx:Script>
+	<mx:Label x="10"
+			  y="8"
+			  text="填充图案："/>
+	<s:DropDownList id="patternTempID"
+					x="77"
+					y="6" selectedIndex="0" width="70"
+					height="25" labelField="id"
+					dataProvider="{linePolygonType}"
+					change="patternTempID_changeHandler(event)"
+					>
+	</s:DropDownList>
+	<s:Label x="165" y="10" id="patternID" text="1" visible="false">
+		
+	</s:Label>
+	
+	<mx:Label x="11"
+			  y="38"
+			  text="图案宽："/>
+	<mx:TextInput id="patternWidth"
+				  x="77"
+				  y="36"
+				  text="10"
+				  width="125"/>
+	<mx:Label x="10"
+			  y="68"
+			  text="图案高："/>
+	<mx:TextInput id="patternHeight"
+				  x="77"
+				  y="66"
+				  text="10"
+				  width="124"/>
+	<mx:Label x="11"
+			  y="128"
+			  text="图案颜色："/>
+	
+
+	<s:DropDownList id="colorTemp"
+					x="77"
+					y="126" selectedIndex="0" width="70"
+					height="25" labelField="color"
+					dataProvider="{datacolorArray}"
+					change="colorTemp_changeHandler(event)"
+					>
+	</s:DropDownList>
+	<s:Label  x="165" y="126" id="patternColor" text="1" visible="false" >
+		
+	</s:Label>
+	
+	
+	<mx:Label x="10"
+			  y="98"
+			  text="图案笔宽："/>
+	<mx:TextInput id="patternPenWidth"
+				  x="77"
+				  y="96"
+				  text="10"
+				  width="124"/>
+	<mx:Label x="11"
+			  y="158"
+			  text="填充颜色："/>
+
+	
+	<s:DropDownList id="fillcolorTemp"
+					x="77"
+					y="156" selectedIndex="0" width="70"
+					height="25" labelField="color"
+					dataProvider="{datacolorArray}"
+					change="fillcolorTemp_changeHandler(event)"
+					>
+	</s:DropDownList>
+	<s:Label  x="165" y="160" id="fillcolor" text="1" visible="false" >
+		
+	</s:Label>
+	
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import Mapgis7.WebService.BasLib.WebGraphicsInfo;
+			import Mapgis7.WebService.BasLib.GInfoType;
+			private var gInfo:WebGraphicsInfo;
+			/**
+			 * 获取样式信息的类型：区样式信息
+			 */ 
+			public function getFeatureGinfoType():String
+			{
+				return GInfoType.RegInfo;
+			}
+			/**
+			 * 设置样式信息
+			 */ 
+			public function setGraphicStyle(style:WebGraphicsInfo):void
+			{
+				this.gInfo = style;
+			}
+			/**
+			 * 窗口初始化函数
+			 */ 
+			public function init():void
+			{
+				if (gInfo == null)
+					return;
+				this.fillcolor.text = gInfo.RegInfo.FillColor.toString();
+				this.patternHeight.text = gInfo.RegInfo.PatHeight.toString();
+				this.patternID.text = gInfo.RegInfo.PatID.toString();
+				this.patternWidth.text = gInfo.RegInfo.PatWidth.toString();
+				this.patternColor.text = gInfo.RegInfo.PatColor.toString();
+				this.patternPenWidth.text = gInfo.RegInfo.OutPenWidth.toString();
+			}
+			
+		]]>
+	</fx:Script>
+</mx:Canvas>

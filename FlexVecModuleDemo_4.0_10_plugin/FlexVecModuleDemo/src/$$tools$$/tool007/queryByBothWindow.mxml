@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:BasicTileWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+							xmlns:s="library://ns.adobe.com/flex/spark" 
+							xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:components="components.*" width="280" height="200"
+							title="复合查询设置窗口" fontFamily="宋体" fontSize="12" x="900"  y="20"
+							creationComplete="queryWinCreationComplete(event)"
+							initialize="queryWinInitialize(event)">
+	<components:layout>
+		<s:BasicLayout/>
+	</components:layout>
+	<fx:Script>
+		<![CDATA[
+			import Mapgis7.WebService.BasLib.*;
+			
+			import config.ServerIP;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.ListEvent;
+			import mx.utils.SecurityUtil;
+			import mx.utils.StringUtil;
+			
+			import spark.events.IndexChangeEvent;
+			
+			import utilEvent.ReadURLEvent;
+			
+			import zdims.control.layer.LayerDataViewer;
+			import zdims.event.IMSMapEvent;
+			import zdims.event.IMSMapMouseEvent;
+			import zdims.util.IMSOperType;
+			
+			import zdimsExtends.QueryControl.drawHighLight;
+			
+			private var VecAddress:String="";
+			private var viewConfig:ServerIP;
+			private var UpFlag:int=0;
+			public var basicApp:FlexVecModuleDemo=null;
+			public var queryByBtModule:QueryByBothModule;
+	
+			
+			//定义图层数组
+			[Bindable]
+			private var queryLayers:ArrayCollection = new ArrayCollection([{name:"世界政区"}]);
+			private var Type:String;
+			private var callfun:Function;
+			import mx.events.FlexEvent;
+			private var dataItemArray:ArrayCollection=new ArrayCollection([{name:"点查询"},{name:"线查询"},{name:"圆查询"},{name:"矩形查询"},{name:"多边形查询"}]);
+			
+			private  var layerDataViewer3:LayerDataViewer=null;
+			
+			protected function queryWinInitialize(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				viewConfig=new ServerIP();
+				viewConfig.mapConfig1(this);
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, ReadURLCompelte);	
+				//添加地图容器的操作状态变化事件
+				basicApp.imsmap.addEventListener(IMSMapEvent.MAP_OPERTYPECHANGE,onOperChange);
+			}
+			
+			
+			public function onOperChange(e:Event):void
+			{
+				if(this.Type!=""&&this.callfun!=null)
+				{
+					basicApp.imsmap.removeEventListener(this.Type,this.callfun);
+				}
+			}
+			
+			
+			//获取服务地址
+			private function ReadURLCompelte(event:ReadURLEvent):void
+			{
+				VecAddress=viewConfig.vectorURL;
+				//this.vectorlayer.serverAddress=VecAddress;
+				//this.mapContainer.refresh();
+				
+				//添加地图容器的加载完毕事件：更新图层状态
+				var item:ContextMenuItem=new ContextMenuItem("清除鼠标状态");
+				item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,Change);
+				basicApp.imsmap.contextMenu.customItems.push(item);
+				basicApp.imsmap.addEventListener(IMSMapEvent.MAPEVENT_MAPREADY,upLayer)
+			}
+			
+			
+			//清除鼠标状态
+			public function Change(e:Event):void
+			{
+				if(this.Type!=""&&this.callfun!=null)
+				{
+					basicApp.imsmap.setCurOper(IMSOperType.None);
+					basicApp.imsmap.removeEventListener(this.Type,this.callfun);
+				}
+			}
+			//选择查询图层，更新图层状态为编辑状态
+			protected function upLayer(event:IMSMapEvent):void
+			{
+				if (queryByBtModule.vectlayer!=null)
+				{
+					changeHandler();
+				}
+				
+			}
+			
+			//设置单图层的状态回调函数
+			public function onSetSingleLayerStatus(e:Event):void
+			{
+				var rlt:COperResult=queryByBtModule.vectlayer.onSetAllEnumLayerStatus(e);
+				if (rlt.OperResult)
+				{	
+					//设置当前激活的图
+					basicApp.imsmap.activeLayerObj=queryByBtModule.vectlayer;
+					//Alert.show("图层状态更新成功!");
+					this.UpFlag=1;
+				}
+			}
+			//点查询处理事件
+			public function selectByPoint(e:Event):void
+			{
+	
+					select(basicApp.imsmap.graphicCanvas.getSelectedDot(), ESelectionType.Both, 0);
+				
+			}
+			//线查询处理事件
+			public function selectByLine(e:Event):void
+			{
+
+					select(basicApp.imsmap.graphicCanvas.getSelectedLine(), ESelectionType.Both, 0);
+				
+			}
+			// 圆查询处理事件
+			public function selectByCircle(e:Event):void
+			{
+				//调用查询方法，传入查询范围，查询类型：几何+属性，页面
+				
+					select(basicApp.imsmap.graphicCanvas.getSelectedCircle(), ESelectionType.Both, 0);
+			
+			}
+			
+			// 矩形查询
+			public function selectByRect(e:Event):void
+			{
+
+					select(basicApp.imsmap.graphicCanvas.getSelectedRect(), ESelectionType.Both, 0);
+				
+
+			}
+			// 多边形查询处理事件
+			public function selectByPolygon(e:Event):void
+			{
+
+					select(basicApp.imsmap.graphicCanvas.getSelectedPolygon(), ESelectionType.Both, 0);
+	
+			}
+			// 圆查询处理事件,geoObj：查询坐标范围,selType：查询类型：几何、属性、几何+属性,page：查询页面,condition：属性查询条件
+			private function select(geoObj:Object, selType:String, page:int, condition:String=""):void
+			{
+				if (!basicApp.imsmap.existActiveLayerObj())
+				{
+					//当前地图容器是否有激活的地图对象
+					return;
+				}		
+				//初始化图层查询参数传入对象
+				var mapsel:CLayerSelectParam = new CLayerSelectParam();
+				//初始化web查询参数设置对象类
+				var websel:CWebSelectParam = new CWebSelectParam();
+				websel.CompareRectOnly = basicApp.imsmap.activeLayerObj.compareRectOnly;
+				//设置线查询的坐标
+				websel.Geometry = geoObj;
+				if (geoObj != null)
+				{
+					//设置几何查询类型
+					websel.GeomType = IWebGeometry(geoObj).GetGeomType();
+				}
+				websel.MustInside = basicApp.imsmap.activeLayerObj.mustInside;
+				//设置查询半径
+				websel.NearDistance = basicApp.imsmap.activeLayerObj.nearDistanse;
+				//设置查询类型
+				websel.SelectionType = selType;
+				//属性查询条件
+				//sqlContent
+				var sqlStr:String="";
+				if(this.txtSqlExpress.text!=""&&this.txtSqlExpress.text!=null){
+					var st:String=mx.utils.StringUtil.trim(this.txtSqlExpress.text.toString());
+					if(st==""){
+						sqlStr="";
+					}else{
+						sqlStr=this.sqlContent.text+this.txtSqlExpress.text;
+					}
+				}
+				websel.WhereClause=sqlStr;
+				//设置web查询参数对象
+				mapsel.WebSelectParam = websel;
+				//查询页面	
+				mapsel.PageCount = page;		
+				layerDataViewer3._lastSelectParam=mapsel;
+				//调用矢量图层的属性查询方法，查询要素
+				basicApp.imsmap.activeLayerObj.layerSelectAndGetAtt(mapsel, callBack);
+				if(this.highlight.selected)
+				{
+					//高亮显示查询结果，传入地图容器对象，web查询参数，绘图层对象
+					drawHighLight.instance.AddhighLightFeatures(basicApp.imsmap,mapsel,queryByBtModule.graphicsLayer1);
+				}				
+			}
+			//查询要素回调处理事件
+			public function callBack(e:Event):void
+			{
+				//获取查询结果，并显示到查询结果框中
+				layerDataViewer3.showResult(queryByBtModule.vectlayer.onLayerSelectAndGetAtt(e));
+				layerDataViewer3.visible= true;
+				
+				
+			}
+			
+
+			//清理高亮显示的要素
+			protected function clear_clickHandler(event:MouseEvent):void
+			{
+				queryByBtModule.graphicsLayer1.removeAllGraphics();
+			}
+			//选择查询类型
+			protected function subQueryType_changeHandler(event:IndexChangeEvent):void
+			{
+				setType();
+			}
+			protected function subQueryType_clickHandler(event:MouseEvent):void
+			{
+				setType();
+			}
+			private function setType():void
+			{
+				if(this.UpFlag==0){
+					changeHandler();	
+				}
+				switch(this.subQueryType.selectedItem.name)
+				{
+					case "点查询":
+					{
+						//点查询：设置鼠标操作状态，以及监听鼠标弹起事件，获取点击的坐标
+						basicApp.imsmap.setCurOper(IMSOperType.SelectByHitting);
+						basicApp.imsmap.addEventListener(IMSMapMouseEvent.MAP_MOUSEUP,selectByPoint);
+						this.Type=IMSMapMouseEvent.MAP_MOUSEUP;
+						this.callfun=selectByPoint;
+						break;
+					}
+					case "线查询":
+					{
+						//线查询：设置鼠标操作状态，以及监听鼠标双击事件，获取绘制的线坐标
+						basicApp.imsmap.setCurOper(IMSOperType.SelectByLine);
+						basicApp.imsmap.addEventListener(IMSMapMouseEvent.MAP_DOUBLECLICK,selectByLine);
+						this.Type=IMSMapMouseEvent.MAP_DOUBLECLICK;
+						this.callfun=selectByLine;
+						break;
+					}
+					case "圆查询":
+					{
+						//圆查询：设置鼠标操作状态，以及监听鼠标弹起事件，获取绘制的圆坐标
+						basicApp.imsmap.setCurOper(IMSOperType.SelectByCircle);
+						basicApp.imsmap.addEventListener(IMSMapMouseEvent.MAP_MOUSEUP,selectByCircle);
+						this.Type=IMSMapMouseEvent.MAP_MOUSEUP;
+						this.callfun=selectByCircle;
+						break;
+					}
+					case "矩形查询":
+					{
+						//矩形查询：设置鼠标操作状态，以及监听鼠标弹起事件，获取绘制的矩形坐标
+						basicApp.imsmap.setCurOper(IMSOperType.SelectByRect);
+						basicApp.imsmap.addEventListener(IMSMapMouseEvent.MAP_MOUSEUP,selectByRect);
+						this.Type=IMSMapMouseEvent.MAP_MOUSEUP;
+						this.callfun=selectByRect;
+						break;
+					}
+					case "多边形查询":
+					{
+						//多边形查询：设置鼠标操作状态，以及监听鼠标双击事件，获取绘制的多边形坐标
+						basicApp.imsmap.setCurOper(IMSOperType.SelectByPolygon);
+						basicApp.imsmap.addEventListener(IMSMapMouseEvent.MAP_DOUBLECLICK,selectByPolygon);
+						this.Type=IMSMapMouseEvent.MAP_DOUBLECLICK;
+						this.callfun=selectByPolygon;
+						break;
+					}
+				}
+			}
+			
+			//更新图层状态
+			protected function subQueryLayer_clickHandler(event:MouseEvent):void
+			{
+				changeHandler();
+			}
+			//选择查询图层，更新图层状态为编辑状态
+			protected function changeHandler():void
+			{
+				//定义图层更新传入参数对象
+				var setLayerState:CSetSingleLayerStatusONFlex=new CSetSingleLayerStatusONFlex();
+				//图层所在GDB数据库在vectorLayer中的索引号
+				setLayerState.GdbIndex=0;
+				//图层所在在vectorLayer中的索引号
+				setLayerState.LayerIndex=this.subQueryLayer.selectedIndex;
+				//设置图层状态
+				setLayerState.LayerStatus=EnumLayerStatus.Editable;
+				//调用vectorlayer的更新图层方法，更新图层状态
+				queryByBtModule.vectlayer.setSingleLayerStatusONFlex(setLayerState, onSetSingleLayerStatus);
+			}
+			
+			protected function queryWinCreationComplete(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				if (layerDataViewer3==null)
+				{
+					layerDataViewer3=new LayerDataViewer();
+					layerDataViewer3.right=50;
+					layerDataViewer3.top=200;
+					//layerDataViewer2.id="layerDataRlt";
+					layerDataViewer3.title="图层复合查询结果";
+					layerDataViewer3.imsmap=basicApp.imsmap;
+					layerDataViewer3.graphicslayer=queryByBtModule.graphicsLayer2;
+					layerDataViewer3.visible=false;
+					basicApp.main.addElement(layerDataViewer3);					
+				}
+				
+			}
+			public override function close():void{
+				if(queryByBtModule){
+					queryByBtModule.graphicsLayer1.removeAllGraphics();
+					this.basicApp.main.removeElement(this.queryByBtModule.queryByBtWindow);
+					queryByBtModule.queryByBtWindow=null;
+				}
+			}
+			public override function onMouseUp(e:MouseEvent):void{
+				this.basicApp.main.removeElement(this);
+				this.basicApp.main.addElement(this);
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:VGroup gap="10" left="5" top="5" bottom="5" right="5">
+		<s:HGroup>
+			<mx:Label text="查询类型：" id="lblTypeOrSql"/>
+			<s:DropDownList id="subQueryType" toolTip="查询类型" 
+							change="subQueryType_changeHandler(event)" 
+							click="subQueryType_clickHandler(event)"
+							selectedIndex="0" width="100"
+							textAlign="center" fontSize="14" fontWeight="normal" labelField="name"  dataProvider="{dataItemArray}" >
+				
+			</s:DropDownList>
+		</s:HGroup>			
+		<s:HGroup>
+			<mx:Label text="查询图层：" />			
+			<s:DropDownList id="subQueryLayer" toolTip="查询图层" 
+							click="subQueryLayer_clickHandler(event)"
+							selectedIndex="0" width="100"
+							textAlign="center" fontSize="14" fontWeight="normal" labelField="name"  dataProvider="{queryLayers}" >
+				
+			</s:DropDownList>
+		
+		</s:HGroup>
+		<s:HGroup>
+			<mx:Label text="SQL 语句："/>
+			<mx:Spacer width="3"/>
+			<mx:Label id="sqlContent" text="周长>"/>
+			<mx:TextInput id="txtSqlExpress" fontFamily="宋体" fontSize="12" text="0.1"  width="149"/><!--周长&lt;80-->
+		</s:HGroup>
+		<s:HGroup>
+			<s:CheckBox id="highlight" content="是否高亮显示结果" >								
+			</s:CheckBox>
+		</s:HGroup>
+		<s:HGroup gap="10" width="100%" height="100%" horizontalAlign="center">
+			<!--<mx:Button label="查询" id="excuteQuery"   click="excuteQuery_clickHandler(event)" />-->
+			<mx:Button label="清除高亮结果" id="clear"  click="clear_clickHandler(event)" />
+		</s:HGroup>
+	</s:VGroup>	
+</components:BasicTileWindow>

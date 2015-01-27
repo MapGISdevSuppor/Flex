@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<compants:IMSWindow02 xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						xmlns:s="library://ns.adobe.com/flex/spark" 
+						xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:compants="compants.*"
+						layout="absolute" width="240" height="190"
+						close="close()"  
+						creationCompleteEffect="blur"
+						showEffect="blur"
+						borderStyle="solid"
+						horizontalAlign="center" 
+						fontSize="12" cornerRadius="10" backgroundAlpha="0.35" 
+						headerColors="{['#33CCFF','#33CCFF']}"
+						title="属性">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	
+	<fx:Script>
+		<![CDATA[
+			import zdimsExtends.chart.NewChartColumn;
+			public var selectColorFill:uint;
+			public var flexTimeObj:FlexTimerChart;
+			private function changeStyle(num:Number,event:Event=null):void{
+				if(this.flexTimeObj!=null){
+					selectColorFill=new uint("0x"+this.fillColor.selectedColor.toString(16));
+					flexTimeObj.fillColor=selectColorFill;
+					flexTimeObj.fillAlpha=fillAlpha.value;
+					flexTimeObj.borderColor=new uint("0x"+this.SelectlineColor.selectedColor.toString(16));
+					flexTimeObj.borderAlpha=SelectlineAlpha.value;
+					flexTimeObj.borderThickness=this.SelectlineWeight.value;
+					flexTimeObj.reDrawChart();
+				}
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<s:GlowFilter id="glower" alpha="1.0" blurX="6.0" blurY="6.0" color="#FF5800" inner="false"
+					  knockout="false" quality="2" strength="1"/>
+	</fx:Declarations>
+	<mx:TabNavigator width="100%" creationPolicy="all" paddingBottom="10" paddingLeft="10"
+					 paddingRight="10" paddingTop="10" height="143" y="-2">
+		<mx:VBox width="100%" height="100%" label="填充">
+	<s:Group width="100%" height="100%">
+		<s:VGroup  width="100%" height="100%">
+			<s:HGroup width="100%" height="43" gap="16" verticalAlign="middle" paddingLeft="20">
+				<s:Label  text="颜   色:" /> 
+				<mx:ColorPicker  id="fillColor" selectedColor="0x3399FF" change="changeStyle(1,event)" />
+			</s:HGroup>
+			<s:HGroup width="100%" gap="16" verticalAlign="middle" paddingLeft="20">
+				<s:Label  text="透明度:"  /> 
+				<mx:NumericStepper  id="fillAlpha" value="1"  maximum="1.0" minimum="0" stepSize="0.1"  change="changeStyle(2,event)" />
+			</s:HGroup>
+		</s:VGroup>
+		</s:Group>
+	</mx:VBox>
+		<mx:VBox width="100%" height="100%" label="边界线">
+			<s:HGroup width="100%" gap="16" verticalAlign="middle" height="27">
+				<s:Label text="颜   色"/>
+				<mx:ColorPicker id="SelectlineColor" change="changeStyle(3,event)"
+								selectedColor="0xFFFFFF"/>
+			</s:HGroup>
+			<s:HGroup width="100%" gap="16" verticalAlign="middle">
+				<s:Label text="透明度"/>
+				<mx:NumericStepper id="SelectlineAlpha" change="changeStyle(4,event)" maximum="1"
+								   minimum="0.1" stepSize="0.1" value="1"/>
+			</s:HGroup>
+			<s:HGroup width="100%" gap="16" verticalAlign="middle">
+				<s:Label text="宽   度"/>
+				<mx:NumericStepper id="SelectlineWeight"  stepSize="1"
+								   change="changeStyle(5,event)" maximum="10" minimum="1"
+								   value="1"/>
+			</s:HGroup>
+		</mx:VBox>
+		</mx:TabNavigator>
+</compants:IMSWindow02>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="400" height="300" implements="IClass.BasicInterFace">
+	<fx:Script>
+		<![CDATA[
+			import IClass.BasicInterFace;
+			public var militaryWindow:MilitaryStandardWindow=null;
+			
+			
+			public	function loadInit(basicApp:FlexModuleDemo,toolId:String):void{
+				if(militaryWindow){
+					militaryWindow.close();
+					militaryWindow=null;
+				}
+				if(militaryWindow==null){
+					militaryWindow=new MilitaryStandardWindow();
+					militaryWindow.mapContainer=basicApp.imsmap;
+					militaryWindow.basicFlexApp=basicApp;
+					militaryWindow.militaryStandModule=this;
+					basicApp.main.addElement(militaryWindow);
+				}
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+</mx:Module>

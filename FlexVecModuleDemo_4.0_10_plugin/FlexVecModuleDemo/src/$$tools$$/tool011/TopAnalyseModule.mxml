@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Module xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		   xmlns:s="library://ns.adobe.com/flex/spark" 
+		   xmlns:mx="library://ns.adobe.com/flex/mx" layout="absolute" width="400" height="300"
+		   implements="IClass.BasicInterFace">
+	<fx:Script>
+		<![CDATA[
+			import IClass.BasicInterFace;
+			public var topAnalyseWindow:TopAnalyseWindow;
+			public	function loadInit(basicApp:FlexVecModuleDemo,toolId:String):void{
+				if(topAnalyseWindow){
+					topAnalyseWindow.close();
+					topAnalyseWindow=null;
+				}
+				if(topAnalyseWindow==null){
+					topAnalyseWindow=new TopAnalyseWindow();
+					topAnalyseWindow.mymap=basicApp.imsmap;
+					topAnalyseWindow.mapDoc=basicApp.mapdoclayer;
+					topAnalyseWindow.basicApp=basicApp;
+					topAnalyseWindow.topAnalyseModule=this;
+					topAnalyseWindow.initWindow();
+					basicApp.main.addElement(topAnalyseWindow);
+				}
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+</mx:Module>

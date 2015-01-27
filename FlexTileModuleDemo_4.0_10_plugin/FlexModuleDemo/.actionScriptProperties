@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<actionScriptProperties mainApplicationPath="FlexModuleDemo.mxml" projectUUID="4f819e9e-2fc6-4db7-a6ed-cce88bc17c31" version="6">
+  <compiler additionalCompilerArguments="-locale zh_CN" autoRSLOrdering="true" copyDependentFiles="true" fteInMXComponents="false" generateAccessible="true" htmlExpressInstall="true" htmlGenerate="true" htmlHistoryManagement="true" htmlPlayerVersionCheck="true" includeNetmonSwc="false" outputFolderPath="bin-debug" sourceFolderPath="src" strict="true" targetPlayerVersion="0.0.0" useApolloConfig="false" useDebugRSLSwfs="true" verifyDigests="true" warn="true">
+    <compilerSourcePath/>
+    <libraryPath defaultLinkType="0">
+      <libraryPathEntry kind="4" path="">
+        <excludedEntries>
+          <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/flex.swc" useDefaultLinkType="false"/>
+        </excludedEntries>
+      </libraryPathEntry>
+      <libraryPathEntry kind="1" linkType="1" path="libs"/>
+    </libraryPath>
+    <sourceAttachmentPath/>
+  </compiler>
+  <theme themeIsDefault="false" themeIsSDK="true" themeLocation="${SDK_THEMES_DIR}/frameworks/themes/Halo"/>
+  <applications>
+    <application path="FlexModuleDemo.mxml"/>
+  </applications>
+  <modules>
+    <module destPath="$$tools$$/tool001/ShowStackMapModule.swf" optimize="false" sourcePath="src/$$tools$$/tool001/ShowStackMapModule.mxml"/>
+    <module destPath="$$tools$$/tool002/DrawGraphicsModule.swf" optimize="false" sourcePath="src/$$tools$$/tool002/DrawGraphicsModule.mxml"/>
+    <module destPath="$$tools$$/tool003/IMSMarkStyleModule.swf" optimize="false" sourcePath="src/$$tools$$/tool003/IMSMarkStyleModule.mxml"/>
+    <module destPath="$$tools$$/tool004/IMSLineStyleModule.swf" optimize="false" sourcePath="src/$$tools$$/tool004/IMSLineStyleModule.mxml"/>
+    <module destPath="$$tools$$/tool005/IMSFillStyleModule.swf" optimize="false" sourcePath="src/$$tools$$/tool005/IMSFillStyleModule.mxml"/>
+    <module destPath="$$tools$$/tool006/MilitaryStandardModule.swf" optimize="false" sourcePath="src/$$tools$$/tool006/MilitaryStandardModule.mxml"/>
+    <module destPath="$$tools$$/tool007/PolymericModule.swf" optimize="false" sourcePath="src/$$tools$$/tool007/PolymericModule.mxml"/>
+    <module destPath="$$tools$$/tool008/TeMaticModule.swf" optimize="false" sourcePath="src/$$tools$$/tool008/TeMaticModule.mxml"/>
+  </modules>
+  <buildCSSFiles/>
+</actionScriptProperties>

@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:BasicTileWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+							xmlns:s="library://ns.adobe.com/flex/spark" 
+							xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:components="components.*" 
+							xmlns:net="flash.net.*"
+							width="300" height="246" title="地图打印界面" fontFamily="宋体" fontSize="12"
+						    x="900" y="200">
+	<components:layout>
+		<s:BasicLayout/>
+	</components:layout>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<net:FileReference id="fileReference" />
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import flashx.textLayout.formats.Float;
+			
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.graphics.ImageSnapshot;
+			import mx.managers.PopUpManager;
+			import mx.printing.FlexPrintJob;
+			import mx.printing.FlexPrintJobScaleType;
+			
+			import zdims.controls.EditImage;
+			import zdims.controls.EditMark;
+			import zdims.controls.PrintPreviewWindow;
+			import zdims.controls.compass.ChooseCompassDialog;
+			import zdims.controls.compass.Compass1;
+			import zdims.controls.compass.Compass2;
+			import zdims.controls.compass.Compass3;
+			import zdims.controls.compass.Compass4;
+			import zdims.controls.compass.Compass5;
+			import zdims.controls.compass.Compass6;
+			import zdims.controls.compass.Compass7;
+			import zdims.controls.compass.Compass8;
+			import zdims.controls.compass.CompassType;
+			import zdims.controls.event.ChooseCompassDialogEvent;
+			import zdims.controls.event.ChooseDialogEvent;
+			import zdims.controls.scale.ChooseScaleBarDialog;
+			import zdims.controls.scale.EditAlternationScaleBar;
+			import zdims.controls.scale.EditDoubleAlernationScaleBar1;
+			import zdims.controls.scale.EditDoubleAlernationScaleBar2;
+			import zdims.controls.scale.EditHollowScaleBar1;
+			import zdims.controls.scale.EditHollowScaleBar2;
+			import zdims.controls.scale.EditScaleLine;
+			import zdims.controls.scale.EditSingleDivisionScaleBar;
+			import zdims.controls.scale.EditStepedScaleLine;
+			import zdims.controls.scale.ScaleBarType;
+			import zdims.controls.table.addTable;
+			import zdims.controls.text.EditText;
+			import zdims.drawing.DrawingType;
+			public var basicApp:FlexVecModuleDemo;
+			public var printMapmodule:PrintMapModule;
+			
+			private var dialog:ChooseCompassDialog=null;
+			private var titlewin:PrintPreviewWindow=null;
+			//打印预览
+			protected function printPreviewBtn_clickHandler(event:MouseEvent):void
+			{		
+				
+				if(titlewin==null){
+				
+					titlewin=new PrintPreviewWindow(); 	
+					var bitmapdata:BitmapData=new BitmapData(basicApp.printBorder.width,basicApp.printBorder.height,true,0x000000);
+					bitmapdata.draw(basicApp.printBorder);
+					titlewin.x=0;
+					titlewin.y=5;
+					titlewin.left=0;
+					titlewin.top=5;
+					titlewin.width=basicApp.printBorder.width;
+					titlewin.height=basicApp.printBorder.height;
+					titlewin.imgData=new Bitmap(bitmapdata);
+					titlewin.addEventListener(MouseEvent.MOUSE_OUT,onTileWinOut);
+					titlewin.addEventListener(MouseEvent.MOUSE_UP,onTileWinOut);
+					titlewin.addEventListener(CloseEvent.CLOSE,onTileWinClose);
+					titlewin.addEventListener(MouseEvent.MOUSE_DOWN,onTileWinOut);
+					titlewin.addEventListener(MouseEvent.MOUSE_MOVE,onTileWinOut);
+					PopUpManager.addPopUp(titlewin,this,true);
+					//PopUpManager.centerPopUp(titlewin);
+				}else{
+					titlewin.x=0;
+					titlewin.y=0;
+				}
+			}
+			protected function onTileWinOut(e:Event):void{
+				if(titlewin){
+					this.titlewin.x = this.titlewin.x < 0 ? 0 : this.titlewin.x;
+					this.titlewin.y = this.titlewin.y < 0 ? 0 : this.titlewin.y;
+				}
+			}
+			protected function onTileWinClose(e:Event):void{
+				if(titlewin){
+					titlewin.removeEventListener(MouseEvent.MOUSE_OUT,onTileWinOut);
+					titlewin.removeEventListener(MouseEvent.MOUSE_UP,onTileWinOut);
+					titlewin.removeEventListener(CloseEvent.CLOSE,onTileWinClose);
+					titlewin.removeEventListener(MouseEvent.MOUSE_DOWN,onTileWinOut);
+					titlewin.removeEventListener(MouseEvent.MOUSE_MOVE,onTileWinOut);
+				}
+				titlewin=null;
+			}
+			
+			//保存打印图
+			protected function savePrintImg_clickHandler(event:MouseEvent):void
+			{
+				var imageSnap:ImageSnapshot = ImageSnapshot.captureImage(basicApp.printBorder,0);
+				fileReference.save(imageSnap.data, "describeType.png");
+			}
+			//打印
+			protected function printBtn_clickHandler(event:MouseEvent):void
+			{
+				try{
+					var job:FlexPrintJob = new FlexPrintJob();
+					job.printAsBitmap = false;
+					if(job.start()) 
+					{
+						job.addObject(basicApp.printBorder, FlexPrintJobScaleType.NONE);
+						job.send();
+					}
+				}
+				catch(err:Error)
+				{
+					Alert.show(err.message);
+				}
+			}
+		
+			
+			//添加文本
+			protected function addTextBtn_clickHandler(event:MouseEvent):void
+			{
+				var textEdit:EditText=new EditText();
+				textEdit.x=basicApp.printBorder.width/2;
+				textEdit.y=10;
+				basicApp.printBorder.addElement(textEdit);
+			}
+			//添加指北针
+			protected function addCompassBtn_clickHandler(event:MouseEvent):void
+			{
+				if(dialog==null){
+					dialog=new ChooseCompassDialog();
+					dialog.addEventListener(ChooseCompassDialogEvent.OK,addCompass);
+					dialog.addEventListener(CloseEvent.CLOSE,ondialogWinClose);
+					dialog.addEventListener(MouseEvent.MOUSE_MOVE,ondialogHandle);
+					PopUpManager.addPopUp(dialog,this,true);
+					PopUpManager.centerPopUp(dialog);
+				}
+				
+			}
+			protected function ondialogHandle(e:Event):void{
+				if(dialog){
+					this.dialog.x = this.dialog.x < 0 ? 0 : this.dialog.x;
+					this.dialog.y = this.dialog.y < 0 ? 0 : this.dialog.y;
+				}
+			}
+			protected function ondialogWinClose(e:Event):void{
+				if(dialog){
+					dialog.removeEventListener(CloseEvent.CLOSE,ondialogWinClose);
+					dialog.removeEventListener(MouseEvent.MOUSE_MOVE,ondialogHandle);
+				}
+				dialog=null;
+			}
+			protected function addCompass(e:ChooseCompassDialogEvent):void
+			{
+				switch(e.compassType)
+				{
+					case CompassType.Compass1:
+						var compass1:Compass1=new Compass1();
+						basicApp.printBorder.addElement(compass1);
+						compass1.x=basicApp.printBorder.width-90;
+						compass1.y=30;
+						break;
+					case CompassType.Compass2:
+						var compass2:Compass2=new Compass2();
+						basicApp.printBorder.addElement(compass2);
+						compass2.x=basicApp.printBorder.width-90;
+						compass2.y=30;
+						break;
+					case CompassType.Compass3:
+						var compass3:Compass3=new Compass3();
+						basicApp.printBorder.addElement(compass3);
+						compass3.x=basicApp.printBorder.width-90;
+						compass3.y=30;
+						break;
+					case CompassType.Compass4:
+						var compass4:Compass4=new Compass4();
+						basicApp.printBorder.addElement(compass4);
+						compass4.x=basicApp.printBorder.width-90;
+						compass4.y=30;
+						break;
+					case CompassType.Compass5:
+						var compass5:Compass5=new Compass5();
+						basicApp.printBorder.addElement(compass5);
+						compass5.x=basicApp.printBorder.width-90;
+						compass5.y=30;
+						break;
+					case CompassType.Compass6:
+						var compass6:Compass6=new Compass6();
+						basicApp.printBorder.addElement(compass6);
+						compass6.x=basicApp.printBorder.width-90;
+						compass6.y=30;
+						break;
+					case CompassType.Compass7:
+						var compass7:Compass7=new Compass7();
+						basicApp.printBorder.addElement(compass7);
+						compass7.x=basicApp.printBorder.width-90;
+						compass7.y=30;
+						break;
+					case CompassType.Compass8:
+						var compass8:Compass8=new Compass8();
+						basicApp.printBorder.addElement(compass8);
+						compass8.x=basicApp.printBorder.width-90;
+						compass8.y=30;
+						break;
+				}
+				
+			} 
+			
+			
+			//添加图片
+			protected function addImgBtn_clickHandler(event:MouseEvent):void
+			{
+				var imgEdit:EditImage=new EditImage();
+				imgEdit.x=2*basicApp.printBorder.width/3;
+				imgEdit.y=10;
+				basicApp.printBorder.addElement(imgEdit);
+			}
+			//添加表格
+			protected function addTableBtn_clickHandler(event:MouseEvent):void
+			{
+				var tableEdit:addTable=new addTable();
+				tableEdit.x=2*basicApp.printBorder.width/3;
+				tableEdit.y=20;
+				basicApp.printBorder.addElement(tableEdit);
+			}
+			
+			
+			//添加标注
+			protected function addMarkBtn_clickHandler(event:MouseEvent):void
+			{
+				basicApp.printBorder.addElement(new EditMark());
+			}
+			public override function close():void{
+				if(printMapmodule){
+					this.basicApp.main.removeElement(printMapmodule.printTileWindow);
+					printMapmodule.printTileWindow=null;
+				}
+			}
+			public override function onMouseUp(e:MouseEvent):void{
+				this.basicApp.main.removeElement(this);
+				this.basicApp.main.addElement(this);
+			}
+			
+			
+		]]>
+	</fx:Script>
+	<mx:Canvas width="100%" height="235">
+		<mx:TabNavigator width="100%" height="208" >
+		
+			<s:NavigatorContent label="输出整饰" width="100%" height="100%">
+				<s:VGroup x="0" y="0" width="100%" height="171" gap="2">
+					<mx:Button icon="@Embed('printModify/wb.png')" label="添加文本" x="0" y="0" width="100%" height="25" labelPlacement="right" textAlign="left" id="addTextBtn" click="addTextBtn_clickHandler(event)"/>
+					<mx:Button icon="@Embed('printModify/zbz.png')" label="添加指北针" x="0" y="0" width="100%" height="25" labelPlacement="right" textAlign="left" id="addCompassBtn" click="addCompassBtn_clickHandler(event)"/>
+					<!--					<mx:Button icon="@Embed('printModify/blc.png')" label="添加比例尺" x="0" y="0" width="100%" height="25" labelPlacement="right" textAlign="left" id="addScaleBtn" click="addScaleBtn_clickHandler(event)"/>
+					-->					
+					<mx:Button icon="@Embed('printModify/tp.png')" label="添加图片" x="0" y="0" width="100%" height="25" labelPlacement="right" textAlign="left" id="addImgBtn" click="addImgBtn_clickHandler(event)"/>
+					<mx:Button icon="@Embed('printModify/bg.png')" label="添加表格" x="0" y="0" width="100%" height="25" labelPlacement="right" textAlign="left" id="addTableBtn" click="addTableBtn_clickHandler(event)"/>
+					
+					<mx:Button icon="@Embed('printModify/bz.gif')" label="图上添加标注" x="0" y="0" width="100%" height="25" labelPlacement="right" textAlign="left" id="addMarkBtn" click="addMarkBtn_clickHandler(event)"/>
+					<!--					
+					<mx:Button icon="@Embed('printModify/tk.png')" label="添加图框" x="0" y="0" width="100%" height="25" labelPlacement="right" textAlign="left" id="addFrameBtn" click=""/>
+					<mx:Button icon="@Embed('printModify/tk.png')" label="删除图框" x="0" y="0" width="100%" height="25" labelPlacement="right" textAlign="left" id="delFrameBtn" click=""/>-->
+					<s:HGroup height="35">
+						<s:Button x="20" y="175"  fontSize="12" label="打印预览" id="printPreviewBtn" click="printPreviewBtn_clickHandler(event)" width="80"  height="30" />
+						<s:Button x="100" y="175" fontSize="12"  label="保存打印图" id="savePrintImg" click="savePrintImg_clickHandler(event)" width="80"  height="30" />
+						<s:Button x="180" y="175" fontSize="12"  label="打印" id="printBtn" click="printBtn_clickHandler(event)" width="80"  height="30"/>
+							
+					</s:HGroup>
+					
+				</s:VGroup>
+			</s:NavigatorContent>
+		</mx:TabNavigator>
+		
+	</mx:Canvas>
+</components:BasicTileWindow>

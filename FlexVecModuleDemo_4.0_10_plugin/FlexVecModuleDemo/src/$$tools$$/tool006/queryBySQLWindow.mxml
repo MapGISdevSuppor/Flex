@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:BasicTileWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+							xmlns:s="library://ns.adobe.com/flex/spark" 
+							xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:components="components.*" width="280" height="180"
+							title="属性条件查询设置窗口" fontFamily="宋体" fontSize="12" x="900"  y="20"
+							creationComplete="queryWinCreationComplete(event)"
+							initialize="queryWinInitialize(event)">
+	<components:layout>
+		<s:BasicLayout/>
+	</components:layout>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import Mapgis7.WebService.BasLib.*;
+			
+			import config.ServerIP;
+			
+			import mx.controls.Alert;
+			import mx.events.ListEvent;
+			import mx.utils.StringUtil;
+			
+			import utilEvent.ReadURLEvent;
+			
+			import zdims.control.layer.LayerDataViewer;
+			import zdims.event.IMSMapEvent;
+			import zdims.event.IMSMapMouseEvent;
+			import zdims.util.IMSOperType;
+			
+			import zdimsExtends.QueryControl.drawHighLight;	
+
+			
+			private var VecAddress:String="";
+			private var viewConfig:ServerIP;
+			public var basicApp:FlexVecModuleDemo=null;
+			public var queryBySQLModule:QueryBySQLModule;
+			
+	
+			
+			
+			//定义图层数组
+			[Bindable]
+			private var queryLayers:Array = ["世界政区"];
+			private var Type:String;
+			private var callfun:Function;
+			import mx.events.FlexEvent;
+			
+			private  var layerDataViewer2:LayerDataViewer=null;
+			
+			protected function queryWinInitialize(event:FlexEvent):void
+			{
+				// TODO Auto-generated method stub
+				viewConfig=new ServerIP();
+				viewConfig.mapConfig1(this);
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, ReadURLCompelte);	
+				//添加地图容器的操作状态变化事件
+				basicApp.imsmap.addEventListener(IMSMapEvent.MAP_OPERTYPECHANGE,onOperChange);
+			}
+			
+			
+			public function onOperChange(e:Event):void
+			{
+				if(this.Type!=""&&this.callfun!=null)
+				{
+					basicApp.imsmap.removeEventListener(this.Type,this.callfun);
+				}
+			}
+			
+			
+			//获取服务地址
+			private function ReadURLCompelte(event:ReadURLEvent):void
+			{
+				VecAddress=viewConfig.vectorURL;
+				//this.vectorlayer.serverAddress=VecAddress;
+				//this.mapContainer.refresh();
+				
+				//添加地图容器的加载完毕事件：更新图层状态
+				var item:ContextMenuItem=new ContextMenuItem("清除鼠标状态");
+				item.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,Change);
+				basicApp.imsmap.contextMenu.customItems.push(item);
+				basicApp.imsmap.addEventListener(IMSMapEvent.MAPEVENT_MAPREADY,upLayer)
+			}
+			
+			
+			//清除鼠标状态
+			public function Change(e:Event):void
+			{
+				if(this.Type!=""&&this.callfun!=null)
+				{
+					basicApp.imsmap.setCurOper(IMSOperType.None);
+					basicApp.imsmap.removeEventListener(this.Type,this.callfun);
+				}
+			}
+			//选择查询图层，更新图层状态为编辑状态
+			protected function upLayer(event:IMSMapEvent):void
+			{
+				if (queryBySQLModule.vectlayer!=null)
+				{
+					changeHandler();
+				}
+				
+			}
+
+
+			//选择查询图层，更新图层状态为编辑状态
+			protected function changeHandler():void
+			{
+				//定义图层更新传入参数对象
+				var setLayerState:CSetSingleLayerStatusONFlex=new CSetSingleLayerStatusONFlex();
+				//图层所在GDB数据库在vectorLayer中的索引号
+				setLayerState.GdbIndex=0;
+				//图层所在在vectorLayer中的索引号
+				setLayerState.LayerIndex=this.subQueryLayer.selectedIndex;
+				//设置图层状态
+				setLayerState.LayerStatus=EnumLayerStatus.Editable;
+				//调用vectorlayer的更新图层方法，更新图层状态
+				queryBySQLModule.vectlayer.setSingleLayerStatusONFlex(setLayerState, onSetSingleLayerStatus);
+			}
+			
+			// 设置单图层的状态回调函数
+			public function onSetSingleLayerStatus(e:Event):void
+			{
+				var rlt:COperResult=queryBySQLModule.vectlayer.onSetAllEnumLayerStatus(e);
+				if (rlt.OperResult)
+				{	
+					//设置当前激活的图
+					basicApp.imsmap.activeLayerObj=queryBySQLModule.vectlayer;
+					basicApp.imsmap.setCurOper(IMSOperType.Refresh);
+					//Alert.show("图层状态更新成功!");
+				}
+			}
+			private function select():void
+			{
+				if (!basicApp.imsmap.existActiveLayerObj())
+				{
+					//当前地图容器是否有激活的地图对象
+					return;
+				}
+				if(this.txtSqlExpress.text!="")
+				{
+					//初始化图层查询参数传入对象
+					var mapsel:CLayerSelectParam = new CLayerSelectParam();
+					//初始化web查询参数设置对象类
+					var websel:CWebSelectParam = new CWebSelectParam();
+					websel.CompareRectOnly = basicApp.imsmap.activeLayerObj.compareRectOnly;
+					websel.MustInside = basicApp.imsmap.activeLayerObj.mustInside;
+					//设置查询半径
+					websel.NearDistance = basicApp.imsmap.activeLayerObj.nearDistanse;
+					//设置查询类型
+					websel.SelectionType = ESelectionType.Condition;
+					//属性查询条件
+					var sqlStr:String="";
+					sqlStr=this.SqlContent.text+this.txtSqlExpress.text+"'";
+	
+					websel.WhereClause = sqlStr;
+					//设置web查询参数对象
+					mapsel.WebSelectParam = websel;
+					//查询页面	
+					mapsel.PageCount = 0;				
+					layerDataViewer2._lastSelectParam=mapsel;
+					//调用矢量图层的属性查询方法，查询要素
+					basicApp.imsmap.activeLayerObj.layerSelectAndGetAtt(mapsel, callBack);
+					if(this.highlight.selected)
+					{
+						//高亮显示查询结果，传入地图容器对象，web查询参数，绘图层对象
+						drawHighLight.instance.AddhighLightFeatures(basicApp.imsmap,mapsel,queryBySQLModule.graphicsLayer1);
+					}
+				}else{
+				
+					Alert.show("输入的条件不能为空!");
+					return;
+				}
+			}
+			protected function excuteQuery_clickHandler(event:MouseEvent):void
+			{
+				
+				
+				if (!basicApp.imsmap.existActiveLayerObj())
+				{
+					//当前地图容器是否有激活的地图对象
+					return;
+				}
+				
+				if(this.txtSqlExpress.text!="")
+				{
+					//初始化图层查询参数传入对象
+					var mapsel:CLayerSelectParam = new CLayerSelectParam();
+					//初始化web查询参数设置对象类
+					var websel:CWebSelectParam = new CWebSelectParam();
+					websel.CompareRectOnly = basicApp.imsmap.activeLayerObj.compareRectOnly;
+					websel.MustInside = basicApp.imsmap.activeLayerObj.mustInside;
+					//设置查询半径
+					websel.NearDistance = basicApp.imsmap.activeLayerObj.nearDistanse;
+					//设置查询类型
+					websel.SelectionType = ESelectionType.Condition;
+					//属性查询条件
+					var sqlStr:String="";
+						sqlStr=this.SqlContent.text+this.txtSqlExpress.text+"'";
+						
+				  var st:String=mx.utils.StringUtil.trim(this.txtSqlExpress.text.toString());	
+				  if(st==""){
+				  	Alert.show("输入的条件不能为空!");
+				  }
+				
+					//var sqlStr:String=this.SqlContent.text+this.txtSqlExpress.text+"'";
+					websel.WhereClause = sqlStr;
+					//设置web查询参数对象
+					mapsel.WebSelectParam = websel;
+					//查询页面		
+					mapsel.PageCount = 0;			
+					layerDataViewer2._lastSelectParam=mapsel;
+					//调用矢量图层的属性查询方法，查询要素
+					basicApp.imsmap.activeLayerObj.layerSelectAndGetAtt(mapsel, callBack);
+					if(this.highlight.selected)
+					{
+						//高亮显示查询结果，传入地图容器对象，web查询参数，绘图层对象
+						drawHighLight.instance.AddhighLightFeatures(basicApp.imsmap,mapsel,queryBySQLModule.graphicsLayer1);
+					}
+				}else{
+				
+					Alert.show("输入的条件不能为空!");
+					return;
+				}
+			}
+			//查询要素回调处理事件
+			public function callBack(e:Event):void
+			{
+				//获取查询结果，并显示到查询结果框中
+				layerDataViewer2.showResult(queryBySQLModule.vectlayer.onLayerSelectAndGetAtt(e));
+				layerDataViewer2.visible= true;
+			}
+			//清理查询结果
+			protected function clear_clickHandler(event:MouseEvent):void
+			{
+				queryBySQLModule.graphicsLayer1.removeAllGraphics();
+			}
+			//更新图层状态
+			protected function subQueryLayer_clickHandler(event:MouseEvent):void
+			{
+				changeHandler();
+			}
+			
+			protected function queryWinCreationComplete(event:FlexEvent):void
+			{
+				changeHandler();
+				// TODO Auto-generated method stub
+				if (layerDataViewer2==null)
+				{
+					layerDataViewer2=new LayerDataViewer();
+					layerDataViewer2.right=50;
+					layerDataViewer2.top=200;
+					//layerDataViewer2.id="layerDataRlt";
+					layerDataViewer2.title="图层属性条件查询结果";
+					layerDataViewer2.imsmap=basicApp.imsmap;
+					layerDataViewer2.graphicslayer=queryBySQLModule.graphicsLayer2;
+					layerDataViewer2.visible=false;
+					basicApp.main.addElement(layerDataViewer2);					
+				}
+				
+			}
+			public override function close():void{
+				if(queryBySQLModule){
+					queryBySQLModule.graphicsLayer1.removeAllGraphics();
+					this.basicApp.main.removeElement(this.queryBySQLModule.queryBySqlWindow);
+					this.queryBySQLModule.queryBySqlWindow=null;
+				}
+			}
+			public override function onMouseUp(e:MouseEvent):void{
+				this.basicApp.main.removeElement(this);
+				this.basicApp.main.addElement(this);
+			}
+			
+			
+		]]>
+	</fx:Script>
+	<s:VGroup gap="10" left="5" top="5" bottom="5" right="5">
+		<s:HGroup>
+			<mx:Label text="查询图层：" />			
+			<mx:ComboBox id="subQueryLayer"   dataProvider="{queryLayers}" selectedIndex="0" click="subQueryLayer_clickHandler(event)"        width="146"/>
+		</s:HGroup>
+		<s:HGroup>
+			<mx:Label text="SQL 语句："/>
+			<!--<mx:Spacer width="3"/>-->
+			<mx:Label  y="10" id="SqlContent" text="name like '" />
+			<mx:TextInput id="txtSqlExpress" fontFamily="宋体" fontSize="12" text="中华%" width="60"/>
+			<s:Label  text="'" />
+		</s:HGroup>
+		<s:HGroup>
+			<s:CheckBox id="highlight" content="    是否高亮显示" >								
+			</s:CheckBox>
+		</s:HGroup>
+		<s:HGroup gap="10" width="100%" height="100%" horizontalAlign="center">
+			<mx:Button label="查询" id="excuteQuery"   click="excuteQuery_clickHandler(event)" />
+			<mx:Button label="清除高亮显示" id="clear"  click="clear_clickHandler(event)"/>
+		</s:HGroup>
+	</s:VGroup>
+</components:BasicTileWindow>
