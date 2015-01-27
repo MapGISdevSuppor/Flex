@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+	<MapURLConfig>
+		<config>
+		<VectorUrl>http://www.mapgis.com/RsWebSite/RelayHandlerSite/RelayHandler.ashx</VectorUrl>
+		<TileURL>http://www.mapgis.com/RsWebSite/RelayHandlerSite/RelayHandler.ashx</TileURL>
+		<ServerURL>http://www.mapgis.com/RsWebSite/newFlexDemo/FlexNetWebSite/Gateway.aspx</ServerURL>
+		<TerrainURL>http://mt0.google.cn/vt/lyrs=t@130,r@207000000&hl=zh-CN&gl=CN&</TerrainURL>
+		<BasicURL>http://mt0.google.cn/vt/lyrs=m@176000000&hl=zh-CN&gl=cn&</BasicURL>	
+		<QueryWebAddress>http://www.mapgis.com/RsWebSite/CityDemoWeb/Service.asmx?WSDL</QueryWebAddress>
+		</config>
+	</MapURLConfig>
