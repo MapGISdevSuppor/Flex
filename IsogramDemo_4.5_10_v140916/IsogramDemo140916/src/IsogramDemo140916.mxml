@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:map="zdims.map.*"
+			   xmlns:components="components.*"
+			   minWidth="955" minHeight="600"
+			   creationComplete="application1_creationCompleteHandler(event)"
+			   initialize="application1_initializeHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import Mapgis7.WebService.BasLib.CGdbInfo;
+			import Mapgis7.WebService.BasLib.CLayerAccessInfo;
+			import Mapgis7.WebService.BasLib.CLayerInfo;
+			import Mapgis7.WebService.BasLib.CLineInfo;
+			import Mapgis7.WebService.BasLib.COpenLayer;
+			import Mapgis7.WebService.BasLib.COperResult;
+			import Mapgis7.WebService.BasLib.CRegionInfo;
+			import Mapgis7.WebService.BasLib.EXClsType;
+			
+			import components.contour.ContourParam;
+			import components.contour.ContourZValue;
+			import components.contour.MeshingParam;
+			
+			import config.mapConfig;
+			
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.formatters.DateFormatter;
+			import mx.messaging.messages.HTTPRequestMessage;
+			import mx.rpc.AbstractOperation;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.http.HTTPService;
+			import mx.rpc.soap.WebService;
+			import mx.utils.ObjectProxy;
+			
+			import spark.events.IndexChangeEvent;
+			
+			import utilEvent.ReadURLEvent;
+			
+			import zdims.map.GoogleInfo;
+			import zdims.map.VectorLayerEx;
+			import zdims.map.VectorMapDocEx;
+			
+			
+			include "components/myData/myisoList.as";
+			
+			private var TerrainAdress:String="";
+			private var BasicAdress:String="";
+			private var RoadAdress:String="";
+			private var RasterAdress:String="";
+			private var vectorMapAddress:String="";
+			private var isoimgAdress:String="";
+			private var vectorMapdocName="";
+			
+			private var tick:Timer;
+			private var isoIndex:int=0;
+			private var strArrL:ArrayCollection;
+			private var strArrR:ArrayCollection;
+			private var timeArrL:ArrayCollection;
+			private var timeArrR:ArrayCollection;
+			private var mapconfig:mapConfig;
+			
+			private var contourAnlyGDBName:String;
+			private var t:int;
+			
+			private var clipTimer:Timer=new Timer(10);
+			public var mytimer:Timer;
+			[Bindable] 
+			private var j:uint=10;
+			[Bindable]
+			private var enableProbar:String="";  
+			private var flag:int=0;
+			
+			private var web:WebService;
+			private var weburl:String="http://localhost/ContourAnalyseService20/Service1.asmx";
+			
+			/**
+			 *地图显示参数初始化
+			 */
+			protected function application1_initializeHandler(event:FlexEvent):void
+			{
+				if(mapconfig==null)
+				{
+					mapconfig=new mapConfig();
+					mapconfig.mapConfig1(this);
+				}
+				this.addEventListener(ReadURLEvent.READ_COMPLETE,mapconfigURLReadComplete);
+			}
+			
+			
+			/**
+			 *获取服务地址
+			 */
+			private function mapconfigURLReadComplete(e:ReadURLEvent):void
+			{
+				BasicAdress=mapconfig.basicURL;
+				RasterAdress=mapconfig.rasterURL;
+				RoadAdress=mapconfig.roadURL;
+				TerrainAdress=mapconfig.terrainURL;
+				vectorMapAddress=mapconfig.vectorURL;
+				isoimgAdress=mapconfig.isoimgURL;
+				weburl=mapconfig.webUrl;
+				contourAnlyGDBName=mapconfig.contourAnalyseGdbName;//等值线分析结果数据库名
+				vectorMapdocName=mapconfig.vecdocName;
+				if(mapdoc&&vectorMapdocName)
+				{
+					mapdoc.mapDocName=vectorMapdocName;
+				}
+				if(mapdoc&&vectorMapAddress)
+				{
+					mapdoc.serverAddress=vectorMapAddress;
+				}
+				
+				if(generateContour&&mapconfig.webUrl)
+				{
+					generateContour.weburl=mapconfig.webUrl;
+				}
+				if(generateContour&&mapconfig.contourAnalyseGdbName)
+				{
+					generateContour.gdbName=mapconfig.contourAnalyseGdbName;
+				}
+			}
+			
+			protected function application1_creationCompleteHandler(event:FlexEvent):void
+			{
+				initMap();
+			}
+			
+			/**
+			 *等值线
+			 */
+			private function isolineClick():void
+			{
+				var url:String="../bin-debug/isogramImg.html";
+				var variables:URLVariables=new URLVariables();
+				variables.uid=1;
+				var request:URLRequest=new URLRequest(url);
+				request.data=variables;
+				try{
+					navigateToURL(request,"_blank");
+				}
+				catch(e:Error){
+				}
+			}
+			
+			/**
+			 *地图类型切换
+			 */
+			protected function SelectMapType_changeHandler(event:IndexChangeEvent):void
+			{
+				initMap();
+			}
+			
+			/**
+			 *根据选择的类型加载地图
+			 */
+			private function initMap():void
+			{
+				var mapType:String=this.SelectMapType.selectedItem;
+				if(mapType!=null)
+				{
+					switch(mapType.toString())
+					{
+						case "Google Basic地图":
+							this.googleMap.display=true;
+							this.googleMap.layerType=GoogleInfo.VectorLayer;
+							if(BasicAdress!="")
+							{
+								GoogleInfo.vectorBasicUrl=this.BasicAdress;
+							}
+							break;
+						case "Google Raster地图":
+							this.googleMap.display=true;
+							this.googleMap.layerType=GoogleInfo.RasterLayer;
+							if(RasterAdress!="")
+							{
+								GoogleInfo.rasterBasicUrl=this.RasterAdress;
+							}
+							break;
+						case "Google Road地图":
+							this.googleMap.display=true;
+							this.googleMap.layerType=GoogleInfo.RoadLayer;
+							if(RoadAdress!=null)
+							{
+								GoogleInfo.roadBasicUrl=this.RoadAdress;
+							}
+							break;
+						case "Google Terrain地图":
+							this.googleMap.display=true;
+							this.googleMap.layerType=GoogleInfo.TerrainLayer;
+							if(TerrainAdress!="")
+							{
+								GoogleInfo.terrainBasicUrl=this.TerrainAdress;
+							}
+							break;
+						default:
+							this.googleMap.display=true;
+							this.googleMap.layerType=GoogleInfo.RasterLayer;
+							if(BasicAdress!="")
+							{
+								GoogleInfo.rasterBasicUrl=this.RasterAdress;
+							}
+							break;
+					}
+					mapContainer.initShowLevel=mapContainer.oldLevel;
+					this.mapContainer.refresh();
+				}
+				
+			}
+			
+			private function initProBar():void { 
+				mytimer = new Timer(10); 
+				generateContour.timer=mytimer;
+				mytimer.addEventListener(TimerEvent.TIMER, timer_timer); 
+			} 
+			
+			private function timer_timer(evt:TimerEvent):void { 
+				runit();
+			} 
+			private function resetProgressBar():void { 
+				mytimer.start();                
+				myprogressBar.setProgress(0, 100); 
+			} 
+			private function playProgressBar():void { 
+				enableProbar="";
+				j=0;
+				resetProgressBar(); 
+				mytimer.start(); 
+			} 
+			
+			//进度条begin		
+			private function runit():void
+			{
+				if(enableProbar=="")
+				{
+					if(j<=100){       
+						myprogressBar.setProgress(j,100);
+						j+=1;      
+						if(j==100){
+							j=0;
+						}
+					}
+				}
+			} 
+			
+			/**
+			 * 生成等值线
+			 */
+			protected function configBtn_clickHandler(event:MouseEvent):void
+			{
+				if(generateContour.visible)
+					generateContour.visible=false;
+				else
+					generateContour.visible=true;
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<s:Resize id="mouseon" widthTo="100" heightTo="110" duration="500"/>
+		<s:Resize id="mouseout" widthTo="80" heightTo="90" duration="500"/>
+		<!--擦除效果-->
+		<mx:WipeRight id="show" duration="1000"/>
+		<mx:WipeLeft id="hide" duration="1000"/>
+	</fx:Declarations>
+	<!--地图显示-->
+	<map:IMSMap id="mapContainer" x="0" y="0" levelNum="15" initShowLevel="7"
+				width="100%" height="100%" enableAnimate="false"
+				restoreCenterX="12008196.042592192" restoreCenterY="2719935.2144997073"
+				enableProgressBar="false">
+		<map:GoogleTileLayer id="googleMap" x="50" y="65"  
+								  isDisTileNetErrInfo="false">
+		</map:GoogleTileLayer>
+		<map:VectorMapDocEx id="mapdoc" autoGetMapInfo="true"/>
+	</map:IMSMap>
+	<components:GenerateContour id="generateContour" x="100" y="154"  visible="false"
+								imsmap="{mapContainer}" progressBar="{myprogressBar}" >
+	</components:GenerateContour>
+	<!--系统logo-->
+	<mx:Image id="logo" x="30" y="20" width="373" height="70" source="@Embed('myImages/系统logo.png')"/>
+	<!--功能按钮-->
+	<mx:Image id="toollogo" x="6" y="226" 
+			  source="@Embed('myImages/叠加显示.png')" 
+			  rollOverEffect="{mouseon}" rollOutEffect="{mouseout}"
+			  click="configBtn_clickHandler(event)"/>
+	<mx:Image x="6" y="347" buttonMode="true" 
+			  source="@Embed('myImages/图层展示.png')" toolTip="降雨等值线图"
+			  rollOverEffect="{mouseon}" rollOutEffect="{mouseout}"
+			  click="isolineClick()" />
+	
+	<!--地图选择-->
+	<s:DropDownList right="50" top="50" height="30" id="SelectMapType" 
+					fontFamily="微软雅黑"   fontSize="12"  
+					chromeColor="#0B79F5" focusColor="#0B83F3" width="148"
+					selectedIndex="0" change="SelectMapType_changeHandler(event)" >
+		<s:ArrayList>
+			<fx:String>Google Raster地图</fx:String>
+			<fx:String>Google Basic地图</fx:String>
+			<fx:String>Google Road地图</fx:String>
+			<fx:String>Google Terrain地图</fx:String>
+		</s:ArrayList>
+	</s:DropDownList>
+	
+	<mx:ProgressBar id="myprogressBar" 
+					mode="manual"        
+					labelPlacement="center"  
+					width="218" 
+					height="16" 
+					x="{this.width/2}" y="{this.height/2}"
+					creationComplete="initProBar();"   
+					chromeColor="#0D33F1" alpha="1.0" visible="false"  />  
+	
+</s:Application>

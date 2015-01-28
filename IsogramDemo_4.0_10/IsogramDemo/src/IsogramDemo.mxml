@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:map="zdims.map.*" 
+			   xmlns:othermap="zdims.othermap.*"
+			   minWidth="955" minHeight="600" 
+			   creationComplete="application1_creationCompleteHandler(event)">
+
+	<fx:Script>
+		<![CDATA[
+			import config.mapConfig;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.FlexEvent;
+			
+			import spark.events.IndexChangeEvent;
+			
+			import utilEvent.ReadURLEvent;
+			
+			import zdims.map.VectorMapDoc;
+			import zdims.othermap.GoogleLayerType;
+			
+			include "components/myData/myisoList.as";
+			
+			private var TerrainAdress:String="";
+			private var BasicAdress:String="";
+			private var RoadAdress:String="";
+			private var RasterAdress:String="";
+			private var vectorMapAdress:String="";
+			private var isoimgAdress:String="";
+			
+			private var mapdoc:VectorMapDoc;
+			private var tick:Timer;
+			private var isoIndex:int=0;
+			private var strArrL:ArrayCollection;
+			private var strArrR:ArrayCollection;
+			private var mapconfig:mapConfig;
+			
+			/**
+			 *地图显示参数初始化
+			 */
+			private function map_creationComplete():void
+			{
+				if(mapconfig==null)
+				{
+					mapconfig=new mapConfig();
+					mapconfig.mapConfig1(this);
+				}
+				this.addEventListener(ReadURLEvent.READ_COMPLETE,mapconfigURLReadComplete);
+			}
+			
+			/**
+			 *获取服务地址
+			 */
+			private function mapconfigURLReadComplete(e:ReadURLEvent):void
+			{
+				BasicAdress=mapconfig.basicURL;
+				RasterAdress=mapconfig.rasterURL;
+				RoadAdress=mapconfig.roadURL;
+				TerrainAdress=mapconfig.terrainURL;
+				vectorMapAdress=mapconfig.vectorURL;
+				isoimgAdress=mapconfig.isoimgURL;
+			}
+			
+			/**
+			 *初始化等值线（面）参数
+			 */
+			protected function initParam():void
+			{
+				clearMapdoc();
+				isoIndex=0;
+				strArrL=new ArrayCollection();
+				strArrR=new ArrayCollection();
+				mapdoc=new VectorMapDoc();
+				if(lineBtn.selected)
+				{
+					isoList.dataProvider=isoLineList;
+					for(var i:int=0;i<isoLineList.length;i++)
+					{
+						strArrL.addItem(isoLineList[i].mapname);
+					}
+					mapdoc.mapDocName=strArrL[0];
+				}
+				if(gramBtn.selected)
+				{
+					isoList.dataProvider=isoGramList;
+					for(var j:int=0;j<isoGramList.length;j++)
+					{
+						strArrR.addItem(isoGramList[j].mapname);
+					}
+					mapdoc.mapDocName=strArrR[0];
+				}
+				this.isoList.selectedIndex=0;
+				addIsogramMap();
+			}
+			
+			/**
+			 *添加等值线（面）图到地图容器中
+			 */
+			private function addIsogramMap():void
+			{
+				
+				mapdoc.serverAddress=this.vectorMapAdress;
+				this.mapContainer.addElement(mapdoc);
+				
+			}
+			
+			/**
+			 *控制面板上的小图标，控制地图的显示与隐藏
+			 */
+			protected function toollogo_clickHandler(event:MouseEvent):void
+			{
+				if(isotool.visible)
+				{
+					isotool.visible=false;
+					if(tick!=null)
+					{
+						tick.stop();
+					}
+					clearMapdoc();
+				}
+				else
+				{
+					isotool.visible=true;
+					initParam();
+				}
+			}
+			
+			/**
+			 *等值线
+			 */
+			private function isolineClick():void
+			{
+				var url:String="../bin-debug/isogramImg.html";
+				var variables:URLVariables=new URLVariables();
+				variables.uid=1;
+				var request:URLRequest=new URLRequest(url);
+				request.data=variables;
+				try{
+					navigateToURL(request,"_blank");
+				}
+				catch(e:Error){
+				}
+			}
+			
+			/**
+			 *地图类型切换
+			 */
+			protected function SelectMapType_changeHandler(event:IndexChangeEvent):void
+			{
+				initMap();
+			}
+			
+			/**
+			 *根据选择的类型加载地图
+			 */
+			private function initMap():void
+			{
+				var mapType:String=this.SelectMapType.selectedItem;
+				if(mapType!=null)
+				{
+					switch(mapType.toString())
+					{
+						case "Google Basic地图":
+							this.googleMap.display=true;
+							this.googleMap.googleLayerType=GoogleLayerType.BasicMap;
+							if(BasicAdress!="")
+							{
+								this.googleMap.serverAddress=this.BasicAdress;
+							}
+							break;
+						case "Google Raster地图":
+							this.googleMap.display=true;
+							this.googleMap.googleLayerType=GoogleLayerType.RasterMap;
+							if(RasterAdress!="")
+							{
+								this.googleMap.serverAddress=this.RasterAdress;
+							}
+							break;
+						case "Google Road地图":
+							this.googleMap.display=true;
+							this.googleMap.googleLayerType=GoogleLayerType.RoadMap;
+							if(RoadAdress!=null)
+							{
+								this.googleMap.serverAddress=this.RoadAdress;
+							}
+							break;
+						case "Google Terrain地图":
+							this.googleMap.display=true;
+							this.googleMap.googleLayerType=GoogleLayerType.TerrainMap;
+							if(TerrainAdress!="")
+							{
+								this.googleMap.serverAddress=this.TerrainAdress;
+							}
+							break;
+						default:
+							this.googleMap.display=true;
+							this.googleMap.googleLayerType=GoogleLayerType.BasicMap;
+							if(BasicAdress!="")
+							{
+								this.googleMap.serverAddress=this.BasicAdress;
+							}
+							break;
+					}
+					mapContainer.initShowLevel=mapContainer.oldLevel;
+					this.mapContainer.refresh();
+				}
+				
+			}
+
+
+			/**
+			 *根据选中的等值线（面）图，加载等值线（面）图
+			 */
+			protected function isoList_changeHandler(event:IndexChangeEvent):void
+			{
+				clearMapdoc();
+				isoIndex=this.isoList.selectedIndex;
+				var mapName:String=new String();
+				if(lineBtn.selected)
+				{
+					mapName=strArrL[isoIndex];
+				}
+				if(gramBtn.selected)
+				{
+					mapName=strArrR[isoIndex];
+				}
+				mapdoc=new VectorMapDoc();
+				mapdoc.mapDocName=mapName;//设置等值线（面）图的名称
+				addIsogramMap();
+			}
+			
+			/**
+			 *清除等值线（面）图层
+			 */
+			private function clearMapdoc():void
+			{
+				if(mapdoc!=null&&this.mapContainer.contains(mapdoc))
+				{
+					this.mapContainer.removeElement(mapdoc);
+				}
+				mapContainer.initShowLevel=mapContainer.oldLevel;
+			}
+
+
+			protected function application1_creationCompleteHandler(event:FlexEvent):void
+			{
+				map_creationComplete();
+				initMap();
+			}
+
+
+			/**
+			 *等值选项切换为等值线
+			 */
+			protected function lineBtn_clickHandler(event:MouseEvent):void
+			{
+				if(tick!=null)
+				{
+					tick.stop();
+				}
+				initParam();
+			}
+
+
+			/**
+			 *等值选项切换为等值面
+			 */
+			protected function gramBtn_clickHandler(event:MouseEvent):void
+			{
+				if(tick!=null)
+				{
+					tick.stop();
+				}
+				initParam();
+			}
+
+
+			/**
+			 *删除等值线（面）按钮点击事件
+			 */
+			protected function deliso_clickHandler(event:MouseEvent):void
+			{
+				if(tick!=null)
+					tick.stop();
+				clearMapdoc();
+			}
+
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<s:Resize id="mouseon" widthTo="100" heightTo="110" duration="500"/>
+		<s:Resize id="mouseout" widthTo="80" heightTo="90" duration="500"/>
+		<!--擦除效果-->
+		<mx:WipeRight id="show" duration="1000"/>
+		<mx:WipeLeft id="hide" duration="1000"/>
+	</fx:Declarations>
+	<!--地图显示-->
+	<map:IMSMap id="mapContainer" x="0" y="0" levelNum="15" initShowLevel="7"
+				width="100%" height="100%" enableAnimate="false"
+				xMinMap="-20037508.3427892" xMaxMap=" 20037508.3427892" yMinMap="-20037508.3427892" yMaxMap="20037508.3427892"
+				restoreCenterX="12008196.042592192" restoreCenterY="2719935.2144997073"
+				enableProgressBar="false">
+		<othermap:GoogleTileLayer id="googleMap" x="50" y="65"  
+								  isDisTileNetErrInfo="false"
+								  startLevel="0">
+		</othermap:GoogleTileLayer>
+	</map:IMSMap>
+	<!--系统logo-->
+	<mx:Image id="logo" x="30" y="20" width="373" height="70" source="@Embed('myImages/系统logo.png')"/>
+	<!--功能按钮-->
+	<mx:Image id="toollogo" x="6" y="105" 
+			  source="@Embed('myImages/叠加显示.png')" 
+			  rollOverEffect="{mouseon}" rollOutEffect="{mouseout}"
+			  click="toollogo_clickHandler(event)"/>
+	<mx:Image x="6" y="226" buttonMode="true" 
+			  source="@Embed('myImages/图层展示.png')" toolTip="降雨等值线图"
+			  rollOverEffect="{mouseon}" rollOutEffect="{mouseout}"
+			  click="isolineClick()" />
+	
+	<!--地图选择-->
+	<s:DropDownList right="50" top="50" height="30" id="SelectMapType" 
+					fontFamily="微软雅黑"   fontSize="12"  
+					chromeColor="#0B79F5" focusColor="#0B83F3" width="148"
+					selectedIndex="0" change="SelectMapType_changeHandler(event)" >
+		<s:ArrayList>
+			<fx:String>Google Basic地图</fx:String>
+			<fx:String>Google Raster地图</fx:String>
+			<fx:String>Google Road地图</fx:String>
+			<fx:String>Google Terrain地图</fx:String>
+		</s:ArrayList>
+	</s:DropDownList>
+	
+	<!--控制面板-->
+	<mx:Canvas width="320" height="470" id="isotool" 
+			   x="47" y="{this.logo.x+this.logo.height+5}"
+			   showEffect="{show}" hideEffect="{hide}" visible="false">
+		<!--选项控制设置-->
+		<mx:Canvas id="isotree" x="47" y="0" width="252" 
+				   backgroundColor="#101AEA" backgroundAlpha="0.52"
+				   dropShadowVisible="true" 
+				   showEffect="{show}" hideEffect="{hide}" height="440">
+			<s:List id="isoList" x="31" y="124" width="190" height="275" labelField="time" selectedIndex="0"
+					change="isoList_changeHandler(event)"></s:List>
+			<mx:Button x="31" y="94" label="等值线列表" width="177" chromeColor="#1E23F3" mouseEnabled="false" fontFamily="微软雅黑"/>
+			<mx:Button x="31" y="30" label="等值选项" width="177" chromeColor="#1E23F3" mouseEnabled="false" fontFamily="微软雅黑"/>
+			<s:RadioButton id="lineBtn" x="31" y="68" label="等值线"  fontFamily="微软雅黑" selected="true" click="lineBtn_clickHandler(event)"/>
+			<s:RadioButton id="gramBtn" x="128" y="68" label="等值面"  fontFamily="微软雅黑" click="gramBtn_clickHandler(event)" />
+			<!--<s:NumericStepper id="timeNum" x="157" y="403" width="64" maximum="10" minimum="2" stepSize="1" value="1"/>
+			<s:Label x="27" y="406" text="播放间隔(单位：秒)：" fontFamily="微软雅黑" width="128"/>-->
+			<!--<mx:Button id="showFlash" x="42" y="434" width="65" label="播放" chromeColor="#1E23F3"
+			click="showFlash_clickHandler(event)" fontFamily="微软雅黑"/>
+			<s:Button id="pauseFlash" x="138" y="434" label="暂停"
+			chromeColor="#1E23F3" fontFamily="微软雅黑"
+			click="pauseFlash_clickHandler(event)"/>-->
+			<s:Label x="10" y="7" color="#FEFCFC" fontFamily="微软雅黑" fontSize="15" fontWeight="bold"
+					 text="降雨等值线图层展示"/>
+			<mx:Button id="deliso" x="68" y="410" 
+					   label="删除等值线图层" fontFamily="微软雅黑" chromeColor="#1E23F3" 
+					   click="deliso_clickHandler(event)"/>
+		</mx:Canvas>
+	</mx:Canvas>
+	
+</s:Application>

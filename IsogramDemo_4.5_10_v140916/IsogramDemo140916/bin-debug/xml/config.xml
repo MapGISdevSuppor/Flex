@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+    <MapURLConfig>
+        <config>
+            <TileUrl>http://127.0.0.1:6163/igs/rest/ims/relayhandler</TileUrl>
+            <VectorUrl>http://127.0.0.1:6163/igs/rest/ims/relayhandler</VectorUrl>
+            <isoimgUrl>../isogramImg.html</isoimgUrl>
+            <BasicUrl>http://mt2.google.cn/vt/lyrs=m@244000000</BasicUrl>
+            <RasterUrl>http://mt1.google.cn/vt/lyrs=s@156&gl=CN</RasterUrl>
+            <RoadUrl>http://mt0.google.cn/vt/imgtp=png32&lyrs=h@247000000&hl=zh-CN&gl=CN</RoadUrl>
+            <TerrainUrl>http://mt3.google.cn/vt/lyrs=t@128,r@170000000&hl=zh-CN&gl=cn</TerrainUrl>
+            <VectMapdocName>gx</VectMapdocName>
+            <GDBName>TEST080601</GDBName>
+	<!-- 传统开发，传统发布，将其发布到默认网站下时的地址（其中，介于localhost和Service1之间的为发布时网站的别名） -->
+            <webURL>http://localhost/test/Service1.asmx</webURL>
+        </config>
+    </MapURLConfig>

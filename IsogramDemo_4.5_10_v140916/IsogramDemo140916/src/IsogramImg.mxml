@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   minWidth="955" minHeight="600"
+			   xmlns:components="components.*"
+			   creationComplete="initApplication()">
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import spark.events.IndexChangeEvent;
+			
+			include "components/myData/myisoList.as";
+			
+			private var isoIndex:int=0;
+			private var strArrL:ArrayCollection;
+			private var strArrR:ArrayCollection;
+			private var tick:Timer;
+			private var TimeTemp:int=1000;
+			
+			protected function initApplication():void
+			{
+				if(img1!=null&&!img1.visible)
+				{
+					img1.visible=true;
+				}
+				if(img2!=null&&!img2.visible)
+				{
+					img2.visible=true;
+				}
+				initParam();
+			}
+			
+			/**
+			 *初始化
+			 */
+			protected function initParam():void
+			{
+				var loader:Loader=new Loader();
+				var url:String=new String();
+				loader.unload();
+				isoIndex=0;
+				strArrL=new ArrayCollection();
+				strArrR=new ArrayCollection();
+				if(lineBtn.selected)
+				{
+					isoList.dataProvider=isoLineListimg;
+					for(var i:int=0;i<isoLineListimg.length;i++)
+					{
+						var strAdressL:String=new String();
+						strAdressL="myImages/myline/"+isoLineListimg[i].imgname;
+						strArrL.addItem(strAdressL);
+					}
+					url=strArrL[0];
+				}
+				if(gramBtn.selected)
+				{
+					isoList.dataProvider=isoGramListimg;
+					for(var j:int=0;j<isoGramListimg.length;j++)
+					{
+						var strAdressR:String=new String();
+						strAdressR="myImages/myreg/"+isoGramListimg[j].imgname;
+						//						strAdressR="http://localhost/降雨等值线展示案例/bin-debug/myImages/myreg/"+isoGramListimg[j].imgname;
+						strArrR.addItem(strAdressR);
+					}
+					url=strArrR[0];
+				}
+				
+				var request:URLRequest=new URLRequest(url);
+				loader.load(request);
+				loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,errorEventHandler);
+				loader.contentLoaderInfo.addEventListener(Event.COMPLETE,function(e:Event):void
+				{
+					if(e.target.content!=null)
+					{
+						
+						isoimg.source=e.target.content;
+					}
+					
+				});
+				isoimg.x=img1.x;
+				isoimg.y=img1.y;
+				isoimg.percentHeight=100;
+				isoimg.percentWidth=100;
+				this.mapContainer.addElement(isoimg);
+				this.isoList.selectedIndex=0;
+			}
+			
+			private function errorEventHandler(e:IOErrorEvent):void
+			{
+				Alert.show("#2036:降雨等值线图加载失败!");
+			}
+			
+			protected function isoList_changeHandler(event:IndexChangeEvent):void
+			{
+				isoIndex=this.isoList.selectedIndex;
+				var loader:Loader=new Loader();
+				var url:String=new String();
+				loader.unload();
+				if(lineBtn.selected)
+				{
+					url=strArrL[isoIndex];
+				}
+				if(gramBtn.selected)
+				{
+					url=strArrR[isoIndex];
+				}
+				var request:URLRequest=new URLRequest(url);
+				loader.load(request);
+				loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,errorEventHandler);
+				loader.contentLoaderInfo.addEventListener(Event.COMPLETE,function(e:Event):void
+				{
+					if(e.target.content!=null)
+					{
+						
+						isoimg.source=e.target.content;
+					}
+					
+				});
+			}
+			
+			
+			/**
+			 *等值选项切换为等值线
+			 */
+			protected function lineBtn_clickHandler(event:MouseEvent):void
+			{
+				if(tick!=null)
+					tick.stop();
+				if(img1!=null&&!img1.visible)
+				{
+					img1.visible=true;
+				}
+				if(img2!=null&&!img2.visible)
+				{
+					img2.visible=true;
+				}
+				initParam();
+			}
+			
+			
+			/**
+			 *等值选项切换为等值面
+			 */
+			protected function gramBtn_clickHandler(event:MouseEvent):void
+			{
+				if(tick!=null)
+					tick.stop();
+				if(img1!=null&&img1.visible)
+				{
+					img1.visible=false;
+				}
+				if(img2!=null&&img2.visible)
+				{
+					img2.visible=false;
+				}
+				initParam();
+			}
+			
+			
+			protected function showFlash_clickHandler(event:MouseEvent):void
+			{
+				TimeTemp=this.timeNum.value*1000;
+				if(tick!=null)
+				{
+					tick.stop();
+					tick=null;
+				}
+				if(tick==null)
+				{
+					tick=new Timer(TimeTemp);
+					tick.addEventListener(TimerEvent.TIMER,showFlashOnLabel);
+					tick.start();
+				}
+				if(this.isoList.selectedIndex<0)
+					this.isoList.selectedIndex=0;
+				isoIndex=this.isoList.selectedIndex;
+			}
+			
+			private function showFlashOnLabel(e:TimerEvent):void
+			{
+				var loader:Loader=new Loader();
+				loader.unload();
+				var url:String=new String();
+				if(lineBtn.selected)
+				{
+					url=strArrL[isoIndex];
+				}
+				if(gramBtn.selected)
+				{
+					url=strArrR[isoIndex];
+				}
+				var request:URLRequest=new URLRequest(url);
+				loader.load(request);
+				loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR,errorEventHandler);
+				loader.contentLoaderInfo.addEventListener(Event.COMPLETE,function(e:Event):void
+				{
+					if(e.target.content!=null)
+						isoimg.source=e.target.content;
+				});
+				this.isoList.selectedIndex=isoIndex;
+				isoIndex++;
+				if(isoIndex==strArrL.length||isoIndex==strArrR.length)
+					isoIndex=0;
+			}
+			
+			//停止动画,暂停按钮处理事件
+			protected function pauseFlash_clickHandler(event:MouseEvent):void
+			{
+				if(tick!=null)
+					tick.stop();
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<s:Resize id="mouseon" widthTo="60" heightTo="70" duration="500"/>
+		<s:Resize id="mouseout" widthTo="40" heightTo="30" duration="500"/>
+		<mx:WipeRight id="show" duration="1000"/>
+		<mx:WipeLeft id="hide" duration="1000"/>
+	</fx:Declarations>
+	<mx:Canvas width="100%" height="50" backgroundAlpha="0.59" backgroundColor="#1020F8">
+		<s:Label x="{this.width/2-100}" y="10" width="294" height="33" color="#FCFCFE" fontFamily="华文行楷"
+				 fontSize="36" text="降雨等值线图"/>
+		
+	</mx:Canvas>
+	
+	<mx:HBox width="100%" height="100%" x="0" y="55">
+		<!--控制面板-->
+		<mx:Canvas id="isotree" x="0" y="50" width="232" 
+				   backgroundColor="#101AEA" backgroundAlpha="0.52"
+				   dropShadowVisible="true" 
+				   showEffect="{show}" hideEffect="{hide}" height="100%">
+			<s:List id="isoList" x="21" y="121" width="190" height="330" labelField="time" selectedIndex="0"
+					change="isoList_changeHandler(event)"></s:List>
+			<mx:Button x="21" y="82" width="177" height="32" label="等值线列表" chromeColor="#1E23F3"
+					   fontFamily="微软雅黑" mouseEnabled="false"/>
+			<mx:Button x="21" y="20" width="177" height="31" label="等值选项" chromeColor="#1E23F3"
+					   fontFamily="微软雅黑" mouseEnabled="false"/>
+			<s:RadioButton id="lineBtn" x="23" y="55" label="等值线" selected="true" fontFamily="微软雅黑" click="lineBtn_clickHandler(event)"/>
+			<s:RadioButton id="gramBtn" x="117" y="55" label="等值面"  fontFamily="微软雅黑" click="gramBtn_clickHandler(event)" />
+			<s:NumericStepper id="timeNum" x="137" y="459" width="64" maximum="10" minimum="1" stepSize="1" value="1"/>
+			<s:Label x="21" y="459" width="128" height="23" fontFamily="微软雅黑" text="播放间隔(单位：秒)："
+					 verticalAlign="middle"/>
+			<mx:Button id="showFlash" x="21" y="490" label="播放" 
+					   chromeColor="#1E23F3" fontFamily="微软雅黑"
+					   click="showFlash_clickHandler(event)"/>
+			<s:Button id="pauseFlash" x="128" y="490" label="暂停"
+					  chromeColor="#1E23F3" fontFamily="微软雅黑"
+					  click="pauseFlash_clickHandler(event)"/>
+		</mx:Canvas>
+		<s:BorderContainer id="mapContainer" x="260" y="10" height="100%" width="100%">
+			<mx:Image id="img1"  visible="false"
+					  x="{(this.mapContainer.width-800)/2-20}" y="{(this.mapContainer.height-550)/2}" 
+					  source="@Embed('myImages/myBackground/reg01.gif')"/>
+			<mx:Image id="img2" visible="false"
+					  x="{this.img1.x}" y="{this.img1.y}"
+					  source="@Embed('myImages/myBackground/reg02.gif')"/>
+			<mx:Image id="isoimg" source="@Embed('myImages/myline/RltLine2006-5-8 8.gif')"
+					  x="{this.img1.x}" y="{this.img1.y}"/>
+			<components:myLegend y="{this.height-258}" right="5">
+			</components:myLegend>
+			
+		</s:BorderContainer>
+	</mx:HBox>
+</s:Application>

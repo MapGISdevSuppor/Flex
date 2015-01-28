@@ -1,0 +1,5 @@
+F:\Demo_win7\VS2010\ContourAnalyseService20\ContourAnalyseService20\ContourAnalyseService20\bin\ContourAnalyseService20.dll
+F:\Demo_win7\VS2010\ContourAnalyseService20\ContourAnalyseService20\ContourAnalyseService20\bin\ContourAnalyseService20.pdb
+F:\Demo_win7\VS2010\ContourAnalyseService20\ContourAnalyseService20\ContourAnalyseService20\obj\Debug\ContourAnalyseService20.dll
+F:\Demo_win7\VS2010\ContourAnalyseService20\ContourAnalyseService20\ContourAnalyseService20\obj\Debug\ContourAnalyseService20.pdb
+F:\Demo_win7\VS2010\ContourAnalyseService20\ContourAnalyseService20\ContourAnalyseService20\obj\Debug\ContourAnalyseService20.csprojResolveAssemblyReference.cache

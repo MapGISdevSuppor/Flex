@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		  xmlns:s="library://ns.adobe.com/flex/spark" 
+		  xmlns:mx="library://ns.adobe.com/flex/mx" 
+		  layout="absolute" width="202" height="168" 
+		  title="降雨等值线图例（颜色：降雨量）" fontFamily="微软雅黑">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<!--40-->
+	<mx:HBox x="8" y="10"  width="45" height="17">			
+		<s:Graphic   height="15" width="13">
+			<s:Rect x="1" id="e15" y="3" height="7" width="7" >
+				<s:stroke>
+					<s:SolidColorStroke color="0x000000"  alpha="1" weight="1.1"/>
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="#e7e7ff"/>
+				</s:fill>
+			</s:Rect>			
+		</s:Graphic>
+		<s:Label text="40" width="25" fontSize="12" height="20" verticalAlign="middle" fontStyle="normal">				
+		</s:Label>
+	</mx:HBox>
+	<!--80-->
+	<mx:HBox x="8" y="31"  width="45" height="17">			
+		<s:Graphic   height="15" width="13">
+			<s:Rect x="1" id="e24" y="3" height="7" width="7">
+				<s:stroke>
+					<s:SolidColorStroke color="0x000000"  alpha="1" weight="1.1"/>
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="#d7dfff"/>
+				</s:fill>
+			</s:Rect>				
+		</s:Graphic>
+		<s:Label text="80" width="74" fontSize="12" height="100%" fontStyle="normal" verticalAlign="middle">				
+		</s:Label>
+	</mx:HBox>
+	<!--120-->
+	<mx:HBox x="8" y="52"  width="45" height="17">		
+		<s:Graphic   height="15" width="13">
+			<s:Rect x="1" id="e25" y="3" height="7" width="7">
+				<s:stroke>
+					<s:SolidColorStroke color="0x000000"  alpha="1" weight="1.1"/>
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="#bfcfff"/>
+				</s:fill>
+			</s:Rect>
+		</s:Graphic>
+		<s:Label text="120" width="80" fontSize="12" verticalAlign="middle" height="100%">				
+		</s:Label>
+	</mx:HBox>
+	<!--160-->
+	<mx:HBox x="8" y="73"  width="45" height="17">		
+		<s:Graphic   height="15" width="13">
+			<s:Rect x="1" id="e32" y="3" height="7" width="7">
+				<s:stroke>
+					<s:SolidColorStroke color="0x000000"  alpha="1" weight="1.1"/>
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="#bfd7ff"/>
+				</s:fill>
+			</s:Rect>
+		</s:Graphic>
+		<s:Label text="160" width="80" fontSize="12" verticalAlign="middle" height="100%">				
+		</s:Label>
+	</mx:HBox>
+	<!--200-->
+	<mx:HBox x="8" y="95"  width="45" height="17">		
+		<s:Graphic   height="15" width="13">
+			<s:Rect x="1" id="e40" y="3" height="7" width="7">
+				<s:stroke>
+					<s:SolidColorStroke color="0x000000"  alpha="1" weight="1.1"/>
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="#a3cfff"/>
+				</s:fill>
+			</s:Rect>
+		</s:Graphic>
+		<s:Label text="200" width="80" fontSize="12" verticalAlign="middle" height="100%">				
+		</s:Label>
+	</mx:HBox>
+	<!--240-->
+	<mx:HBox x="8" y="116"  width="45" height="17">		
+		<s:Graphic   height="15" width="13">
+			<s:Rect x="1" id="e41" y="3" height="7" width="7">
+				<s:stroke>
+					<s:SolidColorStroke color="0x000000"  alpha="1" weight="1.1"/>
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="#87c7ff"/>
+				</s:fill>
+			</s:Rect>
+		</s:Graphic>
+		<s:Label text="240" width="80" fontSize="12" verticalAlign="middle" height="100%">				
+		</s:Label>
+	</mx:HBox>
+	<!--280-->
+	<mx:HBox x="68" y="10"  width="43" height="17">		
+		<s:Graphic   height="15" width="13">
+			<s:Rect x="1" id="e33" y="3" height="7" width="7">
+				<s:stroke>
+					<s:SolidColorStroke color="0x000000"  alpha="1" weight="1.1"/>
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="#a3bfff"/>
+				</s:fill>
+			</s:Rect>
+		</s:Graphic>
+		<s:Label text="280" width="23" fontSize="12" verticalAlign="middle" height="100%">				
+		</s:Label>
+	</mx:HBox>
+	<!--320-->
+	<mx:HBox x="68" y="31"  width="43" height="17">			
+		<s:Graphic   height="15" width="13">
+			<s:Rect x="1" y="3" id="e34" height="7" width="7">
+				<s:stroke>
+					<s:SolidColorStroke color="0x000000"  alpha="1" weight="1.1"/>
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="0x87afff"/>
+				</s:fill>
+			</s:Rect>
+		</s:Graphic>
+		<s:Label width="62" height="15" enabled="false" text="320" verticalAlign="middle">				
+		</s:Label>
+	</mx:HBox>
+	<!--360-->
+	<mx:HBox x="68" y="52"  width="43" height="17">			
+		<s:Graphic   height="15" width="13">
+			<s:Rect x="1" id="e35" y="3" height="7" width="7" >
+				<s:stroke>
+					<s:SolidColorStroke color="0x000000"  alpha="1" weight="1.1"/>
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="#00a3ff"/>
+				</s:fill>
+			</s:Rect>			
+		</s:Graphic>
+		<s:Label text="360" width="56" fontSize="12" height="20" verticalAlign="middle" fontStyle="normal">				
+		</s:Label>
+	</mx:HBox>
+	<!--400-->
+	<mx:HBox x="68" y="73"  width="43" height="17">			
+		<s:Graphic   height="15" width="13">
+			<s:Rect x="1" id="e43" y="3" height="7" width="7" >
+				<s:stroke>
+					<s:SolidColorStroke color="0x000000"  alpha="1" weight="1.1"/>
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="#009fff"/>
+				</s:fill>
+			</s:Rect>			
+		</s:Graphic>
+		<s:Label text="400" width="56" fontSize="12" height="20" verticalAlign="middle" fontStyle="normal">				
+		</s:Label>
+	</mx:HBox>
+	<!--440-->
+	<mx:HBox x="68" y="94"  width="45" height="17">			
+		<s:Graphic   height="15" width="13">
+			<s:Rect x="1" id="e36" y="3" height="7" width="7">
+				<s:stroke>
+					<s:SolidColorStroke color="0x000000"  alpha="1" weight="1.1"/>
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="#0083df"/>
+				</s:fill>
+			</s:Rect>				
+		</s:Graphic>
+		<s:Label text="440" width="74" fontSize="12" height="100%" fontStyle="normal" verticalAlign="middle">				
+		</s:Label>
+	</mx:HBox>
+	<!--480-->
+	<mx:HBox x="68" y="115"  width="43" height="17">		
+		<s:Graphic   height="15" width="13">
+			<s:Rect x="1" id="e44" y="3" height="7" width="7">
+				<s:stroke>
+					<s:SolidColorStroke color="0x000000"  alpha="1" weight="1.1"/>
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="#007fbf"/>
+				</s:fill>
+			</s:Rect>
+		</s:Graphic>
+		<s:Label text="480" width="80" fontSize="12" verticalAlign="middle" height="100%">				
+		</s:Label>
+	</mx:HBox>
+	<!--520-->
+	<mx:HBox x="133" y="10"  width="46" height="17">		
+		<s:Graphic   height="15" width="13">
+			<s:Rect x="1" id="e37" y="3" height="7" width="7">
+				<s:stroke>
+					<s:SolidColorStroke color="0x000000"  alpha="1" weight="1.1"/>
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="#0063bf"/>
+				</s:fill>
+			</s:Rect>
+		</s:Graphic>
+		<s:Label text="520" width="80" fontSize="12" verticalAlign="middle" height="100%">				
+		</s:Label>
+	</mx:HBox>
+	<!--560-->
+	<mx:HBox x="133" y="31"  width="46" height="17">		
+		<s:Graphic   height="15" width="13">
+			<s:Rect x="1" id="e20" y="3" height="7" width="7">
+				<s:stroke>
+					<s:SolidColorStroke color="0x000000"  alpha="1" weight="1.1"/>
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="#0000ff"/>
+				</s:fill>
+			</s:Rect>
+		</s:Graphic>
+		<s:Label text="560" width="80" fontSize="12" verticalAlign="middle" height="100%">				
+		</s:Label>
+	</mx:HBox>
+	<!--600-->
+	<mx:HBox x="133" y="52"  width="46" height="17">		
+		<s:Graphic   height="15" width="13">
+			<s:Rect x="1" id="e22" y="3" height="7" width="7">
+				<s:stroke>
+					<s:SolidColorStroke color="0x000000"  alpha="1" weight="1.1"/>
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="#0000bf"/>
+				</s:fill>
+			</s:Rect>
+		</s:Graphic>
+		<s:Label text="600" width="80" fontSize="12" verticalAlign="middle" height="100%">				
+		</s:Label>
+	</mx:HBox>
+	<!--640-->
+	<mx:HBox x="133" y="73"  width="46" height="17">		
+		<s:Graphic   height="15" width="13">
+			<s:Rect x="1" id="e277" y="3" height="7" width="7">
+				<s:stroke>
+					<s:SolidColorStroke color="0x000000"  alpha="1" weight="1.1"/>
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="#0000ef"/>
+				</s:fill>
+			</s:Rect>
+		</s:Graphic>
+		<s:Label text="640" width="80" fontSize="12" verticalAlign="middle" height="100%">				
+		</s:Label>
+	</mx:HBox>
+	<!--680-->
+	<mx:HBox x="133" y="94"  width="46" height="17">			
+		<s:Graphic   height="15" width="13">
+			<s:Rect x="1" y="3" id="e278" height="7" width="7">
+				<s:stroke>
+					<s:SolidColorStroke color="0x000000"  alpha="1" weight="1.1"/>
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="0x0000d7"/>
+				</s:fill>
+			</s:Rect>
+		</s:Graphic>
+		<s:Label width="62" height="15" enabled="false" text="680" verticalAlign="middle">				
+		</s:Label>
+	</mx:HBox>
+	<!--其它-->
+	<mx:HBox x="133" y="115"  width="46" height="17">			
+		<s:Graphic   height="15" width="13">
+			<s:Rect x="1" id="e255" y="3" height="7" width="7" >
+				<s:stroke>
+					<s:SolidColorStroke color="0x000000"  alpha="1" weight="1.1"/>
+				</s:stroke>
+				<s:fill>
+					<s:SolidColor color="#FF9900"/>
+				</s:fill>
+			</s:Rect>			
+		</s:Graphic>
+		<s:Label text="其它" width="56" fontSize="12" height="20" verticalAlign="middle" fontStyle="normal">				
+		</s:Label>
+	</mx:HBox>
+</mx:Panel>

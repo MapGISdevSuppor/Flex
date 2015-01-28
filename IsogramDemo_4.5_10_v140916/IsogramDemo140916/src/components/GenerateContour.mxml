@@ -1,0 +1,828 @@
+<?xml version="1.0" encoding="utf-8"?>
+<controls:IMSWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+					  xmlns:s="library://ns.adobe.com/flex/spark"
+					  xmlns:mx="library://ns.adobe.com/flex/mx"
+					  xmlns:controls="components.*"
+					  width="454" height="294" showCloseButton="true"
+					  close="titlewindow1_closeHandler(event)"
+					  creationComplete="titlewindow1_creationCompleteHandler(event)"
+					  fontFamily="微软雅黑" fontSize="15" layout="absolute" title="离散点生成等值线设置">
+	
+	<fx:Script>
+		<![CDATA[
+			import Mapgis7.WebService.BasLib.CAppendFeature;
+			import Mapgis7.WebService.BasLib.CAppendFeatureList;
+			import Mapgis7.WebService.BasLib.CAttStruct;
+			import Mapgis7.WebService.BasLib.CCreateLayer;
+			import Mapgis7.WebService.BasLib.CGdbInfo;
+			import Mapgis7.WebService.BasLib.CGetProjectDots;
+			import Mapgis7.WebService.BasLib.CLayerAccessInfo;
+			import Mapgis7.WebService.BasLib.CLayerInfo;
+			import Mapgis7.WebService.BasLib.CLineInfo;
+			import Mapgis7.WebService.BasLib.COpenLayer;
+			import Mapgis7.WebService.BasLib.COperResult;
+			import Mapgis7.WebService.BasLib.CPointInfo;
+			import Mapgis7.WebService.BasLib.CProjectDots;
+			import Mapgis7.WebService.BasLib.CRegionInfo;
+			import Mapgis7.WebService.BasLib.CSetSingleLayerStatusONFlex;
+			import Mapgis7.WebService.BasLib.Dot_2D;
+			import Mapgis7.WebService.BasLib.ESFclsGeomType;
+			import Mapgis7.WebService.BasLib.EXClsType;
+			import Mapgis7.WebService.BasLib.EnumLayerStatus;
+			import Mapgis7.WebService.BasLib.EnumProjAngleUnit;
+			import Mapgis7.WebService.BasLib.EnumProjType;
+			import Mapgis7.WebService.BasLib.EnumProjUnit;
+			import Mapgis7.WebService.BasLib.EnumSphereType;
+			import Mapgis7.WebService.BasLib.EnumType;
+			import Mapgis7.WebService.BasLib.GInfoType;
+			import Mapgis7.WebService.BasLib.GPoint;
+			import Mapgis7.WebService.BasLib.ProjectParam;
+			import Mapgis7.WebService.BasLib.SFeature;
+			import Mapgis7.WebService.BasLib.SFeatureGeometry;
+			import Mapgis7.WebService.BasLib.Serializer;
+			import Mapgis7.WebService.BasLib.WebGraphicsInfo;
+			
+			import components.contour.ContourNoteParam;
+			import components.contour.ContourParam;
+			import components.contour.ContourZValue;
+			import components.contour.MeshingParam;
+			
+			import flash.utils.getTimer;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.controls.ProgressBar;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.formatters.DateFormatter;
+			import mx.rpc.AbstractOperation;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import mx.rpc.soap.WebService;
+			import mx.utils.ObjectProxy;
+			
+			import zdims.map.IMSMap;
+			import zdims.map.VectorLayerEx;
+			import zdims.util.IMSOperType;
+			import zdims.util.SpacialAnalyse;
+			
+			public static  var ErrorFlowResult:String = "错误 - 工作流执行结果为空值";
+			public static  var ErroJsonResult:String = "错误 - 等值线参数序列化失败";
+			private static var ErrorLoaderResult:String="错误-POST请求失败";
+			/**
+			 * 地图是否显示完毕 
+			 */		
+			protected var _loadComplete:Boolean=false;//
+			
+			private var t:int;
+			private var flag:int=0;
+			private var clipTimer:Timer=new Timer(10);
+			private var _timer:Timer;
+			[Bindable] 
+			private var j:uint=10;
+			[Bindable]
+			private var enableProbar:String="";  
+			
+			private var _weburl:String="http://localhost/ContourAnalyseService20/Service1.asmx";
+			private var web:WebService;
+			private var _gdbName:String="TEST080601";
+			private var gdbSvr:String="MapGisLocal";
+			private var gdbConnectStr:String="gdbp://MapGisLocal/"+gdbName;
+			private var svrAddr:String="http://127.0.0.1:6163/igs/rest/ims/relayhandler";
+			private var  vLayer:VectorLayerEx;
+			private var layerContourLName:String;
+			private var layerContourPName:String;
+			private var layerContourAName:String;
+			private var wp:String="";//等值区图层
+			private var wl:String="";//等值线图层
+			private var wt:String="";//等值注记图层
+			
+			private var createPntVectlayer:VectorLayerEx;//创建的矢量图层
+			private var rainInfo:ArrayCollection;
+			private var layerName:String;
+			private var gdbinfo:CGdbInfo=new CGdbInfo();
+			private var spacialAnly:SpacialAnalyse;//投影转换时使用，需要用到空间分析类下的方法
+			
+			/**
+			 * 等值线裁剪的底图
+			 */
+			private var SrcAreaLayer:String="gdbp://MapGisLocal/OpenLayerVecterMap/sfcls/广西省级行政区.wp";
+			
+			private var _progressBar:ProgressBar;
+		
+			public function get gdbName():String
+			{
+				return _gdbName;
+			}
+
+			public function set gdbName(value:String):void
+			{
+				_gdbName = value;
+			}
+
+			public function get timer():Timer
+			{
+				return _timer;
+			}
+
+			public function set timer(value:Timer):void
+			{
+				_timer = value;
+			}
+
+			[Inspectable(category="MapGisIMS")]
+			public function get progressBar():ProgressBar
+			{
+				return _progressBar;
+			}
+
+			public function set progressBar(value:ProgressBar):void
+			{
+				_progressBar = value;
+			}
+			
+			public function get weburl():String
+			{
+				return _weburl;
+			}
+
+			public function set weburl(value:String):void
+			{
+				_weburl = value;
+			}
+
+			/**
+			 * 生成等值线按钮点击处理方法
+			 */
+			protected function GenerateContourL_clickHandler(event:MouseEvent):void
+			{
+				flag=0;
+				startContour();
+			}
+			
+			/**
+			 * 等值线分析入口方法
+			 */
+			private function startContour():void
+			{
+				//设置原始进度条不可见
+			    stopProgress();
+				clearContour();
+				var startTime:String = this.startH.text+":"+this.startM.text+":"+this.startS.text;
+				var endTime:String = this.endH.text+":"+this.endM.text+":"+this.endS.text;
+				
+				
+				//加载进度条
+				this.progressBar.x=this.imsmap.width/2-this.progressBar.width/2+10;
+				this.progressBar.y=this.imsmap.height/2-23;
+				this.progressBar.label="正在获取各站点的雨量数据，请稍等...";
+				this.progressBar.visible=true;
+				playprogressBar();
+				
+				clipTimer = new Timer(1000);
+				clipTimer.addEventListener(TimerEvent.TIMER,function(e:TimerEvent):void{onTimer(startDate.text,endDate.text,startTime,endTime)});
+				clipTimer.start();
+			}
+			
+			//计时器回调函数
+			private function onTimer(startdate:String,enddate:String,starttime:String,endtime:String):void
+			{	
+				sendRequest(startdate,enddate,starttime,endtime);
+			}
+			
+			private function sendRequest(startDay:String,endDay:String,startTime:String,endTime:String):void
+			{
+				var oper:AbstractOperation=web.getOperation("getRainInfo");
+				oper.send(startDay,endDay,startTime,endTime);//发送请求
+				web.addEventListener(ResultEvent.RESULT,onResult);
+				web.addEventListener(FaultEvent.FAULT,onFault);
+				this.clipTimer.stop();
+			}
+			
+			/**
+			 * web服务请求结果，获取数据库查询到的雨量数据
+			 */
+			private function onResult(e:ResultEvent):void
+			{
+				rainInfo=e.result as ArrayCollection;
+				if(rainInfo==null)
+				{
+					Alert.show("雨量信息不足");
+					return;
+				}
+				
+				//结构：要素属性结构
+				var attstruct:CAttStruct=new CAttStruct();
+				attstruct.FldName=[ "STCD", "Rainfall"];
+				attstruct.FldType=["字符串", "double"]; 
+				attstruct.FldNumber=2;
+				//要创建的图层名称
+				var dateFormater:DateFormatter=new DateFormatter();
+				dateFormater.formatString="YYYYMMDDHHNNSS";
+				var time:String = dateFormater.format(new Date()); 
+				layerName="Radar_"+time;//图层名称
+				//CGdbInfo gdb信息类 
+				gdbinfo.GDBSvrName=gdbSvr;
+				gdbinfo.GDBName=gdbName;
+				gdbinfo.User="";
+				gdbinfo.Password="";
+				//创建图层函数的参数
+				var layerobj:CCreateLayer=new CCreateLayer();
+				layerobj.XClsType=EXClsType.SFeatureCls;
+				layerobj.Stype=ESFclsGeomType.Pnt;
+				layerobj.LayerName=layerName;
+				layerobj.GdbInfo=gdbinfo;
+				layerobj.AttStruct=attstruct;
+				
+				//更新进度条描述，描述当前操作
+				this.progressBar.label="正在创建点图层，请稍后......";
+				
+				createPntVectlayer=new VectorLayerEx();
+				createPntVectlayer.serverAddress=svrAddr;
+				createPntVectlayer.createLayer(layerobj,onCreateLayer);//创建矢量图层
+			}
+			
+			/**
+			 * 创建图层
+			 */
+			private function onCreateLayer(event:Event):void
+			{
+					var operResult:COperResult=createPntVectlayer.onCreateLayer(event);
+					if(operResult.OperResult)
+					{
+						//CLayerAccessInfo 图层访问信息类
+						var layerAccessInfo:CLayerAccessInfo=new CLayerAccessInfo();
+						layerAccessInfo.GdbInfo=gdbinfo;
+						//CLayerInfo图层信息类
+						var layerInfo:CLayerInfo=new CLayerInfo();
+						layerInfo.LayerDataName=layerName;
+						layerInfo.LayerType=EXClsType.SFeatureCls;
+						layerAccessInfo.LayerInfoList[0]=layerInfo;
+						//COpenLayer设置要叠加打开的图层信息 
+						var openLayer:COpenLayer=new COpenLayer()
+						openLayer.LayerAccessInfo[0]=layerAccessInfo;
+						//loadLayer()加载图层的方法
+						var openLayer:COpenLayer=new COpenLayer();
+						openLayer.LayerAccessInfo[0]=layerAccessInfo;
+						createPntVectlayer.loadLayer(openLayer,onOpenLayer);
+					}
+			}
+			
+			/**
+			 * 打开矢量图层回调
+			 */
+			private function onOpenLayer(e:Event):void
+			{
+				var rlt:COperResult=this.createPntVectlayer.onSetAllEnumLayerStatus(e);
+				if (rlt.OperResult)
+				{
+					var setLayerState:CSetSingleLayerStatusONFlex=new CSetSingleLayerStatusONFlex();
+					setLayerState.GdbIndex=0;
+					setLayerState.LayerIndex=0;
+					setLayerState.LayerStatus=EnumLayerStatus.Editable;
+					createPntVectlayer.setSingleLayerStatusONFlex(setLayerState,onSetSingleLayerStatus);
+				}
+			}
+			
+			
+			/**
+			 * 更新图层状态回调
+			 */
+			private function onSetSingleLayerStatus(e:Event):void
+			{
+				var rlt:COperResult=this.createPntVectlayer.onSetAllEnumLayerStatus(e);
+				if (rlt.OperResult)
+				{    
+					this.imsmap.activeLayerObj=this.createPntVectlayer;
+					//更新进度条描述，描述当前操作
+					this.progressBar.label="正在进行点投影转换，请稍后......";
+					onTransProject(rainInfo);//由于底图是谷歌地图，创建的图层默认是经纬度的坐标，需要进行投影转换
+				}
+			}
+			private var pntAtt:Array=new Array();
+			
+			/**
+			 * 投影转换
+			 * @param rainInfo 原始的点要素信息，来自于web服务返回的结果
+			 * @param isTransProject 是否需要进行投影转换
+			 */
+			private function onTransProject(rainInfo:ArrayCollection):void
+			{
+				
+				var pnts:Array=new Array();
+				
+				for(var i=0;i<rainInfo.length;i++)
+				{
+					var data:Object=rainInfo[i] as Object;
+					var rainfall:Number=new Number();
+					rainfall=data.RainFall as Number;
+					if(rainfall<parseInt(maxRain.text)&&rainfall>parseInt(minRain.text))
+					{
+							var pnt:Dot_2D=new Dot_2D(data.Lon,data.Lat);
+							pnts.push(pnt);
+							pntAtt.push({SiteNum:data.SiteNum,RainFall:data.RainFall});
+					}//end if(rainfall>parseInt(maxRain.text)||rainfall<parseInt(minRain.text))
+					
+				}//end for(var i=0;i<rainInfo.length;i++)
+				//点的投影参数
+				var cProjectDots:CProjectDots=new CProjectDots();
+				//原始参考系信息
+				var srcParam:ProjectParam=new ProjectParam();
+				srcParam.ProjAngleUnit=EnumProjAngleUnit.UNIT_Degree;//角度单位
+				srcParam.ProjType=EnumType.TYPE_JWD;//坐标系类型
+				srcParam.ProjTypeID=EnumProjType.LonLat;//投影类型
+				srcParam.ProjUnit=EnumProjUnit.UNIT_MM;//长度单位 
+				srcParam.ProjZoneNO=0;//投影带号 
+				srcParam.SphereID=EnumSphereType.Beijing54;//椭球体参数
+				
+				//目的参考系信息
+				var desParam:ProjectParam=new ProjectParam();
+				desParam.ProjAngleUnit=EnumProjAngleUnit.UNIT_Degree;
+				desParam.ProjLon=0;
+				desParam.ProjRate=1;
+				desParam.ProjType=EnumType.TYPE_PRJ;
+				desParam.ProjTypeID=EnumProjType.Mercator;
+				desParam.ProjUnit=EnumProjUnit.UNIT_Meter;
+				desParam.SphereID = EnumSphereType.WGS84;
+				
+				cProjectDots.SrcProjParam=srcParam;//原始参考系信息
+				cProjectDots.DesProjParm=desParam;//目的参考系信息
+				cProjectDots.InputDots=pnts;//输入点序列
+				spacialAnly=new SpacialAnalyse(createPntVectlayer);
+				spacialAnly.projectDots(cProjectDots,onAddFeature);
+			}
+			
+			/**
+			 * 投影转换回调，将经过投影转换的点添加到图层中
+			 * @param rainInfo 原始的点要素信息，来自于web服务返回的结果
+			 * @param isTransProject 是否需要进行投影转换
+			 */
+			private function onAddFeature(e:Event):void
+			{
+				var layerObj:CAppendFeatureList=new CAppendFeatureList();
+				var operResult:CGetProjectDots=spacialAnly.onProjectDots(e);
+				if(operResult)
+				{
+					var desDots:Array=new Array();
+					if(operResult.DesDots)
+					{
+						//更新进度条描述，描述当前操作
+						this.progressBar.label="正在向点图层中添加离散点，请稍后......";
+						
+						desDots=operResult.DesDots;
+						for(var i=0;i<desDots.length;i++)
+						{
+							//需要添加的要素的样式信息（如颜色，显示样式等） 
+							var webGraphicsInfo:WebGraphicsInfo = new WebGraphicsInfo();
+							webGraphicsInfo.InfoType = GInfoType.PntInfo;
+							webGraphicsInfo.PntInfo = new CPointInfo();
+							webGraphicsInfo.PntInfo.Angle =0;
+							webGraphicsInfo.PntInfo.Color =96;
+							webGraphicsInfo.PntInfo.SymHeight=10;
+							webGraphicsInfo.PntInfo.SymID = 514;
+							webGraphicsInfo.PntInfo.SymWidth=10;
+							//空间几何信息
+							var sfGeo:SFeatureGeometry = new SFeatureGeometry();
+							sfGeo.PntGeom[0] = new GPoint();
+							sfGeo.PntGeom[0].Dot = new Dot_2D(desDots[i].x,desDots[i].y);
+							//需要添加的要素的空间信息及属性信息（如x,y坐标及属性信息等） 
+							var sFeature:SFeature=new SFeature();
+							sFeature.ftype=ESFclsGeomType.Pnt;
+							sFeature.FID=i;
+							sFeature.AttValue[0]=pntAtt[i].SiteNum as String;
+							sFeature.AttValue[1]=(pntAtt[i].RainFall as Number).toString();
+							sFeature.fGeom=sfGeo;
+							//添加多个要素函数的参数
+							layerObj.GdbIndex=0;
+							layerObj.LayerIndex=0;
+							layerObj.GInfo=webGraphicsInfo;
+							layerObj.FSet[i]=sFeature;
+						}//for(var i=0;i<desDots.length;i++)
+						createPntVectlayer.appendFeatureList(layerObj,onAppendFeature);
+					}//if(operResult.DesDots)
+				}//	if(operResult)
+			}
+			
+			/**
+			 * 生成点图层回调，在回调函数里调用工作流，进行等值线分析
+			 */
+			private function onAppendFeature(e:Event):void
+			{
+				var rlt:COperResult=createPntVectlayer.onAppendFeature(e);
+				if(!rlt.OperResult||!rlt)
+				{
+					Alert.show("添加要素失败！");
+					return;
+				}
+				if(rlt.OperResult)
+				{
+					DayContourLineService();
+				}
+			}
+			
+			/**
+			 * 获取当前时间，作为图层后缀
+			 */
+			private function getCurrentTime():String
+			{
+				var dateFormater:DateFormatter=new DateFormatter();
+				dateFormater.formatString="YYYYMMDDHHNNSS";
+				var currentTime:String = dateFormater.format(new Date()); 
+				return currentTime;
+			}
+			
+			/**
+			 * 离散点生成等值线
+			 */
+			private function DayContourLineService():void
+			{
+				var time:String =getCurrentTime();
+				layerContourPName="ContourP_"+time;
+				wp=gdbConnectStr+"/sfcls/"+layerContourPName;
+				layerContourLName="ContourL_"+time;
+				wl=gdbConnectStr+"/sfcls/"+layerContourLName;
+				layerContourAName="ContourT_"+time;
+				wt=gdbConnectStr+"/sfcls/"+layerContourAName;
+				
+				var mpstr:MeshingParam=new MeshingParam();
+				mpstr.SfClsURL=gdbConnectStr+"/sfcls/"+layerName;
+				mpstr.FieldName="Rainfall";
+				var mp:String=JSON.stringify(mpstr);
+				
+				var noteparam:ContourNoteParam=new ContourNoteParam();
+				noteparam.MinDist=0.1;
+				
+				var zvlues:Array=new Array();
+				t = (parseInt(maxRain.text)-parseInt(minRain.text))/parseInt(contourGap.text);
+				for(var i:int=0;i<t;i++)
+				{
+					zvlues[i]=new ContourZValue();
+					var item:ContourZValue=new ContourZValue();
+					item.ZValue=0.0+parseFloat(contourGap.text)*i;
+					var line:CLineInfo=new CLineInfo();
+					line.LinWidth=0.02;
+					line.Color=9+parseInt(contourGap.text)*i;
+					var reg:CRegionInfo=new CRegionInfo();
+					reg.FillColor=4+parseInt(contourGap.text)*i;
+					item.LineInfo=line;
+					item.RegInfo=reg;
+					item.IsOutputNote=true;
+					zvlues[i]=item;
+				}
+				
+				var cpstr:ContourParam=new ContourParam();
+				cpstr.IsMakeReg=true;
+				cpstr.NoteParam=noteparam;
+				cpstr.ZValues=zvlues;
+				var cp:String=JSON.stringify(cpstr);
+				
+				//等值线分析参数设置
+				var paraValues:Array=new Array();
+				paraValues.push(
+					{Key:"linSfclsURL",Value:wl},
+					{Key:"regSfclsURL",Value:wp},
+					{Key:"annoClsURL",Value:wt},
+					{Key:"meshingParam",Value:mp},
+					{Key:"contourParam",Value:cp});
+				
+				//更新进度条描述，描述当前操作
+				this.progressBar.label="正在生成等值线，请稍后......";
+				
+				ExecuteFlow("600320",paraValues,"",clipLayer);//执行等值线分析工作流
+			}
+			
+			
+			/**
+			 *执行工作流
+			 * @param flowId 工作流编号
+			 * @param urlParam POST请求发送的参数
+			 * @param resultLayerName 回调函数参数
+			 * @param callback 回调函数
+			 */
+			private function ExecuteFlow(flowId:String,urlParam:Array,resultLayerName:String,callback:Function):void
+			{
+				var url:String="http://127.0.0.1:6163/igs/rest/mrfws/execute/"+flowId+"?f=json";
+				try
+				{
+					//序列化为json
+					var sendStr:String = null;//作为参数post请求发送的数据
+					if (urlParam != null && urlParam.length > 0) 
+					{
+						var res:Array=new Array();
+						for(var i:int=0;i<urlParam.length;i++)
+						{
+							res.push({Key:urlParam[i].Key,Value:urlParam[i].Value});
+						}
+						sendStr = JSON.stringify(res);
+					}
+				}
+				catch(err:Error)
+				{
+					Alert.show(err.message,ErroJsonResult);
+					return;
+				}
+				var urlRequest:URLRequest=new URLRequest(url+"&r="+Math.random());
+				urlRequest.method=URLRequestMethod.POST;
+				urlRequest.data=sendStr;
+				urlRequest.contentType="text/plain;charset=utf-8";//"text/xml;charset=utf-8";
+				var loader:URLLoader=new URLLoader();
+				try 
+				{
+					loader.addEventListener(IOErrorEvent.IO_ERROR,onHttpIOError);
+					loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR,onSecurityError);
+					loader.addEventListener(Event.COMPLETE, function (e:Event):void{
+						var loader:URLLoader=e.target as URLLoader;
+						if(loader.data!=null)
+						{
+							var flowResult:Object=JSON.parse(loader.data);
+							if(flowResult!=null&&flowResult.results!=null)
+							{
+								var results:Array=new Array();
+								results=flowResult.results;
+								if(results.length>0)
+								{
+									var res:String=results[0].Value;
+									if(res!=null)
+									{
+										callback(res);
+									}
+									else
+									{
+										Alert.show(ErrorFlowResult);
+									}
+								}
+							}//if(flowResult!=null&&flowResult.results!=null)
+						}//if(loader.data!=null)
+						else
+						{
+							Alert.show(ErrorLoaderResult);
+						}
+					});//loadComplete
+					loader.load(urlRequest);
+				}
+				catch(err:Error)
+				{
+					stopProgress();
+					Alert.show(err.message,"错误提示");
+				}
+			}
+			
+			/**
+			 * 针对工作流执行的结果图层（矩形图层）进行裁剪，获取和广西边界相一致的图层，比较美观
+			 */
+			private function clipLayer(resultValue:String):void
+			{
+				//更新进度条描述，描述当前操作
+				this.progressBar.label="正在裁剪结果图层，请稍后......";
+				
+				var timeStr:String=getCurrentTime();
+				var wpName:String="AnalyseLayerP_" + timeStr;
+				var wlName:String="AnalyseLayerL_" + timeStr;
+				var wpClip:String = gdbConnectStr + "/sfcls/"+wpName;
+				var wlClip:String = gdbConnectStr + "/sfcls/"+wlName;
+				
+				var array:Array=new Array();
+				if(flag==0)
+				{
+					array.push(
+						{Key:"srcInfo1",Value:wl},
+						{Key:"srcInfo2",Value:SrcAreaLayer},
+						{Key:"desInfo",Value:wlClip});
+					ExecuteFlow("600230",array,wlName,loadContourLayer);
+				}
+				else if(flag==1)
+				{
+					array.push(
+						{Key:"srcInfo1",Value:wp},
+						{Key:"srcInfo2",Value:SrcAreaLayer},
+						{Key:"desInfo",Value:wpClip});
+					ExecuteFlow("600230",array,wpName,loadContourLayer);
+				}
+				else
+				{
+					Alert.show("图层裁剪失败，详情请查看工作流日志","提示");
+					return;
+				}
+			}
+			
+			/**
+			 * 加载裁剪之后的结果图层到地图视图中
+			 * @param resultLayerName 裁剪之后结果图层的名称
+			 */
+			private function loadContourLayer(resultLayerName:String):void
+			{
+				//更新进度条描述，描述当前操作
+				this.progressBar.label="正在加载结果图层，请稍后......";
+				
+				//CGdbInfo gdb信息类 
+				var gdbinfo:CGdbInfo=new CGdbInfo();
+				gdbinfo.GDBSvrName=gdbSvr;
+				gdbinfo.GDBName=gdbName;
+				gdbinfo.User="";
+				gdbinfo.Password="";
+				//CLayerAccessInfo 图层访问信息类
+				var layerAccessInfo:CLayerAccessInfo=new CLayerAccessInfo();
+				layerAccessInfo.GdbInfo=gdbinfo;
+				//CLayerInfo图层信息类
+				var layerInfo:CLayerInfo=new CLayerInfo();
+				var layername:String=new String();
+				layername=resultLayerName;
+				layerInfo.LayerDataName=layername;
+				layerInfo.LayerType= EXClsType.SFeatureCls;;
+				layerAccessInfo.LayerInfoList[0]=layerInfo;
+				vLayer=new VectorLayerEx();
+				
+				var openLayer:COpenLayer=new COpenLayer();
+				openLayer.LayerAccessInfo[0]=layerAccessInfo;
+				vLayer.serverAddress=svrAddr;
+				vLayer.autoGetMapInfo=true;
+				//loadLayer()加载图层的方法
+				vLayer.loadLayer(openLayer, onSingleLayerLoad);	
+			}
+			
+			/**
+			 * HttpIO错误回调函数
+			 * @param e 事件的数据源
+			 */
+			private function onHttpIOError(e:IOErrorEvent):void
+			{
+				stopProgress();
+				if(imsmap!=null)    	
+					imsmap.setErrorText("请求出错,具体原因:"+e.text);
+				if(e.target is URLLoader)
+					URLLoader(e.target).removeEventListener(e.type,onHttpIOError);
+			}
+			
+			/**
+			 * 安全错误回调函数 
+			 * @param e 事件的数据源
+			 */	
+			protected function onSecurityError(e:SecurityErrorEvent):void
+			{
+				stopProgress();
+				if(imsmap!=null)
+					imsmap.setErrorText("安全性错误,请检查安全设置!");
+				if(e.target is URLLoader)
+					URLLoader(e.target).removeEventListener(e.type,onSecurityError);
+			}
+			
+			/**
+			 * IO错误响应函数
+			 * @param err 事件的数据源
+			 */
+			protected function onIOError(err:IOErrorEvent):void
+			{
+				stopProgress();
+				Alert.show(err.toString());
+			}
+						
+			/**
+			 *加载图层的回调函数
+			 * */
+			private function onSingleLayerLoad(e:Event):void{
+				var rlt:COperResult=vLayer.onLoadLayer(e);
+				if(rlt.OperResult){
+					stopProgress();
+					this.imsmap.addElement(vLayer);
+					this.imsmap.refresh();
+				}
+			}
+			
+			/**
+			 * 停止进度条
+			 */
+			private function stopProgress():void
+			{
+				this.imsmap.enableProgressBar=false;
+				timer.stop();
+				this.enableProbar="false";
+				this.progressBar.visible=false;
+			}
+			
+			/**
+			 * POST请求失败回调
+			 */
+			private function onFault(e:FaultEvent):void
+			{
+				var s:String=e.message.toString();
+				Alert.show(s);
+				//设置原始进度条不可见
+				stopProgress();
+			}
+			
+			/**
+			 * 清除之前的等值线（面）图层
+			 */
+			private function clearContour():void
+			{
+				if(vLayer!=null&&this.imsmap.contains(vLayer))
+				{
+					this.imsmap.removeElement(vLayer);
+					vLayer=null;
+				}
+			}
+			
+			/**
+			 * 生成等值面
+			 */
+			protected function GenerateContourR_clickHandler(event:MouseEvent):void
+			{
+				flag=1;
+				startContour();
+			}
+			
+			/**
+			 * 关闭窗口
+			 */
+			protected function titlewindow1_closeHandler(event:CloseEvent):void
+			{
+				if(this.visible)
+					this.visible=false;
+				clearContour();
+			}
+			
+			/**
+			 * 初始化
+			 */
+			protected function titlewindow1_creationCompleteHandler(event:FlexEvent):void
+			{
+				var h:Array = new Array();
+				var m:Array = new Array();
+				for(var i:int = 0;i < 24;i++)
+				{
+					if(i<10)
+						h[i]="0"+i.toString();
+					else
+						h[i]=i.toString();
+				}
+				for(i = 0;i < 60;i++)
+				{
+					if(i<10)
+						m[i]="0"+i.toString();
+					else
+					    m[i]=i.toString();
+				}
+				this.startH.dataProvider = h;
+				this.startM.dataProvider = m;
+				this.startS.dataProvider = m;
+				this.endH.dataProvider   = h;
+				this.endM.dataProvider   = m;
+				this.endS.dataProvider   = m;
+				
+				web=new WebService();
+				web.loadWSDL(weburl+"?WSDL");
+			}
+			
+			/**
+			 *进度条到最后之后从头开始滚动
+			 */
+			private function resetprogressBar():void { 
+				timer.start();                
+				progressBar.setProgress(0, 100); 
+			} 
+			
+			/**
+			 * 进度条动画
+			 */
+			private function playprogressBar():void { 
+				enableProbar="";
+				j=0;
+				resetprogressBar(); 
+				timer.start(); 
+			} 
+
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:Button id="GenerateContourL" x="108"   y="223" label="生成等值线" fontFamily="微软雅黑" fontSize="15" click="GenerateContourL_clickHandler(event)"/>
+	<s:Button id="GenerateContourR" x="234" y="223" label="生成等值面" fontFamily="微软雅黑" fontSize="15" click="GenerateContourR_clickHandler(event)"/>
+	<s:Label x="13" y="47" fontFamily="微软雅黑" fontSize="15" text="雨量范围："/>
+	<s:TextInput id="minRain" x="96" y="41" width="80" text="0"/>
+	<s:Label x="184" y="43" fontFamily="微软雅黑" fontSize="15" text="至"/>
+	<s:TextInput id="maxRain" x="207" y="41" width="81" height="22" text="300"/>
+	<s:Label x="299" y="43" fontFamily="微软雅黑" fontSize="15" text="ml"/>
+	<s:Label x="13" y="92" fontFamily="微软雅黑" fontSize="15" text="等值间隔："/>
+	<mx:ComboBox x="96" y="87" width="161" id="contourGap" 
+				dataProvider="{['5','10','20','30','40','50','60','70','80','90','100']}"/>
+	<s:Label x="14" y="140" fontFamily="微软雅黑" fontSize="15" text="开始时间："/>
+	<mx:DateField x="95" y="133" id="startDate" formatString="YYYY-MM-DD" text="2006-05-04"/>
+	<mx:ComboBox id="startH" x="192" y="133" width="60"/>
+	<s:Label x="257" y="137" fontFamily="微软雅黑" fontSize="14" text="时"/>
+	<mx:ComboBox x="273" y="132" width="60" id="startM"/>
+	<s:Label x="338" y="137" fontFamily="微软雅黑" fontSize="14" text="分"/>
+	<mx:ComboBox x="355" y="131" width="60" id="startS"/>
+	<s:Label x="416" y="137" fontFamily="微软雅黑" fontSize="14" text="秒"/>
+	<s:Label x="14" y="175" fontFamily="微软雅黑" fontSize="15" text="结束时间："/>
+	<mx:DateField id="endDate" x="95" y="175" formatString="YYYY-MM-DD" text="2006-05-04"/>
+	<mx:ComboBox id="endH" x="192" y="175" width="60"/>
+	<s:Label x="257" y="179" fontFamily="微软雅黑" fontSize="14" text="时"/>
+	<mx:ComboBox x="274" y="175" width="60" id="endM"/>
+	<s:Label x="338" y="179" fontFamily="微软雅黑" fontSize="14" text="分"/>
+	<mx:ComboBox x="355" y="174" width="60" id="endS"/>
+	<s:Label x="416" y="179" fontFamily="微软雅黑" fontSize="14" text="秒"/>
+	<s:Label x="23" y="10" width="419" color="#05770A" text="说明：雨量监测的时间一般为08:00:00/14:00:00/20:00:00"/>
+</controls:IMSWindow>
