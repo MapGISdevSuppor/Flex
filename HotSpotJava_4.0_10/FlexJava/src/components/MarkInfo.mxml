@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<zdims:IMSWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				 xmlns:s="library://ns.adobe.com/flex/spark" 
+				 xmlns:mx="library://ns.adobe.com/flex/mx" 
+				 xmlns:zdims="zdims.*" 
+				 layout="absolute" width="256" height="166"
+				 dropShadowEnabled="true" shadowDistance="4"
+				 showCloseButton="true"  
+				 title="详细信息" >
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import zdims.event.IMSMapEvent;
+			import zdims.event.IMSMapMoveEvent;
+			import zdims.map.IMSMap;
+			import zdims.util.IMSOperType;
+			
+			public var oldx:int=0;
+			public var oldy:int=0;
+			public var logicX:Number=0.0;
+			public var logicY:Number=0.0;
+			
+			private var _mapcontainer:IMSMap; 
+
+			public function get mapcontainer():IMSMap
+			{
+				if(_mapcontainer==null&&this.parent is IMSMap)
+					mapcontainer=this.parent as IMSMap;
+				return this._mapcontainer;
+			}
+
+			public function set mapcontainer(value:IMSMap):void
+			{
+				_mapcontainer = value;
+				if(this._mapcontainer!=null)
+				{
+					this._mapcontainer.addEventListener(IMSMapEvent.MAP_CHANGE,updatePosition);
+					this._mapcontainer.addEventListener(IMSMapMoveEvent.MOVE_STEP,updatePosition);
+				}
+			}
+
+			/**
+			 * 更新位置
+			 */ 
+			public function updatePosition(e:Event=null):void
+			{
+				if(e is IMSMapMoveEvent)
+				{
+					if(this.mapcontainer.operType==IMSOperType.Drag)
+					{
+						var xLen:int=this.imsmap.mouseMoveScrPnt.x - this.imsmap.mouseDownScrPnt.x;
+						var yLen:int=this.imsmap.mouseMoveScrPnt.y - this.imsmap.mouseDownScrPnt.y;
+						this.x =this.oldx+xLen;
+						this.y = this.oldy+yLen;
+					}
+					return;
+				}
+				var coor:Point = this.mapcontainer.logicToScreen(logicX, logicY);
+				
+				this.oldx=this.x = coor.x;
+				this.oldy=this.y = coor.y;
+			}
+
+			protected function imswindow1_creationCompleteHandler(event:FlexEvent):void
+			{
+				if(this.mapcontainer!=null)
+					updatePosition();
+			}
+
+		]]>
+	</fx:Script>
+	
+	<s:Label x="19" y="8" text="详细信息：" fontFamily="微软雅黑"/>
+	<s:Label x="19" y="33" text="ID：" fontFamily="微软雅黑"/>
+	<s:Label x="19" y="52" text="名称：" fontFamily="微软雅黑"/>
+	<mx:Text id="hotID" x="71" y="24"  width="156"/>
+	<mx:Text id="hotName" x="71" y="48" width="156"/>
+	<s:Label x="19" y="71" text="人口数："/>
+	<mx:Text x="71" y="72" width="156" id="hotPnum" />
+	<s:Label x="19" y="96" text="地址:"/>
+	<mx:Text x="71" y="97" width="156" id="hotPaddress" />
+
+</zdims:IMSWindow>

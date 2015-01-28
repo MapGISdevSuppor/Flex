@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:MyIMSWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						xmlns:s="library://ns.adobe.com/flex/spark" 
+						xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:components="components.*" layout="absolute" width="300" height="200"
+						title="登录窗口">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			
+			import zdims.map.IMSMap;
+			
+			public var hotFlexJava:FlexJava=null;
+
+			private function loginHandle():void{
+				if(txtUsername.text==""||txtPassword.text==""){
+					Alert.show("请输入完整数据")
+					return;
+				}else if(txtUsername.text=="admin"&&txtPassword.text=="123456"){
+						
+						this.hotFlexJava.userName=txtUsername.text;
+						this.hotFlexJava.userPass=txtPassword.text;
+						this.hotFlexJava.uName.right=115;
+						this.hotFlexJava.uName.text="管理员用户"+txtUsername.text;
+						if(this.imsmap!=null){
+							this.imsmap.setInfoText("登录成功，当前用户为管理员用户sa！");
+						}
+						this.visible=false;
+						
+				}else if(txtUsername.text=="sa"&&txtPassword.text=="sa123"){
+					    this.hotFlexJava.userName=txtUsername.text;
+					    this.hotFlexJava.userPass=txtPassword.text;
+						this.hotFlexJava.uName.right=140;
+						this.hotFlexJava.uName.text="普通用户"+txtUsername.text;
+						if(this.imsmap!=null){
+							this.imsmap.setInfoText("登录成功，当前用户为普通用户sa！");
+						}
+						this.visible=false;
+				}
+				else{
+						
+						Alert.show("用户名或密码错误！")
+						return;
+					}
+				
+				
+			}
+			private function resetHandle():void{
+				txtUsername.text="";
+				txtPassword.text="";
+			}
+			private function closeHandle():void{
+				
+				this.visible=false;
+			}
+		]]>
+	</fx:Script>
+	<s:Label x="44" y="33" text="用户名:"/>
+	<s:TextInput x="103" y="23" id="txtUsername"/>
+	<s:Label x="44" y="76" text="密  码:"/>
+	<s:TextInput x="103" y="66" id="txtPassword"  displayAsPassword="true" />
+	<s:Button x="44" y="114" label="确定" click="loginHandle()"/>
+	<s:Button x="160" y="114" label="重置" click="resetHandle()"/>
+</components:MyIMSWindow>

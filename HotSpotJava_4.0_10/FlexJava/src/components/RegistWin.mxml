@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:MyIMSWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						xmlns:s="library://ns.adobe.com/flex/spark" 
+						xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:components="components.*" layout="absolute" width="298" height="338"
+						title="注册页面">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:RemoteObject id="insertReg" destination="getHotspot" result="InsertRegistResult(event)" fault="InsertRegistFault(event)">	 
+		</s:RemoteObject>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			public var fObj:FlexJava=null;
+			private function closeHandle():void{
+				this.visible=false;
+			}
+
+			private function InsertRegistResult(event:ResultEvent):void{
+				this.registError.text="";
+				var reLoc:int=event.result as int;
+				if(reLoc!=0){
+					this.registName.text="";
+					this.registCompanly.text="";
+					this.registPhone.text="";
+					this.registMail.text="";
+					this.registError.text="";
+					this.registInfo.text="     注册成功！您当前注册的为普通用户,用户名：sa ;密码：sa123。若需管理员权限请发送本页面内容至zhengli@mapgis.net邮箱，审核通过后，我们将及时回复!";
+				}else{
+				
+				}
+				
+			}
+			
+			private function InsertRegistFault(event:FaultEvent):void{
+				this.registError.text="注册失败！";
+			}
+
+
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				if(this.registName.text!=""){
+					if(this.registCompanly.text!=""){
+						if(this.registPhone.text!=""){
+							if(this.registMail.text!=""){
+								this.registError.text="";
+								insertReg.insertRegistInfo(this.registName.text,this.registCompanly.text,this.registPhone.text,this.registMail.text);
+							}else{
+								this.registError.text="请输入邮箱地址！";
+							}
+							
+						}else{
+							this.registError.text="请输入联系方式！";
+						}
+						
+					}else{
+						this.registError.text="请输入学校或公司名称！";
+					}
+				
+				}else{
+					this.registError.text="请输入姓名！";
+				
+				}
+				
+			}
+
+
+			protected function button2_clickHandler(event:MouseEvent):void
+			{
+				this.registName.text="";
+				this.registCompanly.text="";
+				this.registPhone.text="";
+				this.registMail.text="";
+				this.registError.text="";
+				this.registInfo.text="请完整填写注册信息！";
+			}
+
+
+			protected function button3_clickHandler(event:MouseEvent):void
+			{
+				this.registName.text="";
+				this.registCompanly.text="";
+				this.registPhone.text="";
+				this.registMail.text="";
+				this.registError.text="";
+				this.registInfo.text="请完整填写注册信息！";
+				this.visible=false;
+			}
+
+		]]>
+	</fx:Script>
+	<s:Label x="11" y="24" text="姓名：" fontFamily="宋体" fontSize="14"   />
+	<s:TextInput id="registName" x="93" y="10" width="175"/>
+	<s:Label  x="10" y="52" text="学校或公司：" fontFamily="宋体" fontSize="14" />
+	<s:TextInput  id="registCompanly" x="93" y="38" width="175" />
+	<s:Label x="10" y="76" text="联系方式：" fontFamily="宋体" fontSize="14"/>
+	<s:TextInput id="registPhone" x="93" y="66" width="175"/>
+	<s:Label x="10" y="105" text="邮箱：" fontFamily="宋体" fontSize="14"/>
+	<s:TextInput id="registMail" x="93" y="95" width="175"/>
+	<mx:Text id="registError" x="10" y="131" width="244" fontFamily="宋体" fontSize="12"  color="0xFF0000"/>
+	<s:TextArea x="10" y="159" width="250" height="82" id="registInfo" />
+	<s:Button x="6" y="267" label="提交" fontFamily="宋体" fontSize="14" click="button1_clickHandler(event)"/>
+	<s:Button x="104" y="267" label="取消" fontFamily="宋体" fontSize="14" click="button2_clickHandler(event)"/>
+	<s:Button x="198" y="267" label="关闭" fontFamily="宋体" fontSize="14" click="button3_clickHandler(event)"/>
+	
+
+</components:MyIMSWindow>

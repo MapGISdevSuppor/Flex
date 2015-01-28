@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" xmlns:map="zdims.map.*" xmlns:drawing="zdims.drawing.*"
+ 				xmlns:components="components.*" >
+	<fx:Script>
+		<![CDATA[
+			import flash.net.navigateToURL;   
+			import mx.controls.Alert;  
+			
+			private function getUrl():String{  
+				var url:String = "mailto:";  
+				url+=sendTo.text;  
+				url+="?subject="+subject.text;  
+				url+="&body=test"+content.text;   
+				return url;  
+			}  
+			private function newWin():void {   
+				var urlRequest:URLRequest = new URLRequest( getUrl());   
+				navigateToURL(urlRequest, '_self');   
+			}  
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		
+	</fx:Declarations>
+	<mx:TextInput x="351" y="88" width="592" id="sendTo"/>  
+	<mx:Label x="291" y="90" text="Mail to:" fontWeight="bold"/>  
+	<mx:TextInput x="351" y="116" width="592" id="subject"/>  
+	<mx:Label x="285" y="118" text="Subject:" fontWeight="bold"/>  
+	<mx:Label x="285" y="146" text="Content:" fontWeight="bold"/>  
+	<mx:Button x="351" y="343" label="Send" click="newWin()"/>  
+	<mx:TextArea x="351" y="145" width="592" height="171" id="content"/>
+	
+</s:Application>

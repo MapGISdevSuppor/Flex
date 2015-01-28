@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="FlexDemo"
+  id="myeclipse.1339119315680"
+  context-root="/FlexDemo"
+  j2ee-spec="5.0"
+  archive="FlexDemo.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

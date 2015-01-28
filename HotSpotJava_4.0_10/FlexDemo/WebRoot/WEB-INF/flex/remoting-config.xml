@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<service id="remoting-service" 
+    class="flex.messaging.services.RemotingService">
+
+    <adapters>
+        <adapter-definition id="java-object" class="flex.messaging.services.remoting.adapters.JavaAdapter" default="true"/>
+    </adapters>
+
+    <default-channels>
+        <channel ref="my-amf"/>
+    </default-channels>
+
+	<!-- 配置远程服务 -->
+	<destination id="myHellowService"> 
+      <properties>  
+			<!-- 这里要写完整路径：包名 + 类名 -->
+            <source>com.flex.demo.HelloService</source> 
+      </properties>  
+	</destination>
+	
+		<destination id="getHotspot"> 
+      <properties>  
+			<!-- 这里要写完整路径：包名 + 类名 -->
+            <source>com.MapGIS.Demo.GetHotSpot</source> 
+      </properties>  
+	</destination>
+
+</service>

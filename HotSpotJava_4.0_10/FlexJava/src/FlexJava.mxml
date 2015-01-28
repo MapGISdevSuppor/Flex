@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" xmlns:map="zdims.map.*" xmlns:drawing="zdims.drawing.*"
+			    creationComplete="onClick()" xmlns:components="components.*"
+			   initialize="tile_creationCompleteHandler()"	>
+	<fx:Script>
+		<![CDATA[
+			import com.MapGIS.Demo.HotSpotDTO;
+			
+			import components.EditHotSpot;
+			import components.HotSpotForjava;
+			import components.MarkInfo;
+			
+			import config.ServerIP;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.controls.List;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			import mx.rpc.Fault;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import utilEvent.ReadURLEvent;
+			
+			import zdims.drawing.CoordinateType;
+			import zdims.drawing.DrawingType;
+			import zdims.drawing.IMSPolygon;
+			import zdims.event.IMSMapEvent;
+			public var HSpotArray:ArrayCollection;
+			public var userName:String="";
+			public var userPass:String="";
+			private var markInfo:MarkInfo=null;
+			private var locHot:Array=null;
+		    private var hotPolygon:IMSPolygon=null;
+			private var hotPolygonArr:Vector.<Point>=null;
+			private var editHotspot:EditHotSpot=new EditHotSpot();
+			private var TileLaAddress:String="";
+			private var viewConfig:ServerIP;
+			private var SerIP:String="";
+			private var SQLName:String="";
+			private var SQLPass:String="";
+			private function tile_creationCompleteHandler():void{
+				if(viewConfig==null){
+					viewConfig=new ServerIP();
+					viewConfig.mapConfig1(this);
+				}
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, TilereadURLCompelte);
+			}
+			//获取服务地址
+			private function TilereadURLCompelte(event:ReadURLEvent):void
+			{
+				TileLaAddress=viewConfig.TileURL;
+				SerIP=viewConfig.serIp;
+				SQLName=viewConfig.sqlName;
+				SQLPass=viewConfig.sqlPass;
+				this.tilelayer.serverAddress=this.TileLaAddress;
+			}
+			
+			
+			
+		
+			protected function onClick():void{
+				if(SerIP==""||SQLName==""||SQLPass==""){
+					SerIP=viewConfig.serIp;
+					SQLName=viewConfig.sqlName;
+					SQLPass=viewConfig.sqlPass;
+				}
+				getHot.firstGetHotSpots(this.mymap.getLevel(),this.mymap.levelNum,SerIP,SQLName,SQLPass);
+				this.mymap.addEventListener(IMSMapEvent.MAP_ZOOMOVER,OnzoomHandle);
+			}
+			//获取数据库的结果
+			protected function getHotspotResult(event:ResultEvent):void{
+				locHot=new Array();
+				HSpotArray=event.result as  ArrayCollection;
+				if(HSpotArray.length>0){
+				var hot:HotSpotForjava=null;
+				for(var i:int=0;i<HSpotArray.length;i++){
+					var loc1:HotSpotDTO=HSpotArray[i] as HotSpotDTO;
+					 hot=new HotSpotForjava();
+					 hot.hotLabelText=loc1.name;
+					 hot.hotTemp=loc1;
+					 var area:Array=new Array();
+					 var loc2:Array=null;
+					 hotPolygonArr=new Vector.<Point>();
+					 loc2=loc1.coord.split(",");
+					 for(var j:int=0;j<loc2.length;j=j+2){
+						 area.push(new Point(loc2[j],loc2[j+1]));
+						 hotPolygonArr.push(new Point(loc2[j],loc2[j+1]));
+					 } 
+					 hot.hotAreaDots=area; 
+					 hot.mymap=this.mymap;
+					 hot.markinfo=this.markinfo;
+					 hot.hotTabNavigator=this.showTabNavigator;
+					 hot.EditHotSpotMXML=this.editHotspot;
+					 hot.fObj=this;
+					 hot.loginWin=this.logWin;
+					 if(loc1.pnum>0&&loc1.pnum<=1000){
+						 if(this.hotMain.hotprotity.e1!=null){
+							 hot.hotfillColor=new uint("0x"+this.hotMain.hotprotity.e1.selectedColor.toString(16));
+						 }else{
+					 		 hot.hotfillColor=0xFF9900;
+						 }
+					 }else if(loc1.pnum>1000&&loc1.pnum<=2000){
+						 if(this.hotMain.hotprotity.e2!=null){
+							 hot.hotfillColor=new uint("0x"+this.hotMain.hotprotity.e2.selectedColor.toString(16));
+						 }else{
+							 hot.hotfillColor=0x3366FF;
+						 }
+					 }else if(loc1.pnum>2000&&loc1.pnum<=3000){
+						 if(this.hotMain.hotprotity.e3!=null){
+							 hot.hotfillColor=new uint("0x"+this.hotMain.hotprotity.e3.selectedColor.toString(16));
+						 }else{
+						 	 hot.hotfillColor=0xCC00FF;
+						 }
+					 }else if(loc1.pnum>3000&&loc1.pnum<=4000){
+						 if(this.hotMain.hotprotity.e4!=null){
+							 hot.hotfillColor=new uint("0x"+this.hotMain.hotprotity.e4.selectedColor.toString(16));
+						 }else{
+							 hot.hotfillColor=0x66FFFF;
+						 }
+					 }else if(loc1.pnum>4000&&loc1.pnum<=5000){
+						 if(this.hotMain.hotprotity.e5!=null){
+							 hot.hotfillColor=new uint("0x"+this.hotMain.hotprotity.e5.selectedColor.toString(16));
+						 }else{
+						 	 hot.hotfillColor=0xCC6666;
+						 }
+					 }else{
+						 if(this.hotMain.hotprotity.e6!=null){
+							 hot.hotfillColor=new uint("0x"+this.hotMain.hotprotity.e6.selectedColor.toString(16));
+						 }else{
+						 	 hot.hotfillColor=0xFF0099;
+						 }
+					 }
+					 //绘制多边形热区
+					 hotPolygon=new  IMSPolygon(CoordinateType.Logic);
+					 graphic.addGraphics(hotPolygon);
+					 hotPolygon.points=hotPolygonArr;
+					 if(loc1.pnum>0&&loc1.pnum<=1000){
+						 if(this.hotMain.hotprotity.e1!=null){
+							var e1Color:uint=new uint("0x"+this.hotMain.hotprotity.e1.selectedColor.toString(16));
+							 hotPolygon.beginFill(e1Color,0.8);
+						 }else{
+						     hotPolygon.beginFill(0xFF9900,0.8);
+						 }
+					 }else if(loc1.pnum>1000&&loc1.pnum<=2000){
+						 if(this.hotMain.hotprotity.e2!=null){
+							 var e2Color:uint=new uint("0x"+this.hotMain.hotprotity.e2.selectedColor.toString(16));
+							 hotPolygon.beginFill(e2Color,0.8);
+						 }else{
+						     hotPolygon.beginFill(0x3366FF,0.8);
+						 }
+					 }else if(loc1.pnum>2000&&loc1.pnum<=3000){
+						 if(this.hotMain.hotprotity.e3!=null){
+							 var e3Color:uint=new uint("0x"+this.hotMain.hotprotity.e3.selectedColor.toString(16));
+							 hotPolygon.beginFill(e3Color,0.8);
+						 }else{
+							 hotPolygon.beginFill(0xCC00FF,0.8);
+						 }
+					 }else if(loc1.pnum>3000&&loc1.pnum<=4000){
+						 if(this.hotMain.hotprotity.e4!=null){
+							 var e4Color:uint=new uint("0x"+this.hotMain.hotprotity.e4.selectedColor.toString(16));
+							 hotPolygon.beginFill(e4Color,0.8);
+						 }else{
+						 	hotPolygon.beginFill(0x66FFFF,0.8);
+						 }
+					 }else if(loc1.pnum>4000&&loc1.pnum<=5000){
+						 if(this.hotMain.hotprotity.e5!=null){
+							 var e5Color:uint=new uint("0x"+this.hotMain.hotprotity.e5.selectedColor.toString(16));
+							 hotPolygon.beginFill(e5Color,0.8);
+						 }else{
+						     hotPolygon.beginFill(0xCC6666,0.8);
+						 }
+					 }else{
+						 if(this.hotMain.hotprotity.e6!=null){
+							 var e6Color:uint=new uint("0x"+this.hotMain.hotprotity.e6.selectedColor.toString(16));
+							 hotPolygon.beginFill(e6Color,0.8);
+						 }else{
+						     hotPolygon.beginFill(0xFF0099,0.8);
+						 }
+					 }
+					 hotPolygon.enableEdit=false;
+					 hotPolygon.draw();
+					 hotPolygon.visible=false;
+					//将绘制的图形赋值给热区中
+					 hot.hotPolygonTemp=hotPolygon;
+					 this.mymap.addChild(hot);
+					 locHot.push(hot);
+				}
+				}
+			}
+			private function OnzoomHandle(e:Event):void{
+				this.graphic.removeAllElements();
+				hotPolygon=null;
+				
+				if(locHot!=null){
+					for(var i:int=0;i<locHot.length;i++){
+					var hotTemp:HotSpotForjava=locHot[i];
+					hotTemp.removeHotspot();
+					this.mymap.removeChild(hotTemp);
+					if(markinfo!=null){
+						markinfo.visible=false;
+					}
+					}
+					locHot=null;
+				}
+				getHot.firstGetHotSpots(this.mymap.getLevel(),this.mymap.levelNum,SerIP,SQLName,SQLPass);
+			}
+			public function OnRereshHandle():void{
+				if(locHot!=null){
+					for(var i:int=0;i<locHot.length;i++){
+						var hotTemp:HotSpotForjava=locHot[i];
+						hotTemp.removeHotspot();
+						this.mymap.removeChild(hotTemp);
+						if(markInfo!=null){
+							markInfo.visible=false;
+						}
+					}
+					locHot=null;
+				}
+				getHot.firstGetHotSpots(this.mymap.getLevel(),this.mymap.levelNum,SerIP,SQLName,SQLPass);
+			}
+			protected function getHotspottResult(event:FaultEvent):void{
+				this.mymap.setErrorText("调用失败！");
+			}
+
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				if(this.regWin!=null){
+					this.newlogWin.visible=false;
+					logWin.visible=false;
+					this.regWin.visible=true;
+					this.regWin.registInfo.text="";
+					this.regWin.registInfo.text="请完整填写注册信息！";
+				}
+			}
+			protected function button2_clickHandler(event:MouseEvent):void
+			{
+				if(newlogWin!=null){
+					this.regWin.visible=false;
+					logWin.visible=false;
+					this.newlogWin.txtUsername.text="";
+					this.newlogWin.txtPassword.text="";
+					this.newlogWin.visible=true;
+					this.newlogWin.x=this.mymap.width/2;
+					this.newlogWin.y=this.mymap.height/2-100;
+					
+				}
+			}
+			
+			protected function button3_clickHandler(event:MouseEvent):void
+			{
+				if(newlogWin!=null){
+					this.newlogWin.txtUsername.text="";
+					this.newlogWin.txtPassword.text="";
+					this.newlogWin.visible=false;
+					this.regWin.visible=false;
+					logWin.visible=false;
+				}
+				this.userName="";
+				this.userPass="";
+				this.uName.text="";
+			}
+			public function divisiable():void{
+				this.newlogWin.visible=false;
+				this.regWin.visible=false;
+				//this.logWin.visible=false;
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+			<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:RemoteObject id="getHot" destination="getHotspot" result="getHotspotResult(event)" fault="getHotspottResult(event)">	 
+		</s:RemoteObject>
+		<mx:WipeLeft id="wipeIn" duration="1000"/>
+		<mx:WipeRight id="wipeOut" duration="1000"/>
+		<mx:Iris id="effShowForm" target="{logWin}" duration="1000" />
+		<mx:Iris id="effHideForm" target="{logWin}"  duration="2000" showTarget="false"/>
+	</fx:Declarations>
+	
+	<map:IMSMap x="0" y="80"  width="{this.width-305}" height="100%" levelNum="5"
+			    initShowLevel="2" id="mymap"
+				xMinMap="1110078.36643173"  xMaxMap="1111428.96697105"
+				yMinMap="3236448.06045859" yMaxMap="3237798.66099791"  >
+		
+		<!--基于K9系列平台显示瓦片地图-->
+		<!--<map:TileLayer x="197" y="138"  hdfName="Wh3D.HDF" id="tilelayer"  dataVersion="0" indexOffset="2" >
+		</map:TileLayer>-->	
+		
+		<!--显示瓦片地图-->
+		<map:TileLayer x="197" y="138"  hdfName="Wh3D" id="tilelayer"  dataVersion="0" indexOffset="2" >
+		</map:TileLayer>	
+		<drawing:GraphicsLayer x="396" y="133" id="graphic">
+		</drawing:GraphicsLayer>
+		<components:MarkInfo x="0" y="10" id="markinfo"  visible="false" mapcontainer="{mymap}" >
+		</components:MarkInfo>
+	</map:IMSMap>
+	<components:LoginWin x="{this.mymap.width/2}" y="{this.mymap.height/2-100}"  showEffect="{effShowForm}" hideEffect="{effHideForm}" fObj="{this}"  id="logWin" visible="false">
+	</components:LoginWin>
+	<components:newLoginWin x="{this.mymap.width/2}" y="{this.mymap.height/2-100}"  showEffect="{effShowForm}" hideEffect="{effHideForm}"  imsmap="{this.mymap}" hotFlexJava="{this}" id="newlogWin" visible="false">
+	</components:newLoginWin>
+	<components:RegistWin   x="{this.mymap.width/2}" y="{this.mymap.height/2-160}"  showEffect="{effShowForm}" hideEffect="{effHideForm}"  imsmap="{this.mymap}"  id="regWin" visible="false">
+	</components:RegistWin>
+	<!--<s:BorderContainer id="container" width="100%" height="100" 
+					   x="0"  y="0">-->
+		<mx:Canvas x="0"
+				   y="0"
+				   width="100%"
+				   height="110"
+				   backgroundImage="@Embed(source='images/newImages/bg.png')"
+				   minWidth="1000"
+				   backgroundSize="100%">
+			<mx:Image  top="0"
+					   left="0"
+					   height="110"
+					   id="img1"
+					   source="images/newImages/banner_lt.png"/>
+			<mx:Image 
+				height="110"
+				width="320"
+				right="0"
+				id="img2"
+				source="images/newImages/banner_rt.png" top="0"  />
+			<s:Label right="350" top="19" text="注册" useHandCursor="true" buttonMode="true" mouseChildren="false" click="button1_clickHandler(event)" fontFamily="宋体" fontSize="12"/>
+			<s:Label right="310" top="19" text="登录"  useHandCursor="true" buttonMode="true" mouseChildren="false"  id="txtDL" fontFamily="宋体" fontSize="12" click="button2_clickHandler(event)"  />
+			<s:Label right="270" top="19" text="退出"  useHandCursor="true" buttonMode="true" mouseChildren="false"  id="txtTC" fontFamily="宋体" fontSize="12" click="button3_clickHandler(event)"  />
+			<s:Label right="200" top="19" text="当前用户："  fontFamily="宋体" fontSize="12" color="0x3366FF"  />
+			<s:Label right="140" top="19"  id="uName" text=""  fontFamily="宋体" fontSize="12" color="0xFF0000" />
+		</mx:Canvas>
+		<!--<s:Label left="0" top="8" text="热区" width="441" height="30" fontWeight="bold" verticalAlign="middle" fontSize="25" themeColor="#0C98F1" fontFamily="宋体" textAlign="center"  />-->
+	<!--</s:BorderContainer>-->
+	<mx:Canvas right="0" top="80" width="315" height="100%" hideEffect="{wipeOut}" showEffect="{wipeIn}"  id="resultID" backgroundAlpha="0.4" backgroundColor="#D3D2D2" >
+		<mx:TabNavigator id="showTabNavigator" width="100%" height="100%"   backgroundColor="#D3D2D2" backgroundAlpha="0.2" fontWeight="normal" fontSize="12" >	
+			<components:HotSpotMain id="hotMain" width="100%" height="100%" top="0" left="0"  loginWin="{logWin}" flexObj="{this}" imamap="{mymap}"  g_graphics="{graphic}" showTabNavigator="{showTabNavigator}">
+			</components:HotSpotMain>
+		</mx:TabNavigator>
+	</mx:Canvas>	
+</s:Application>

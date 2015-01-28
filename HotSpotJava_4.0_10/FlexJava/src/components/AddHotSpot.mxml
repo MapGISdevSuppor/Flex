@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:NavigatorContent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					xmlns:s="library://ns.adobe.com/flex/spark" 
+					xmlns:mx="library://ns.adobe.com/flex/mx" width="245" height="450"
+					label="添加热区">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:RemoteObject id="getHot2" destination="getHotspot" result="getHotspotResult2(event)" fault="getHotspottResult2(event)">	 
+		</s:RemoteObject>
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import Mapgis7.WebService.BasLib.Dot_2D;
+			import mx.controls.Alert;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import zdims.control.HotSpot;
+			import zdims.drawing.CoordinateType;
+			import zdims.drawing.DrawingType;
+			import zdims.drawing.GraphicsLayer;
+			import zdims.drawing.IMSPolygon;
+			import zdims.interfaces.IGraphics;
+			import zdims.map.IMSMap;
+			import zdims.util.IMSOperType;
+			public var imsmap:IMSMap;
+			public var graphicLayer:GraphicsLayer;
+			public var fObj:FlexJava=null;
+			public var hotSpotMain:HotSpotMain=null;
+			public var loginWindow:LoginWin=null;
+			private var locLev:int=-1;
+			private var loc2:String="";
+			private var loc3:String="";
+			private var loc4:String="";
+			private var loc5:String="";
+			private function Polygon():void
+			{
+				this.PutHotCoords.text="";
+				this.graphicLayer.drawingType=DrawingType.Polygon
+				this.graphicLayer.drawingOverCallback=DrawingOverCallback;
+			}
+			public function DrawingOverCallback(gLayer:GraphicsLayer,graphics:IGraphics,pntArr:Vector.<Point>):void
+			{
+				PutHotCoords.text="";
+				PutHotCoords.editable=true;
+				var Polygon:IMSPolygon=new IMSPolygon(CoordinateType.Logic);
+				gLayer.addGraphics(Polygon);
+				for(var i:int=0;i<pntArr.length;i++){
+					if(i==0){
+						this.PutHotCoords.text+=pntArr[i].x.toString()+","+pntArr[i].y.toString();
+					}else{
+						this.PutHotCoords.text+=","+pntArr[i].x.toString()+","+pntArr[i].y.toString();
+					}
+				}
+				PutHotCoords.editable=false;
+				locLev=this.imsmap.getLevel();
+				if(imsmap!=null){
+					this.imsmap.setCurOper(IMSOperType.None);
+					//this.imsmap.setCurOper(IMSOperType.Drag);
+				}
+			}
+			
+			private function onSubmit():void{
+				
+				
+				if(PutHotName.text!=null&&PutHotName.text!=""){
+				
+					if(PutHotCoords.text!=null&&PutHotCoords.text!=""){
+						 loc2=PutHotName.text.toString();
+						 loc3=PutHotCoords.text.toString();
+						 loc5=this.PutPaddress.text.toString();
+						 if(this.fObj!=null){
+						 	this.fObj.divisiable();
+						 }
+						 if(this.PutPnum.text.toString()!=null&&this.PutPnum.text.toString()!=""){
+							 if(this.PutPnum.text.toString().indexOf(".")!=-1){
+							 	Alert.show("人口数中请输入正整数");
+							 	return;
+							 }else{
+								 if(this.fObj!=null){
+									 if(this.fObj.userName=="admin"&&this.fObj.userPass=="123456"){
+										 loc4=this.PutPnum.text.toString();
+										 if(locLev==-1){
+											 locLev=this.imsmap.getLevel();
+										 }
+										 addHotSpot();
+									 }else {
+										 if(this.loginWindow!=null){
+											 this.loginWindow.t1.visible=true;
+											 this.loginWindow.t2.visible=false;
+											 this.loginWindow.x=this.imsmap.width/2;
+											 this.loginWindow.y=this.imsmap.height/2-100;
+											 this.loginWindow.visible=true;
+										 }
+									 return;
+									 }
+								 }
+								
+							 }
+						 }else{
+								 loc4=0+"";
+								if(this.fObj.userName=="admin"&&this.fObj.userPass=="123456"){
+									if(this.fObj!=null){
+										 if(locLev==-1){
+											 locLev=this.imsmap.getLevel();
+								 			}
+								 		addHotSpot();
+									}
+								 }else{
+									 if(this.loginWindow!=null){
+										 this.loginWindow.t1.visible=true;
+										 this.loginWindow.t2.visible=false;
+										 this.loginWindow.x=this.imsmap.width/2;
+										 this.loginWindow.y=this.imsmap.height/2-100;
+										 this.loginWindow.visible=true;
+									 }
+									 return;
+								 
+								 }
+						 }
+						
+						//getHot2.insertHotspot(loc2,loc3,locLev);
+					}else{
+						Alert.show("坐标不能为空");
+						return;
+					}
+				}else{
+					Alert.show("名称不能为空");
+					return;
+				}
+			}
+			public function addHotSpot():void{
+				getHot2.insertHotspot(loc2,loc3,locLev,loc4,loc5);
+			}
+			private function getHotspotResult2(event:ResultEvent):void{
+				var loc:int=event.result as int;
+				if(loc!=0){
+					this.fObj.OnRereshHandle();
+					PutHotCoords.editable=true;
+					this.PutHotName.text="";
+					this.PutPnum.text="";
+					this.PutHotCoords.text="";
+					this.PutPaddress.text="";
+					this.imsmap.setInfoText("添加成功");
+					this.PutHotCoords.editable=false;
+					locLev=-1;
+				}
+				this.imsmap.setCurOper(IMSOperType.Drag);
+			}
+			private function getHotspottResult2(event:FaultEvent):void{
+				this.imsmap.setErrorText("添加失败！");
+			}
+			private function onCance():void{
+				if(imsmap!=null){
+					//this.imsmap.setCurOper(IMSOperType.None);
+					this.PutHotName.text="";
+					this.PutHotCoords.text="";
+					this.PutPnum.text="";
+					this.PutPaddress.text="";
+					loc2="";
+					loc3="";
+					loc4="";
+					loc5="";
+					locLev=-1;
+					this.PutHotCoords.editable=false;
+					this.imsmap.setCurOper(IMSOperType.Drag);
+				}
+			}
+			private function onClose():void{
+				if(hotSpotMain!=null){
+					loc2="";
+					loc3="";
+					loc4="";
+					loc5="";
+					locLev=-1;
+					hotSpotMain.closeAddHotSpot();
+					hotSpotMain=null;
+					this.imsmap.setCurOper(IMSOperType.Drag);
+				}	
+			}
+		]]>
+	</fx:Script>
+	<s:Panel width="100%"  title="添加热点" height="100%">		
+			<s:Label x="10" y="10" text="添加热区" width="153" height="20" fontSize="15" color="#123EA2" />
+			<s:Label x="18" y="38" text="名称：" width="166" height="18"/>
+			<s:TextInput x="57" y="33" width="166" height="23" id="PutHotName"/>
+			<s:Label x="11" y="145" text="坐标Coords：" width="162" height="18"  />
+			<s:Label x="10" y="68" text="人口数："  />
+			<s:TextInput x="57" y="64" width="168" id="PutPnum" restrict="0-9\."  />
+			<!--<s:TextArea x="12" y="167"  height="113" id="PutHotCoords" editable="false" width="95%" />-->
+			<s:TextArea x="12" y="167"  height="113" id="PutHotCoords"  width="95%" />
+		<s:Label x="18" y="90" text="地址："/>
+		<s:TextInput x="57" y="87" width="168" id="PutPaddress" />
+			<!--<s:Button x="10" y="89" label="绘制热区区域"  click="Polygon()"/>-->
+		<mx:Image source="images/newImages/btn_drawhot.jpg"  x="10" y="113" click="Polygon()"  useHandCursor="true" buttonMode="true" mouseChildren="false">
+		</mx:Image>
+		<mx:Image source="images/newImages/btn_queding.jpg"  x="10" y="291" click="onSubmit()"  useHandCursor="true" buttonMode="true" mouseChildren="false">
+		</mx:Image>
+		<mx:Image source="images/newImages/btn_cancel.gif" x="112" y="291" click="onCance()"  useHandCursor="true" buttonMode="true" mouseChildren="false">
+		</mx:Image>
+		<mx:Image source="images/newImages/button.png"  x="209" y="288" click="onClose()"  useHandCursor="true" buttonMode="true" mouseChildren="false">
+		</mx:Image>
+		
+			<s:TextArea  x="10" y="344" height="117" width="95%" text="添加热区：&#13;       输入热区的名称、人口数以及地址，然后点击绘制热区的按钮，在地图上绘制多边形（可根据建筑物的轮廓绘制），双击结束，点击确定，添加热区完成；点击取消可清除当前输入的热区名称和坐标范围；点击关闭可关闭当前的页面。" editable="false"/>
+			<s:Label x="10" y="326" text="操作提示："/>
+			
+			
+	</s:Panel>
+	
+</s:NavigatorContent>

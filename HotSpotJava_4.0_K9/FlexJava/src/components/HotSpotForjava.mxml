@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="utf-8"?>
+<OverlayObject xmlns="zdims.map.*" creationComplete="init()" visible="false" show="onShow()" fontSize="12" xmlns:mx="http://www.adobe.com/2006/mxml" >
+	<mx:Label id="hotLabel" x="10"  text=""/>
+	<mx:RemoteObject id="delHot" destination="getHotspot" result="delHotspotResult(event)" fault="delHotspotFault(event)">
+	</mx:RemoteObject>
+	<mx:Script>
+		<![CDATA[
+			import com.MapGIS.Demo.HotSpotDTO;
+			
+			import mx.containers.TabNavigator;
+			import mx.controls.Alert;
+			import mx.core.UIComponent;
+			import mx.events.FlexEvent;
+			import mx.graphics.GradientBase;
+			import mx.managers.PopUpManager;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			
+			import zdims.control.IMSRoad;
+			import zdims.drawing.IMSPolygon;
+			import zdims.map.IMSMap;
+			import zdims.util.UIComponentEx;
+			public var hotArea:IMSRoad=new IMSRoad();
+			//public var fillColor:int=0x0BC821;
+			public var fillColor:int=0xFFFF33
+			public var hotfillColor:int=0xffffff;
+			public var hotLabelText:String="";
+			public var markinfo:MarkInfo=null;
+			public var mymap:IMSMap;
+			public var hotTemp:HotSpotDTO;
+			public var hotPolygonTemp:IMSPolygon;
+			public var hotTabNavigator:TabNavigator;
+			public var EditHotSpotMXML:EditHotSpot=null;
+			public var loginWin:LoginWin=null;
+			public var fObj:FlexJava=null;
+			private var edit_coords:String="";
+			
+			private function delHotspotResult(event:ResultEvent):void{
+				var res:int=event.result as int;
+				if(res!=0){
+					this.mymap.setInfoText("删除成功！");
+				}else{
+					this.mymap.setErrorText("删除失败！");
+				}
+			}
+			
+			private function delHotspotFault(event:FaultEvent):void{
+				this.mymap.setErrorText("调用失败！");
+			}
+			
+			public function set hotAreaDots(value:Array):void
+			{
+				hotArea.setDots(value);
+			}
+			public function init():void
+			{
+				hotArea.enableFill=true;
+				hotArea.fillColor=hotfillColor;
+				hotArea.borderSize=2;
+				if(this.imsmap!=null)
+				{
+				//	this.imsmap.contextMenu=null;
+					var mu:ContextMenu=new ContextMenu();
+					mu.hideBuiltInItems();
+					
+					var item0:ContextMenuItem=new ContextMenuItem("编辑热区",true);
+					item0.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,onEditHandle);
+					mu.customItems.push(item0);
+					
+					//var item1:ContextMenuItem=new ContextMenuItem("取消编辑",true);
+					//item1.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,onClearEdit);
+					//mu.customItems.push(item1);
+					
+					var item3:ContextMenuItem=new ContextMenuItem("删除热区",true);
+					item3.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,removeHotSpotByMu);
+					mu.customItems.push(item3);
+					this.hotArea.contextMenu=mu;
+					this.imsmap.addChild(hotArea);
+					if(this.imsmap.contains(this))
+						this.imsmap.setChildIndex(this,this.imsmap.getChildren().length-1);
+					//hotArea.addEventListener(MouseEvent.MOUSE_DOWN,this.imsmap.onMouseDown);
+					hotArea.addEventListener(MouseEvent.MOUSE_DOWN,showHotInfo);
+					hotArea.addEventListener(MouseEvent.MOUSE_MOVE,this.imsmap.onMouseMove);
+					hotArea.addEventListener(MouseEvent.MOUSE_UP,this.imsmap.onMouseUp);
+					hotArea.addEventListener(MouseEvent.DOUBLE_CLICK,this.imsmap.onDoubleClick);
+					hotArea.addEventListener(MouseEvent.MOUSE_WHEEL,this.imsmap.onMouseWheel);
+				}
+				hotArea.addEventListener(MouseEvent.MOUSE_OVER,onMouseOver);
+				hotArea.addEventListener(MouseEvent.MOUSE_MOVE,onMouseOver);
+				hotArea.addEventListener(MouseEvent.MOUSE_OUT,onMouseOut);
+				this.hotArea.alpha=0;
+				this.hotLabel.text=this.hotLabelText;
+			}
+			//删除热区
+			private function removeHotSpotByMu(e:Event):void{
+				if(this.fObj!=null){
+					this.fObj.divisiable();
+				}
+				if(this.fObj!=null){
+					if(this.fObj.userName=="admin"&&this.fObj.userPass=="123456"){
+						onRemoveHotSpot();
+						
+					}else{
+						if(loginWin!=null){
+							this.loginWin.t1.visible=true;
+							this.loginWin.t2.visible=false;
+							loginWin.x=this.imsmap.width/2;
+							loginWin.y=this.imsmap.height/2-100;
+							loginWin.visible=true;
+						}
+						return;
+					}
+					
+				}
+				if(EditHotSpotMXML!=null){
+					EditHotSpotMXML.hotSpotForjavaObj=null;
+				}
+			}
+			public function onRemoveHotSpot():void{
+				if(markinfo!=null){
+					markinfo.close();
+				}
+				clearHots();
+				if(hotTemp!=null){
+					delHot.deleteHotSpot(hotTemp.id);
+				}
+			}
+			//右键编辑
+			private function onEditHandle(e:Event):void{
+				if(this.hotPolygonTemp!=null){
+					
+					this.hotPolygonTemp.enableEdit=true;
+					this.hotPolygonTemp.editMark1DragOverCallback=reDrawHotarea;
+					
+					this.hotPolygonTemp.editMark2DragOverCallback=reDrawHotarea;
+					
+					this.hotArea.visible=false;
+					this.hotPolygonTemp.visible=true;
+					this.hotPolygonTemp.shape.addEventListener(MouseEvent.MOUSE_OVER,onPolygonOver);
+					if(EditHotSpotMXML==null){
+					     EditHotSpotMXML=new EditHotSpot();
+					}
+					if(EditHotSpotMXML!=null){
+						EditHotSpotMXML.width=this.hotTabNavigator.width;
+						hotTabNavigator.addElement(EditHotSpotMXML);
+						if(hotTemp!=null){
+							EditHotSpotMXML.clearoldPic();
+							EditHotSpotMXML.editID=hotTemp.id.toString();
+							EditHotSpotMXML.edit_Name=hotTemp.name;
+							EditHotSpotMXML.editCoord=hotTemp.coord;
+							EditHotSpotMXML.fObj=this.fObj;
+							if(hotTemp.pnum!=0){
+								EditHotSpotMXML.edit_Pnum=hotTemp.pnum.toString();
+							}else{
+								EditHotSpotMXML.edit_Pnum="";
+							}
+							if(hotTemp.paddress!=null||hotTemp.paddress!=""){
+								EditHotSpotMXML.edit_Paddress=hotTemp.paddress.toString();
+							}else{
+								EditHotSpotMXML.edit_Paddress="";
+							}
+							EditHotSpotMXML.imsmap=this.mymap;
+							EditHotSpotMXML.hotSpotForjavaObj=this;
+							EditHotSpotMXML.hotDrawPic=this.hotPolygonTemp;
+							EditHotSpotMXML.hotTabNavigator=this.hotTabNavigator;
+						}
+						hotTabNavigator.selectedIndex=hotTabNavigator.getItemIndex(EditHotSpotMXML);
+						this.hotPolygonTemp.visible=true;
+					}
+					//this.hotPolygonTemp.editMark1DragOverCallback=onEditmark1;
+				}
+			}
+			//修改点移动回调事件
+			private function reDrawHotarea(curEditMarkIndex:int,mouseDownShape:UIComponentEx,editMark1List:Vector.<UIComponentEx>,polygonTemp:IMSPolygon):void{
+				edit_coords="";
+				for(var i:int=0;i<polygonTemp.points.length;i++){
+					if(i==0){
+						this.edit_coords+=polygonTemp.points[i].x.toString()+","+polygonTemp.points[i].y.toString();
+					}else{
+						this.edit_coords+=","+polygonTemp.points[i].x.toString()+","+polygonTemp.points[i].y.toString();
+					}
+				}
+				if(EditHotSpotMXML!=null){
+					EditHotSpotMXML.editCoord=this.edit_coords;
+				}
+			}
+			public function  removeEditNav():void{
+				if(this.hotTabNavigator!=null){
+					this.hotTabNavigator.removeElement(this.EditHotSpotMXML);
+				}
+				if(EditHotSpotMXML!=null){
+					EditHotSpotMXML.hotSpotForjavaObj=null;
+				}
+			}
+			private function onPolygonOver(e:Event):void{
+				var muPol:ContextMenu=new ContextMenu();
+				muPol.hideBuiltInItems();
+				var item1:ContextMenuItem=new ContextMenuItem("取消编辑",true);
+				item1.addEventListener(ContextMenuEvent.MENU_ITEM_SELECT,onClearEdit);
+				muPol.customItems.push(item1);
+				this.hotPolygonTemp.shape.contextMenu=muPol;
+				
+			}
+			private function onClearEdit(e:Event):void{
+				if(this.hotPolygonTemp!=null){
+					this.hotPolygonTemp.enableEdit=false;
+					this.hotPolygonTemp.visible=false;
+					if(hotTemp!=null){
+						if(EditHotSpotMXML!=null){
+							EditHotSpotMXML.editID="";
+							EditHotSpotMXML.edit_Name="";
+							EditHotSpotMXML.editCoord="";
+							EditHotSpotMXML.edit_Pnum="";
+							EditHotSpotMXML.edit_Paddress="";
+						}
+					}
+					this.hotArea.visible=true;
+					this.hotPolygonTemp.shape.removeEventListener(MouseEvent.MOUSE_OVER,onPolygonOver);
+					if(EditHotSpotMXML!=null){
+						EditHotSpotMXML.hotSpotForjavaObj=null;
+					}
+				}
+			}
+			public function onSuccessCancel():void{
+				if(this.hotPolygonTemp!=null){
+					this.hotPolygonTemp.enableEdit=false;
+					this.hotPolygonTemp.visible=false;
+					if(hotTemp!=null){
+						if(EditHotSpotMXML!=null){
+							EditHotSpotMXML.editID="";
+							EditHotSpotMXML.edit_Name="";
+							EditHotSpotMXML.editCoord="";
+							EditHotSpotMXML.edit_Pnum="";
+							EditHotSpotMXML.edit_Paddress="";
+						}
+					}
+					if(this.hotArea!=null){
+						this.hotArea.visible=true;
+					}
+					this.hotPolygonTemp.shape.removeEventListener(MouseEvent.MOUSE_OVER,onPolygonOver);
+					if(EditHotSpotMXML!=null){
+						EditHotSpotMXML.hotSpotForjavaObj=null;
+					}
+					this.imsmap.refresh();
+				}
+			}
+			public function clearHots():void{
+				removeHotspot();
+			}
+			
+			//鼠标点击标注响应事件：弹框显示详细信息
+			private function showHotInfo(e:Event):void
+			{
+				if(markinfo==null)
+				{
+					//当前没有添加过详细信息显示窗口，则创建
+					markinfo=new MarkInfo();
+					markinfo.imsmap=this.mymap;
+					markinfo.addEventListener(FlexEvent.CREATION_COMPLETE,function(e:FlexEvent):void{
+						markinfo.logicX=this.mymap.mouseDownLogicPnt.x;
+						markinfo.logicY=this.mymap.mouseDownLogicPnt.y;
+						//更新详细信息显示位置
+						markinfo.updatePosition();
+						markinfo.hotID.text=hotTemp.id.toString();
+						markinfo.hotName.text=this.hotLabelText;
+						if(hotTemp.pnum!=0){
+						markinfo.hotPnum.text=hotTemp.pnum.toString();
+						}
+						markinfo.hotPaddress.text=hotTemp.paddress.toString();
+						markinfo.visible=true;	
+					});
+					markinfo.mapcontainer=this.mymap;
+					this.mymap.addChild(markinfo);
+					PopUpManager.addPopUp(markinfo,this.mymap,false);
+				}
+				else
+				{
+					//Alert.show(this.mymap.mouseMoveLogicPnt+"--"+this.mymap.mouseMoveScrPnt);
+					markinfo.mapcontainer=this.mymap;
+					var lgX:Number=markinfo.logicX=mymap.mouseMoveLogicPnt.x;
+					var lgY:Number=markinfo.logicY=mymap.mouseMoveLogicPnt.y;
+					//更新详细信息显示位置
+					markinfo.updatePosition();
+					markinfo.hotID.text=hotTemp.id.toString();
+					markinfo.hotName.text=this.hotLabelText;
+					if(hotTemp.pnum!=0){
+						markinfo.hotPnum.text=hotTemp.pnum.toString();
+					}
+					if(hotTemp.paddress!=null&&hotTemp.paddress!=""){
+						markinfo.hotPaddress.text=hotTemp.paddress.toString();
+					}
+					markinfo.visible=true;
+				}
+			}
+			
+			public function onMouseOver(e:Event):void
+			{
+				this.x=this.hotArea.contentMouseX+20;
+				this.y=this.hotArea.contentMouseY;
+				this.visible=true;
+				this.hotArea.alpha=0.8;
+			}
+			public function onMouseOut(e:Event):void
+			{
+				this.visible=false;
+				if(hotArea!=null)
+					this.hotArea.alpha=0;
+			}
+			public function onShow():void
+			{
+				this.graphics.clear();
+				this.graphics.beginFill(fillColor,0.8);
+				this.graphics.moveTo(0,this.height/2);
+				this.graphics.lineTo(10,0);
+				this.graphics.lineTo(width,0);
+				this.graphics.lineTo(width,height);
+				this.graphics.lineTo(10,height);
+				this.graphics.moveTo(0,this.height/2);
+				this.graphics.endFill();
+			}
+			
+			public function removeHotspot():void{
+				if(hotArea!=null){
+					hotArea.clear();
+					hotArea=null;
+				}
+				if(hotLabel!=null){
+					this.removeChild(hotLabel);
+					hotLabel=null;
+				}
+			}
+		]]>
+	</mx:Script>
+</OverlayObject>

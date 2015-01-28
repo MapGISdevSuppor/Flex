@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:NavigatorContent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					xmlns:s="library://ns.adobe.com/flex/spark" 
+					xmlns:mx="library://ns.adobe.com/flex/mx" width="245" height="450"
+					label="编辑热点">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<s:RemoteObject id="upHot" destination="getHotspot" result="updateHotResult(event)" fault="updateHotFaultResult(event)">	 
+		</s:RemoteObject>
+	</fx:Declarations>
+
+	<fx:Script>
+		<![CDATA[
+			import mx.containers.TabNavigator;
+			import mx.controls.Alert;
+			import mx.rpc.events.FaultEvent;
+			import mx.rpc.events.ResultEvent;
+			import zdims.drawing.IMSPolygon;
+			import zdims.map.IMSMap;
+			public var imsmap:IMSMap;
+			public var hotSpotForjavaObj:HotSpotForjava;
+			public var hotDrawPic:IMSPolygon=null;
+			public var closeflag:Boolean=true;
+			public var hotTabNavigator:TabNavigator;
+			public var fObj:FlexJava=null;
+			
+			
+			[Bindable]
+			public var editID:String="";
+			[Bindable]
+			public var edit_Name:String="";
+			[Bindable]
+			public var edit_Pnum:String="";
+			[Bindable]
+			public var edit_Paddress:String="";
+			
+			public var editCoord:String="";
+
+			
+			//获取数据库的结果
+			protected function updateHotResult(event:ResultEvent):void{
+				var res:int=event.result as int;
+				if(res!=0){
+					this.imsmap.setInfoText("修改成功！");
+					
+					this.EditID.text="";
+					this.EditName.text="";
+					this.EditPnum.text="";
+					this.EditPaddress.text="";
+					//this.imsmap.refresh();
+					if(hotSpotForjavaObj!=null){
+						//Alert.show("ceshi");
+						hotSpotForjavaObj.onSuccessCancel();
+						hotSpotForjavaObj=null;
+					}
+					
+				}else{
+					this.imsmap.setErrorText("修改失败！");
+				}	
+	
+			}
+			protected function updateHotFaultResult(event:FaultEvent):void{
+				this.imsmap.setErrorText("调用失败！");
+			}
+
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				var bid:String=this.EditID.text.toString();
+				var bname:String=this.EditName.text.toString();
+				var bPnum:String=this.EditPnum.text.toString();
+				var bPaddress:String=this.EditPaddress.text.toString();
+				if(this.fObj!=null){
+					this.fObj.divisiable();
+				}
+				if(bid!=null&&bid!=""){
+					if(bname!=null&&bname!=""){
+						if(bPnum!=null&&bPnum!=""){
+							if(bPnum.indexOf(".")!=-1){
+								Alert.show("人口数中请输入正整数");
+								return;
+							}else{
+								if(this.editCoord!=""){
+									if(this.fObj!=null){
+										if(this.fObj.userName=="admin"&&this.fObj.userPass=="123456"){
+											upHot.upHotData(bname,bid,bPnum,bPaddress,editCoord);
+										}else if(this.fObj.userName=="sa"&&this.fObj.userPass=="sa123"){
+											upHot.upHotData(bname,bid,bPnum,bPaddress,editCoord);
+										}else{
+											this.fObj.logWin.t1.visible=false;
+											this.fObj.logWin.t2.visible=true;
+											this.fObj.logWin.x=this.imsmap.width/2;
+											this.fObj.logWin.y=this.imsmap.height/2-100;
+											this.fObj.logWin.visible=true;
+										}
+										
+									}
+									
+								}
+								
+							}
+						}else{
+							bPnum=0+"";
+							if(this.editCoord!=""){
+								if(this.fObj!=null){
+									if(this.fObj.userName=="admin"&&this.fObj.userPass=="123456"){
+										upHot.upHotData(bname,bid,bPnum,bPaddress,editCoord);
+									}else if(this.fObj.userName=="sa"&&this.fObj.userPass=="sa123"){
+										upHot.upHotData(bname,bid,bPnum,bPaddress,editCoord);
+									}else{
+										this.fObj.logWin.t1.visible=false;
+										this.fObj.logWin.t2.visible=true;
+										this.fObj.logWin.x=this.imsmap.width/2;
+										this.fObj.logWin.y=this.imsmap.height/2-100;
+										this.fObj.logWin.visible=true;
+									}
+									
+								}
+								
+							}
+						}
+						
+						
+					}else{
+						Alert.show("名称不能为空！"); 
+						return;
+					}
+				}else{
+					Alert.show("id不能为空，请选择要编辑的热区！");
+					return;
+				}
+					
+			}
+			protected function button2_clickHandler(event:MouseEvent):void
+			{
+				if(imsmap!=null){
+					this.EditID.text="";
+					this.EditName.text="";
+					this.EditPnum.text="";
+					this.EditPaddress.text="";
+					if(hotSpotForjavaObj!=null){
+						hotSpotForjavaObj.onSuccessCancel();
+						hotSpotForjavaObj=null;
+					}
+				}
+			}
+			protected function button3_clickHandler(event:MouseEvent):void
+			{
+				if(imsmap!=null){
+					this.EditID.text="";
+					this.EditName.text="";
+					this.EditPnum.text="";
+					this.EditPaddress.text="";
+					if(hotSpotForjavaObj!=null){
+						hotSpotForjavaObj.onSuccessCancel();
+						hotSpotForjavaObj=null;
+					}
+				}
+				if(hotTabNavigator!=null){
+					this.hotTabNavigator.removeElement(this);
+				}
+				hotSpotForjavaObj=null;
+			}
+			public function clearoldPic():void{
+				if(closeflag==true){
+					if(this.hotDrawPic!=null){
+						hotDrawPic.visible=false;
+						hotDrawPic=null;
+					}
+					if(hotSpotForjavaObj!=null){
+						if(hotSpotForjavaObj.hotArea!=null){
+							hotSpotForjavaObj.hotArea.visible=true;
+						}
+					}
+				}
+			}
+		]]>
+	</fx:Script>
+	<s:Label  x="35" y="39" text="选中编辑热区的ID:"/>
+	<!--ID号-->
+	<s:Label id="EditID" x="154" y="40" text="{editID}"/>
+	<s:Label x="37" y="72" text="当前热区的名称:"/>
+	<!--名称-->
+	<s:TextInput id="EditName" x="127" y="68" width="123" text="{edit_Name}"/>
+	<s:Label x="10" y="193" text="操作提示:"/>
+	<!--热区坐标-->
+	<s:TextArea id="EditCoords" x="12" y="230" width="100%" text="       编辑热区：在热区上单击右键选择编辑热区后，在本页面会显示该热区的ID号、名称人口数和地址，可以对这些属性信息进行修改，并且可以可以拖动修改热区的范围大小，然后点击确定即可将该热区修改成功，取消表示放弃修改，关闭是关闭该修改页面！" editable="false"/>
+	<!--<s:Button x="10" y="138" label="确定" click="button1_clickHandler(event)"/>-->
+	<mx:Image source="images/newImages/btn_queding.jpg"  x="10" y="138" click="button1_clickHandler(event)"  useHandCursor="true" buttonMode="true" mouseChildren="false">
+	</mx:Image>
+	<mx:Image source="images/newImages/btn_cancel.gif" x="113" y="138" click="button2_clickHandler(event)"  useHandCursor="true" buttonMode="true" mouseChildren="false">
+	</mx:Image>
+	<mx:Image source="images/newImages/button.png"  x="206" y="139" click="button3_clickHandler(event)"  useHandCursor="true" buttonMode="true" mouseChildren="false">
+	</mx:Image>
+	<!--人口数-->
+	<s:Label x="37" y="97" text="人口数:" />
+	<s:TextInput x="125" y="93" id="EditPnum" text="{edit_Pnum}"  restrict="0-9\." />
+	<s:Label x="37" y="122" text="地址："/>
+	<s:TextInput x="127" y="117" id="EditPaddress" text="{edit_Paddress}" />
+	<!--
+	<s:Button x="113" y="138" label="取消" click="button2_clickHandler(event)"/>
+	<s:Button x="206" y="139" label="关闭" click="button3_clickHandler(event)"/>-->
+</s:NavigatorContent>

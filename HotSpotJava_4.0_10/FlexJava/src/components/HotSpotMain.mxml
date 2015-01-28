@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:NavigatorContent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					xmlns:s="library://ns.adobe.com/flex/spark" 
+					xmlns:mx="library://ns.adobe.com/flex/mx" width="245" height="450"
+					label="主页面" xmlns:components="components.*">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.containers.TabNavigator;
+			
+			import zdims.drawing.GraphicsLayer;
+			import zdims.map.IMSMap;
+			public var g_graphics:GraphicsLayer=null;
+			public var imamap:IMSMap=null;
+			public var flexObj:FlexJava=null;
+			public var showTabNavigator:TabNavigator;
+			public var loginWin:LoginWin;
+			public var newlogin:newLoginWin;
+			private var addHotSpotMXML:AddHotSpot;
+			
+			private function showAddHotSpot():void{
+				if(addHotSpotMXML==null){
+					addHotSpotMXML=new AddHotSpot();
+					addHotSpotMXML.graphicLayer=this.g_graphics;
+					addHotSpotMXML.imsmap=this.imamap;
+					addHotSpotMXML.fObj=this.flexObj;
+					addHotSpotMXML.width=showTabNavigator.width;
+					addHotSpotMXML.height=showTabNavigator.height;
+					addHotSpotMXML.hotSpotMain=this;
+					addHotSpotMXML.loginWindow=this.loginWin;
+					if(showTabNavigator!=null){
+						showTabNavigator.addElement(addHotSpotMXML);
+						showTabNavigator.selectedIndex=showTabNavigator.getItemIndex(addHotSpotMXML);
+					}
+
+				}else{
+					addHotSpotMXML.visible=true;
+					if(showTabNavigator!=null){
+						showTabNavigator.selectedIndex=showTabNavigator.getItemIndex(addHotSpotMXML);
+					}
+				}
+			}
+			//关闭添加热区的控件
+			public function closeAddHotSpot():void{
+				if(showTabNavigator!=null){
+					if(addHotSpotMXML!=null){
+						showTabNavigator.removeElement(addHotSpotMXML);
+						addHotSpotMXML=null;
+					}	
+				}
+			}
+		]]>
+	</fx:Script>
+	<!--<s:Button x="94" y="290" label="添加热区" click="showAddHotSpot()"/>-->
+	<mx:Image x="10" y="347" source="images/newImages/btn_hot.jpg" click="showAddHotSpot()" useHandCursor="true" buttonMode="true" mouseChildren="false" >
+	</mx:Image>
+	<s:TextArea x="10" y="10" width="100%" height="194"  text="     本热区示例是采用Flex与Java之间进行交互访问SQLServer 2005的数据库进行编写的，可以根据级数和人口数目的不同进行显示不同颜色的热区，并且对这些热区可以进行添加修改和删除！&#13;     添加热区：点击本页面的添加热区按钮，在弹出的添加热区的界面进行添加热区的操作。&#13;
+				编辑热区：在热区上单击右键，选择编辑热区，右侧会弹出编辑热区的页面，在该页面可以修改热区空间信息以及属性信息。&#13;
+				删除热区：在热区上单击右键，选择删除热区，即可删除该热区。&#13;
+				在热区图例中可以选择修改不同范围内热区的颜色。"
+				editable="false"/>
+	<components:Hotprotity x="10" id="hotprotity" y="210" imsmap="{this.imamap}" width="{this.width-10}">
+	</components:Hotprotity>
+</s:NavigatorContent>

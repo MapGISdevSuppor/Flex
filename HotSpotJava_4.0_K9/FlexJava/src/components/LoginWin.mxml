@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<components:MyIMSWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+						xmlns:s="library://ns.adobe.com/flex/spark" 
+						xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:components="components.*" layout="absolute" width="300" height="200"
+						title="提示框">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			public var fObj:FlexJava=null;
+			private function closeHandle():void{
+				this.visible=false;
+			}
+
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				if(this.fObj!=null){
+				this.fObj.newlogWin.visible=true;
+				this.visible=false;
+				}
+				
+			}
+
+		]]>
+	</fx:Script>
+	<s:TextArea id="t1" x="10" y="10" width="264" height="141" text="     对不起，您没有该权限，请以管理员身份登录后再进行操作！" fontFamily="宋体" fontSize="12" />
+	<s:TextArea id="t2" x="10" y="10" width="264" height="141" text="     对不起，您没有该权限，请以普通用户的身份或管理员的身份登录后再进行操作！" fontFamily="宋体" fontSize="12" visible="false" />
+	<s:Label x="217" y="120" text="登录" click="button1_clickHandler(event)" fontFamily="宋体" fontSize="12"  useHandCursor="true" buttonMode="true" mouseChildren="false" />
+	<!--<s:Button x="36" y="104" label="登录" click="button1_clickHandler(event)"/>
+	<s:Button x="162" y="104" label="关闭" click="closeHandle()" />-->
+
+</components:MyIMSWindow>

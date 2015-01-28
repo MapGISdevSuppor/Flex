@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import cn.stock.util.Mail;   
+	//		import cn.stock.util.Base64;   
+			private var xmlSocket:Socket;   
+			private var mail:Mail;   
+			
+			function login():void{   
+				mail.send("pi**a@trendcom.com.cn","pi**a","pi**a@trendcom.com.cn","290223030@qq.com","测试下","我是笨人");   
+			}   
+			
+			function init():void{   //
+				mail=new Mail("mail.trendcom.com.cn");   
+	//			initSystary();   
+			}   
+
+		]]>
+	</fx:Script>
+</s:Application>
