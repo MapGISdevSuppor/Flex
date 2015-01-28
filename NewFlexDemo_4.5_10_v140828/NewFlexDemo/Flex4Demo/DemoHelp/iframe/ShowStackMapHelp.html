@@ -1,0 +1,42 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>无标题文档</title>
+<style type="text/css">
+.biaoti{color:#3366FF;FONT-SIZE:13pt;}
+.xiaobiaoti{color:#3366FF;FONT-SIZE:11pt;}
+.zhengwen{FONT-SIZE:9pt;}
+.zhuji{FONT-SIZE:9pt;color:#F00;}
+</style>
+</head>
+
+<body>
+<div class="biaoti">
+    瓦片矢量叠加显示:
+</div>
+<br />
+<div class="xiaobiaoti">一、示例功能：
+</div>
+<br />
+ <div class="zhengwen">
+&nbsp;&nbsp;&nbsp;&nbsp;该示例实现瓦片矢量地图叠加显示功能，即显示世界地图，叠加矢量的世界主要河流图层与河流名称（动态注记）。
+ </div>
+<br />
+
+ <div class="xiaobiaoti">二、实现说明： </div> <br />
+  <div class="zhengwen">
+   &nbsp;&nbsp;&nbsp;&nbsp;1、数据：使用世界地图的瓦片数据（NewWorldTile.HDF）与世界地图的矢量数据（世界主要河流图层），已在GIS服务器（MapGIS Server Manager）中发布。<br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;2、实现步骤： <br /><br />
+   &nbsp;&nbsp;&nbsp;（1）先在设计面板中拖入一个地图容器控件（IMSMap）； <br /><br />
+   &nbsp;&nbsp;&nbsp;（2）然后在地图容器中拖入一个瓦片图层控件（TileLayerEx），设置相应参数，加载世界地图；&nbsp;<br /><br />
+   &nbsp;&nbsp;&nbsp;（3）再以图层方式加载世界主要河流矢量图层，即分别拖入VectorLayerSource、VectorLayerDataCfg、VectorLayerEx控件，并设置相应参数；&nbsp;<br /><br />
+   &nbsp;&nbsp;&nbsp;（4）加载一个图层控制窗口（IMSWindow），在该控制面板上分别加载世界地图图层、世界主要河流图层与其动态注记的控制选项，以及各图层的透明度控制滑块，最后通过change事件实现各图层显示与透明度控制。&nbsp;<br />
+   <br />  
+   </div>
+        <div class="zhengwen">
+<p>注：详细说明请参见MapGIS IGServer for Flex的API手册（4.5）。</p></div> 
+</body>
+
+</html>

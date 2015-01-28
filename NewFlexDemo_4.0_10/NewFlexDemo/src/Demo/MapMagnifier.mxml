@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" 
+			   xmlns:map="zdims.map.*" xmlns:control="zdims.control.*" initialize="tile_creationCompleteHandler()" >
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		@namespace map "zdims.map.*";
+		@namespace control "zdims.control.*";
+		mx|ToolTip
+		{
+			font-size:               12px;
+			background-alpha:        0.8;
+			background-color:        #b7d5dd;
+		}	
+	</fx:Style>
+	<fx:Script>
+		<![CDATA[
+			import config.ServerIP;
+			import flash.events.MouseEvent;
+			import mx.events.FlexEvent;
+			import utilEvent.ReadURLEvent;
+			import zdims.event.IMSMapEvent;
+			private var viewConfig:ServerIP;
+			private function tile_creationCompleteHandler():void{
+				viewConfig=new ServerIP();
+				viewConfig.mapConfig1(this);
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, readURLCompelte);
+			}
+			//获取服务地址
+			private function readURLCompelte(event:ReadURLEvent):void
+			{
+				this.worldmap.serverAddress=viewConfig.TileURL;
+				this.mapcontainer.addEventListener(IMSMapEvent.MAP_CHANGE,changeFun);
+				this.mapcontainer.refresh();
+			}
+			private function changeFun(e:Event):void{
+				this.magnifier.visible = false;
+			}
+			public function doZoom(event:MouseEvent):void 
+			{
+				if (changesize.isPlaying) {
+					changesize.reverse();
+				}
+				else 
+				{
+					changesize.play([event.target], event.type == MouseEvent.ROLL_OUT ? true : false);
+				}
+			}
+
+			protected function Magnifierbutton_clickHandler(event:MouseEvent):void
+			{
+				this.magnifier.visible = true;
+			}
+		
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<mx:Resize id="changesize" widthFrom="80"  widthTo="104"  heightFrom="80" heightTo="104"  duration="500" />
+	</fx:Declarations>
+	<map:IMSMap x="0" y="0" width="100%" height="100%" id="mapcontainer"
+				levelNum="8" initShowLevel="4" enableProgressBar="false" enableZoomOutMinLevel="false"
+				xMinMap="-181.18399779022" xMaxMap="188.619962766591" yMinMap="-90.7340663245236" yMaxMap="279.069894232288"
+				restoreCenterX="102.85000121166703" restoreCenterY="33.31638333491467">
+		
+		<!--基于K9系列平台显示瓦片地图(世界地图)-->
+		<!--<map:TileLayer x="0" y="0" id="worldmap" hdfName="world.hdf"  autoGetMapBound="true">
+		</map:TileLayer>-->
+		
+		<!--显示瓦片图层(世界地图)-->
+		<map:TileLayer x="0" y="0" id="worldmap" hdfName="world"  autoGetMapBound="true">
+		</map:TileLayer>
+		<!--放大镜控件-->
+		<control:Magnifier x="101" y="129" id="magnifier" imsmap="{mapcontainer}">
+		</control:Magnifier>
+		<!--放大镜按钮-->
+		<mx:Image  y="30" horizontalCenter="0" id="Magnifierbutton"  width="80" height="80" rollOver="doZoom(event)" rollOut="doZoom(event)"
+				   toolTip="放大镜"  source="@Embed('/image/toolbar/tool_7.png')" click="Magnifierbutton_clickHandler(event)"/>		
+	</map:IMSMap>
+</s:Application>

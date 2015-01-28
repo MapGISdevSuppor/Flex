@@ -1,0 +1,40 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>无标题文档</title>
+<style type="text/css">
+.biaoti{color:#3366FF;FONT-SIZE:13pt;}
+.xiaobiaoti{color:#3366FF;FONT-SIZE:11pt;}
+.zhengwen{FONT-SIZE:9pt;}
+.zhuji{FONT-SIZE:9pt;color:#F00;}
+</style>
+</head>
+
+<body>
+<div class="biaoti">
+    地图目录:
+</div>
+<br />
+<div class="xiaobiaoti">一、示例功能：
+</div>
+<br />
+ <div class="zhengwen">
+&nbsp;&nbsp;&nbsp;&nbsp;该示例以矢量地图为例，加载一个图层目录树，实现数据目录功能。
+ </div>
+<br />
+
+ <div class="xiaobiaoti">二、实现说明： </div> <br />
+  <div class="zhengwen">
+   &nbsp;&nbsp;&nbsp;&nbsp;1、数据：使用中国地图的矢量地图文档（china.Map），该矢量数据服务在GIS服务器中发布。<br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;2、实现步骤： <br /><br />
+   &nbsp;&nbsp;&nbsp;（1）先在设计面板中拖入一个地图容器控件（IMSMap）； <br /><br />
+   &nbsp;&nbsp;&nbsp;（2）然后在地图容器中拖入一个矢量地图文档图层控件（VectorMapDoc），设置相应参数，加载中国地图；&nbsp;<br /><br />
+   &nbsp;&nbsp;&nbsp;（3）再在地图容器中拖入一个数据目录控件（IMSCatalog），设置imsmap参数绑定地图容器，并设置其初始为隐藏状态；&nbsp;<br /><br />
+   &nbsp;&nbsp;&nbsp;（4）最后加载一个图片按钮，作为数据目录树显示的控制按钮，通过click事件控制其显示与隐藏，并在显示时展开数据目录树的节点。&nbsp;<br /><br />
+   <br />  
+  <div class="zhengwen">
+<p>注：详细说明请参见MapGIS IGServer for Flex的API手册。</p></div></body>
+
+</html>

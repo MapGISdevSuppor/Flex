@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" xmlns:map="zdims.map.*"
+			   xmlns:drawing="zdims.drawing.*"
+			   xmlns:mark="zdims.mark.*" xmlns:control="zdims.control.*" xmlns:layer="zdims.control.layer.*" initialize="tile_creationCompleteHandler()" >
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:controlBarLayout >
+		<s:BasicLayout/>
+	</s:controlBarLayout>
+	<s:controlBarContent>
+	<s:HGroup height="35" verticalAlign="middle" left="10" width="100%">
+	<s:Label  text="水系要素拓扑分析"  fontFamily="宋体" fontSize="14"  fontWeight="bold"  left="5" textAlign="left" verticalAlign="middle"/>
+	<s:Button label="拓扑分析一" click="onclick(1,3095,3083)" fontSize="13"  fontWeight="bold" fontFamily="宋体"/>
+	<s:Button  label="拓扑分析二" click="onclick(2,3281,3282)" fontSize="13"  fontWeight="bold" fontFamily="宋体"/>
+	<s:Button  label="清除" click="clear()" fontSize="13"  fontWeight="bold" fontFamily="宋体"/>
+	<s:Label  text="拓扑分析结果:" fontFamily="宋体" fontSize="14"  fontWeight="bold"  left="5" textAlign="left" verticalAlign="middle"/>
+	<s:Label text="" id="TopStyle" color="0xff0000" fontSize="16"  fontWeight="bold" fontFamily="宋体"/>
+	</s:HGroup>
+	</s:controlBarContent>
+	<s:BorderContainer id="printView" x="0" y="0" width="100%" height="100%" borderColor="0xffffff" borderWeight="1" borderAlpha="0">
+		<map:IMSMap x="0" y="0" width="100%" height="100%" levelNum="7"
+					xMinMap="114.125602"  xMaxMap="114.500788"
+					yMinMap="30.453932" yMaxMap="30.829118" enableZoomOutMinLevel="false"
+					id="mymap" initShowLevel="4" enableProgressBar="false"  >
+			
+			<!--基于K9系列平台显示瓦片地图-->
+			<!--<map:TileLayer x="197" y="138"  hdfName="whmap.hdf" id="tilelayer"  >
+			</map:TileLayer>-->
+			
+			<!--显示瓦片地图-->
+			<map:TileLayer x="197" y="138"  hdfName="whmap" id="tilelayer"  >
+			</map:TileLayer>
+			
+			<!--基于K9系列平台显示矢量地图-->
+			<!--<map:VectorMapDoc  id="mapDoc" x="262" y="41" mapDocName="wh.map"  display="false">
+			</map:VectorMapDoc>	-->
+			
+			<!--显示矢量地图-->
+			<map:VectorMapDoc  id="mapDoc" x="262" y="41" mapDocName="wh"  display="false" layerOpenCallBack="init">
+			</map:VectorMapDoc>			
+			<drawing:GraphicsLayer x="42" y="188" id="graphicsLayer">
+			</drawing:GraphicsLayer>
+		</map:IMSMap>
+	</s:BorderContainer>
+
+	<fx:Script>
+		<![CDATA[
+			import Mapgis7.WebService.BasLib.AnyLine;
+			import Mapgis7.WebService.BasLib.Arc;
+			import Mapgis7.WebService.BasLib.CGetObjByID;
+			import Mapgis7.WebService.BasLib.CLayerAccessInfo;
+			import Mapgis7.WebService.BasLib.CLayerInfo;
+			import Mapgis7.WebService.BasLib.CRegionRelationAnalyse;
+			import Mapgis7.WebService.BasLib.Dot_2D;
+			import Mapgis7.WebService.BasLib.GRegion;
+			import Mapgis7.WebService.BasLib.SFeatureGeometry;
+			
+			import config.ServerIP;
+			
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			
+			import utilEvent.ReadURLEvent;
+			
+			import zdims.drawing.CoordinateType;
+			import zdims.drawing.IMSPolygon;
+			import zdims.interfaces.IGraphics;
+			import zdims.map.VectorLayerBase;
+			import zdims.util.SpacialAnalyse;
+			private var _firstFeature:SFeatureGeometry;
+			private var _secondFeature:SFeatureGeometry;
+			private var _firstPoly:IMSPolygon;
+			private var _secondPoly:IMSPolygon;
+			private var _spatial:SpacialAnalyse;
+			private var VecAddress:String="";
+			private var TileAddress:String="";
+			private var viewConfig:ServerIP;
+			private var secondNum:Number=0;
+			private var TFlag:int=1;
+			private var  waterLayerIndex:int=-1;
+			private function tile_creationCompleteHandler():void{
+				if(TileAddress==null||TileAddress==""){
+					if(viewConfig==null){
+						viewConfig=new ServerIP();
+						viewConfig.mapConfig1(this);
+					}
+					this.addEventListener(ReadURLEvent.READ_COMPLETE, TilereadURLCompelte);
+				}else{
+					this.tilelayer.serverAddress=TileAddress;
+				}
+			}
+			
+			//获取服务地址
+			private function TilereadURLCompelte(event:ReadURLEvent):void
+			{
+				TileAddress=viewConfig.TileURL;
+				VecAddress=viewConfig.vectorURL;
+				this.tilelayer.serverAddress=TileAddress;
+				this.mapDoc.serverAddress=VecAddress;
+				this.mymap.refresh();
+			}
+			
+			//初始化激活水系图层
+			public function init(layer:VectorLayerBase):void{
+				 waterLayerIndex=getWaterLayerIndex();
+				if(waterLayerIndex==-1){
+					Alert.show("该地图中没有‘水系.WP’的图层");
+					return;
+				}
+				
+				this.mymap.activeMapDoc=this.mapDoc;
+				this.mymap.activeMapDoc.activeLayerIndex=waterLayerIndex;
+				this.mapDoc.updateAllLayerInfo();
+			}
+			
+			
+			private function getWaterLayerIndex():int{
+				
+				var  layerNodeCount:int = mapDoc.loadMapResult.LayerCount;
+				var layerAccessArry:Array = new Array(layerNodeCount);
+				layerAccessArry = mapDoc.loadMapResult.LayerAccessInfo.LayerAccessInfo;
+				var mapLayerInfoArry:Array = mapDoc.loadMapResult.MapLayerInfo;
+				var layerIndex:int=-1;
+				for (var i:int = 0; i < layerNodeCount; i++)
+				{
+					
+					var layerAccess:CLayerAccessInfo = layerAccessArry[i] as CLayerAccessInfo;
+					var layerInfo:CLayerInfo = layerAccess.LayerInfoList[0] as CLayerInfo;
+					var layerName:String = layerInfo.LayerDataName;
+					if(layerName=="水系.WP"){
+						layerIndex=i;
+						break;
+					}
+					
+				}
+				return layerIndex;
+			}
+			//拓扑分析
+			public function onclick(TopFlag:int,firstFeatID:Number,secondFeatID:Number):void{
+				
+				
+				//清除绘图图层上的所有要素
+				this.graphicsLayer.removeAllElements();
+				//实例化第一个拓扑分析的要素
+			 	 _firstFeature=new SFeatureGeometry();
+				 //实例化第二个拓扑分析的要素
+				 _secondFeature=new SFeatureGeometry();
+				 //实例化第一个拓扑分析要素的显示区的对象
+				 _firstPoly=new IMSPolygon();
+				 //实例化第二个拓扑分析要素的显示区的对象
+				 _secondPoly=new IMSPolygon();
+				//根据要素id获取需要的数据
+				var targetObj:CGetObjByID=new CGetObjByID();
+				//设置第一个要素的id
+				targetObj.FeatureID=firstFeatID;
+				//设置第一个要素所在的图层号
+				targetObj.LayerIndex=waterLayerIndex;
+				this.TFlag=TopFlag;
+				//拓扑分析第二个要素的id
+				this.secondNum=secondFeatID;
+				//获取第一个要素空间信息 
+				this.mapDoc.getGeomByID(targetObj,FirstgetGemos);
+			}
+			//获取第一个要素回调函数
+			public function FirstgetGemos(e:Event):void{
+				//简单要素类
+				var FirstresutltGemo:SFeatureGeometry=this.mapDoc.onGetGeomByID(e);
+				if(FirstresutltGemo!=null){
+					this._firstFeature=FirstresutltGemo;
+					//显示拓扑分析的第一个要素
+					this._firstPoly=drawGetFeatrue(0xFFFF00,0x00FFCC,FirstresutltGemo);
+					//获取第二个要素空间信息 
+					var targetObj2:CGetObjByID=new CGetObjByID();
+					//设置拓扑分析的第二个要素的id
+					targetObj2.FeatureID=this.secondNum;
+					//设置第二个要素所在的图层号
+					targetObj2.LayerIndex=waterLayerIndex;
+					this.mapDoc.getGeomByID(targetObj2,SelectgetGemos);
+				}else{
+					Alert.show("获取第一个要素失败!");
+					return;
+				}
+			}
+			//获取第二个要素回调函数
+			public function SelectgetGemos(e:Event):void{
+				var SelectresutltGemo:SFeatureGeometry=this.mapDoc.onGetGeomByID(e);
+				if(SelectresutltGemo!=null){
+					this._secondFeature=SelectresutltGemo;
+					//显示拓扑分析的第二个要素
+					this._secondPoly=drawGetFeatrue(0x00FF00,0xFFFF66,SelectresutltGemo);
+					//地图跳转到某个位置
+					if(this.TFlag==1){
+						this.mymap.panTo(114.24202324169921,30.63291477441406);
+					}else if(this.TFlag==2){
+						this.mymap.panTo(114.2513662524414,30.4964335390625);
+					}else if(this.TFlag==3){
+						this.mymap.panTo(114.25081666357421,30.56174301611328);
+					}
+					//拓扑分析
+					onTopSpanalyse();
+				}else{
+					Alert.show("获取第二要素失败!");
+					return;
+				}
+			}
+			
+			//拓扑分析
+			public function onTopSpanalyse():void{
+				//闪烁拓扑分析的第一个要素
+				this._firstPoly.flicker();
+				//闪烁拓扑分析的第二个要素
+				this._secondPoly.flicker();
+				//判断区与区之间的拓扑关系
+				var obj:CRegionRelationAnalyse = new CRegionRelationAnalyse();
+				//设置第一个区信息 
+				obj.Reg0 = this._firstFeature.RegGeom[0];
+				//设置第二个区信息 
+				obj.Reg1 = this._secondFeature.RegGeom[0];
+				obj.NearDis = 0.002;
+				this._spatial = new SpacialAnalyse(this.mymap.activeMapDoc);
+				//regionRelationAnalyse()区拓扑关系判断
+				this._spatial.regionRelationAnalyse(obj, onSubmit);
+			}
+			 // 获取拓扑分析结果
+			public function onSubmit(e:Event):void
+			{
+				//获取两个区拓扑分析结果
+				var data:String=this._spatial.onRegionRelationAnalyse(e);
+				switch(data)
+				{
+					case "Unknown":
+						data="未知类型";
+						break;
+					case "Intersect":
+						data="相交";
+						break;
+					case "Disjoin":
+						data="相离";
+						break;
+					case "Include":
+						data="包含";
+						break;
+					case "Adjacent":
+						data="相邻";
+						break;
+					default:
+						data="未知类型";
+						break;
+				}
+				
+				this.TopStyle.text=data;
+			}
+		
+			//绘制显示要素
+			public function drawGetFeatrue(boderColor:uint,colorTemo:uint,sfeatureTemp:SFeatureGeometry):IMSPolygon{
+				var reg:GRegion=sfeatureTemp.GetRegGeom(0);
+				var arcLine:AnyLine=reg.GetRings(0);
+				var arc:Arc=arcLine.GetArcs(0);
+				//获取要素边界的点
+				var ArcPnt:Array=arc.Dots;
+				var ArcPntNum:int=arc.Dots.length;
+				//绘制多边形
+				var poly:IMSPolygon=new IMSPolygon(CoordinateType.Logic);
+				graphicsLayer.addGraphics(poly);
+				for(var i:int=0;i<ArcPntNum;i++){
+					poly.points.push(new Point(arc.GetDots(i).x, arc.GetDots(i).y));
+				}
+				//设置边界线颜色及大小
+				poly.lineStyle(2,boderColor);
+				//设置填充区的颜色及透明度
+				poly.beginFill(colorTemo,0.8);
+				//绘制图形
+				poly.draw();
+				//poly.flicker();
+				return poly;
+			}
+			
+			//停止闪烁,清除绘制的图形
+			public function clear():void{
+				this._firstPoly.flickerStop();
+				this._secondPoly.flickerStop();
+				this.graphicsLayer.removeAllElements();
+				this.TopStyle.text="";
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+</s:Application>

@@ -1,0 +1,38 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>裁剪分析</title>
+<style type="text/css">
+.biaoti{color:#3366FF;FONT-SIZE:13pt;}
+.xiaobiaoti{color:#3366FF;FONT-SIZE:11pt;}
+.zhengwen{FONT-SIZE:9pt;}
+.zhuji{FONT-SIZE:9pt;color:#F00;}
+</style>
+</head>
+
+<body>
+<div class="biaoti">
+裁剪分析:
+</div>
+<br />
+<div class="xiaobiaoti">一、示例功能：
+</div>
+<br />
+ <div class="zhengwen">
+ &nbsp;&nbsp;&nbsp;&nbsp;该示例实现海洋陆地图层某一范围内的要素进行裁剪形成一个新图层。</div>
+<br />
+   <div class="xiaobiaoti">二、实现说明： </div> <br />
+  <div class="zhengwen">
+   &nbsp;&nbsp;&nbsp;&nbsp;1、数据：使用世界地图的矢量数据（WorldG20140808.mapx）和瓦片数据（NewWorldTile.HDF），其中海洋陆地图层的索引号为4，即在WorldG20140808.mapx的矢量地图文档中海洋陆地图层的顺序排第五，已在GIS服务器（MapGIS Server Manager）中发布。 <br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;2、实现步骤：<br /><br />
+  &nbsp;&nbsp;&nbsp;（1）首先设置要裁剪的图层为激活的状态；<br /><br />
+  &nbsp;&nbsp;&nbsp;（2）然后根据CLayerAccessInfo对象设置裁剪图层的信息、裁剪的类型、裁剪半径以及裁剪的名称；<br /><br />
+  &nbsp;&nbsp;&nbsp;（3）分析成功之后，会得到一个新图层的名称，赋值给COpenLayer对象；<br /><br />
+  &nbsp;&nbsp;&nbsp;（4）通过loadLayer()的方法可以将裁剪后的结果图层添加到地图上。 <br /><br />
+
+<p>注：详细说明请参见MapGIS IGServer for Flex的API手册（4.5）。</p></div>
+</body>
+
+</html>

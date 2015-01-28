@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+	<MapURLConfig>
+		<config>
+		<VectorUrl>http://127.0.0.1/RelayHandlerSite/RelayHandler.ashx</VectorUrl>
+		<TileURL>http://127.0.0.1/RelayHandlerSite/RelayHandler.ashx</TileURL>
+		<GPSURL>http://127.0.0.1/GPSService/gpsHandler.ashx</GPSURL>	
+		</config>
+	</MapURLConfig>

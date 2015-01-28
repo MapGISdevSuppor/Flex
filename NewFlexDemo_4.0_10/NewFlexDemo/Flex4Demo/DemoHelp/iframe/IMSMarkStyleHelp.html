@@ -1,0 +1,49 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>无标题文档</title>
+<style type="text/css">
+.biaoti{color:#3366FF;FONT-SIZE:13pt;}
+.xiaobiaoti{color:#3366FF;FONT-SIZE:11pt;}
+.zhengwen{FONT-SIZE:9pt;}
+.zhuji{FONT-SIZE:9pt;color:#F00;}
+</style>
+</head>
+
+<body>
+<div class="biaoti">
+点样式示例:
+</div>
+<br />
+<div class="xiaobiaoti">一、示例功能：
+</div>
+<br />
+ <div class="zhengwen">
+&nbsp;&nbsp;&nbsp;&nbsp;该示例实现几何图形、图片点样式信息的修改，包括点样式大小、颜色、透明度等。 </div>
+<br />
+
+ <div class="xiaobiaoti">二、实现说明： </div> <br />
+  <div class="zhengwen">
+   &nbsp;&nbsp;&nbsp;&nbsp;1、使用Flex二次开发库中提供的MarkLayer图层以及相关绘图样式对象实现各种点样式。 <br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;2、实现步骤： <br /><br />
+   &nbsp;&nbsp;&nbsp;（1）在MarkLayer图层中，添加IMSMark对象；<br /><br />
+   &nbsp;&nbsp;&nbsp;（2）将点样式对象（IMSPredefinedMarkStyle或、IMSPredefinedPictureMarkStyle）赋值给IMSMark对象中设置MarkControl属性； <br /><br />
+   &nbsp;&nbsp;&nbsp;（3）选择点对象，在样式框中修改对应点的大小、颜色、透明度以及点显示样式； <br /><br />
+   &nbsp;&nbsp;&nbsp;（4）在自定义绘制结束事件中创建对应的几何对象，传入坐标点，将对象添加到绘图层控件。 <br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;3、对象说明<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;MarkLayer图层参数： <br /><br /> </div>
+ <div class="zhuji">
+  &nbsp;&nbsp;&nbsp;&nbsp;addMark()：添加标注方法； <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;IMSMark对象：标注对象 。<br /><br /> 
+  &nbsp;&nbsp;&nbsp;&nbsp;IMSPredefinedMarkStyle对象：几何图形点样式（圆、五角星、菱形等），相关参数： <br /><br /> 
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;symbol：点样式类型 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;size：点样式大小 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Alpha：点的显示透明度 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;IMSPredefinedPictureMarkStyle对象：图片点样式，可以修改图片大小、角度等属性 。<br /><br /> </div>
+ <div class="zhengwen">
+<p>注：详细说明请参见MapGIS IGServer for Flex的API手册。</p></div>
+</body>
+
+</html>

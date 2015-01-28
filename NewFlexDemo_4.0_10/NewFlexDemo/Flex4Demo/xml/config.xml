@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+	<MapURLConfig>
+		<config>
+		<VectorUrl>http://192.168.21.29:6163/igs/rest/ims/relayhandler</VectorUrl>
+		<TileURL>http://192.168.21.29:6163/igs/rest/ims/relayhandler</TileURL>
+		<GPSURL>http://127.0.0.1/GPSService/gpsHandler.ashx</GPSURL>	
+		<TerrainURL>http://mt1.google.cn/vt/lyrs=t@132,r@248000000</TerrainURL>
+    	<RasterURL>http://mt1.google.cn/vt/lyrs=s@141</RasterURL>
+    	<BasicURL>http://mt2.google.cn/vt/lyrs=m@244000000</BasicURL>
+		
+		</config>
+	</MapURLConfig>

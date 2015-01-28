@@ -1,0 +1,50 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>无标题文档</title>
+<style type="text/css">
+.biaoti{color:#3366FF;FONT-SIZE:13pt;}
+.xiaobiaoti{color:#3366FF;FONT-SIZE:11pt;}
+.zhengwen{FONT-SIZE:9pt;}
+.zhuji{FONT-SIZE:9pt;color:#F00;}
+</style>
+</head>
+
+<body>
+<div class="biaoti">
+属性查询功能:
+</div>
+<br />
+<div class="xiaobiaoti">一、示例功能：
+</div>
+<br />
+ <div class="zhengwen">
+&nbsp;&nbsp;&nbsp;&nbsp;属性查询示例：根据查询图层要素的属性字段设置查询条件。 </div>
+<br />
+
+ <div class="xiaobiaoti">二、实现说明： </div> <br />
+  <div class="zhengwen">
+   &nbsp;&nbsp;&nbsp;&nbsp;1、数据：使用世界地图的瓦片数据（NewWorldTile.HDF），已在GIS服务器（MapGIS Server Manager）中发布，查询图层名称（湖泊_1）。 <br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;2、实现步骤： <br /><br />
+   &nbsp;&nbsp;&nbsp;（1）先在设计面板中拖入一个地图容器控件（IMSMap）； <br /><br />
+   &nbsp;&nbsp;&nbsp;（2）在地图容器中拖入一个瓦片图层控件（TileLayerEx），设置相应参数，加载世界地图； <br /><br />
+   &nbsp;&nbsp;&nbsp;（3）在地图容器中拖入矢量图层相关控件（VectorLayerSource、VectorLayerDataCfg、VectorLayerEx），设置相应参数，加载湖泊_1图层；<br /><br />
+   &nbsp;&nbsp;&nbsp;（4）设置要查询的图层状态为可编辑或可查询状态（CSetSingleLayerStatusONFlex）； <br /><br />
+   &nbsp;&nbsp;&nbsp;（5）设置web查询相关参数：属性查询条件，调用查询方法，查询要素 ；<br /><br /> 
+   &nbsp;&nbsp;&nbsp;（6）根据web查询参数，使用高亮显示对象（drawHighLight），高亮显示结果 。<br /><br /> 
+ &nbsp;&nbsp;&nbsp;&nbsp;3、相关对象说明<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;CSetSingleLayerStatusONFlex：图层状态更新对象<br /><br /> 
+  &nbsp;&nbsp;&nbsp;&nbsp;CWebSelectParam：Web查询参数传入对象<br /><br /> 
+  &nbsp;&nbsp;&nbsp;&nbsp;CLayerSelectParam：矢量图层web查询参数设置对象<br /><br /> 
+  &nbsp;&nbsp;&nbsp;&nbsp;VectorLayerEx中相关方法： <br /><br /> </div>
+ <div class="zhuji">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;layerSelectAndGetAtt：查询要素属性方法 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;onLayerSelectAndGetAtt：获取查询结果 <br /><br /> 
+</div>
+   <div class="zhengwen">
+<p>注：详细说明请参见MapGIS IGServer for Flex的API手册（4.5）。</p></div>
+</body>
+
+</html>

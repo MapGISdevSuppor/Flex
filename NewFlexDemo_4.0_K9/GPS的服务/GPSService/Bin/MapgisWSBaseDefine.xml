@@ -1,0 +1,1565 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MapgisWSBaseDefine</name>
+    </assembly>
+    <members>
+        <member name="T:Mapgis7.WebService.BasLib.GmlVersion">
+            <summary>
+            GML版本
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.GmlVersion.Ver2x">
+            <summary>
+            2.x
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.GmlVersion.Ver3x">
+            <summary>
+            3.x
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.WebGeomType">
+            <summary>
+            Web几何类型
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.SFclsGeomType">
+            <summary>
+            枚举：简单要素类几何约束形态
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.SFclsGeomType.Pnt">
+            <summary>
+            点几何实体
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.SFclsGeomType.Lin">
+            <summary>
+            线几何实体
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.SFclsGeomType.Reg">
+            <summary>
+            区几何实体
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.GInfoType">
+            <summary>
+            枚举：图形参数类型
+            /// </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.GInfoType.PntInfo">
+            <summary>
+            点几何实体
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.GInfoType.LinInfo">
+            <summary>
+            线几何实体
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.GInfoType.RegInfo">
+            <summary>
+            区几何实体
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.FClsGeomType">
+            <summary>
+            枚举：要素类几何约束形态
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.XClsType">
+            <summary>
+            枚举：X类的类型
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.XClsType.FeatureCls">
+            <summary>
+            要素类
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.XClsType.SFeatureCls">
+            <summary>
+            简单要素类
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.XClsType.ObjectCls">
+            <summary>
+            对象类
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.XClsType.AnnotationCls">
+            <summary>
+            注记类
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.XClsType.RelationCls">
+            <summary>
+            关系类
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.XClsType.RasterDataset">
+            <summary>
+            栅格数据集
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.XClsType.GNetCls">
+            <summary>
+            几何网络
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.XClsType.GNetSet">
+            <summary>
+            几何网络集
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.XClsType.Unknown">
+            <summary>
+            未知类型
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.ImgFormat">
+            <summary>
+            枚举：图像类型
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.ImgFormat.gif">
+            <summary>
+            gif
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.ImgFormat.png">
+            <summary>
+            png
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.ImgFormat.jpg">
+            <summary>
+            jpg
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.XmlEncoding">
+            <summary>
+            枚举：字符编码
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.XmlEncoding.gb2312">
+            <summary>
+            gb2312
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.XmlEncoding.unicode">
+            <summary>
+            unicode
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.XmlEncoding.utf_8">
+            <summary>
+            utf_8
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.XmlEncoding.utf_16">
+            <summary>
+            utf_16
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.XDBType">
+            <summary>//added by wjy 2009-01-14
+            数据库类型
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.OpType">
+            <summary> 
+            数据操作类型
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.OpType.Add">
+            <summary>
+             增加数据
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.OpType.Update">
+            <summary>
+            更新数据
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.OpType.Delete">
+            <summary>
+            删除数据
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.Dot_2D">
+            <summary>
+            结构：2维点
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.Dot_2D.x">
+            <summary>
+            x
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.Dot_2D.y">
+            <summary>
+            y
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.Dot_2D.#ctor(System.Double,System.Double)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="x">x</param>
+            <param name="y">y</param>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.Dot_3D">
+            <summary>
+            结构：3维点
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.Dot_3D.x">
+            <summary>
+            x
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.Dot_3D.y">
+            <summary>
+            y
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.Dot_3D.z">
+            <summary>
+            z
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.Dot_3D.#ctor(System.Double,System.Double,System.Double)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="x">x</param>
+            <param name="y">y</param>
+            <param name="z">z</param>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.Arc">
+            <summary>
+            结构：弧段
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.AnyLine">
+            <summary>
+            结构：任意线
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.AnyLine.Arcs">
+            <summary>
+            弧段
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.AnyLine.#ctor(Mapgis7.WebService.BasLib.Arc[])">
+            <summary>
+            构造函数
+            </summary>
+            <param name="pntArr"></param>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.Rect">
+            <summary>
+            矩形边界
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.Rect.#ctor(System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="xmin"></param>
+            <param name="ymin"></param>
+            <param name="xmax"></param>
+            <param name="ymax"></param>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.Polygon">
+            <summary>
+            结构：多边形
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.Polygon.Dots">
+            <summary>
+            dots
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.Polygon.#ctor(Mapgis7.WebService.BasLib.Dot_2D[])">
+            <summary>
+            构造函数1
+            </summary>
+            <param name="dots"></param>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.Polygon.#ctor(System.Double[],System.Double[])">
+            <summary>
+            构造函数2
+            </summary>
+            <param name="XDots">x数组</param>
+            <param name="YDots">y数组</param>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.Circle">
+            <summary>
+             结构：圆
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.GPoint">
+            <summary>
+            结构：点几何
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.GPoint.Dot">
+            <summary>
+            点(多点或多点)
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.GPoint.GID">
+            <summary>
+            几何ID
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.GPoint.#ctor(Mapgis7.WebService.BasLib.Dot_2D)">
+            <summary>
+            构造函数1
+            </summary>
+            <param name="pntArr">点数组</param>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.GPoint.#ctor(Mapgis7.WebService.BasLib.Dot_2D,System.Int64)">
+            <summary>
+            构造函数2
+            </summary>
+            <param name="pntArr">点数组</param>
+            <param name="gid">几何ID</param>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.GLine">
+            <summary>
+            结构：线几何
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.GLine.Line">
+            <summary>
+            线
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.GLine.GID">
+            <summary>
+            线的几何ID
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.GLine.#ctor(Mapgis7.WebService.BasLib.AnyLine,System.Int64)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="arcArr"></param>
+            <param name="gid"></param>
+            <param name="oIdArr"></param>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.GLine.#ctor(Mapgis7.WebService.BasLib.AnyLine)">
+            <summary>
+            构造函数2
+            </summary>
+            <param name="arcArr"></param>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.GRegion">
+            <summary>
+            结构：区几何
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.GRegion.Rings">
+            <summary>
+            区(单圈或多圈)
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.GRegion.GID">
+            <summary>
+            几何ID
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.GRegion.#ctor">
+            <summary>
+            空构造函数
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.GRegion.#ctor(Mapgis7.WebService.BasLib.AnyLine[],System.Int64)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="glinArr"></param>
+            <param name="gid"></param>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.GRegion.#ctor(Mapgis7.WebService.BasLib.AnyLine[])">
+            <summary>
+            构造函数2
+            </summary>
+            <param name="glinArr"></param>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.SFeatureGeometry.PntGeom">
+            <summary>
+            (多)点几何
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.SFeatureGeometry.LinGeom">
+            <summary>
+            (多)线几何
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.SFeatureGeometry.RegGeom">
+            <summary>
+            (多)区几何
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.SFeature">
+            <summary>
+             结构：要素
+             </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.SFeature.FID">
+            <summary>
+            要素ID
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.SFeature.bound">
+            <summary>
+            要素的外包络矩形范围
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.SFeature.AttValue">
+            <summary>
+            属性字段值
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.SFeature.fGeom">
+            <summary>
+            空间几何信息
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.SFeature.ftype">
+            <summary>
+            简单要素类几何约束形态
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CLayerScaleInfo.MinScale">
+            <summary>
+            最小显示比率
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CLayerScaleInfo.MaxScale">
+            <summary>
+            最大显示比率
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CWebSelectParam.Geometry">
+            <summary>
+            查询范围
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CWebSelectParam.GeomType">
+            <summary>
+            所输入空间范围的几何类型
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CWebSelectParam.NearDistance">
+            <summary>
+            搜索半径
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CWebSelectParam.WhereClause">
+            <summary>
+            条件查询的where语句
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CWebSelectParam.SelectionType">
+            <summary>
+            查询类型：空间范围查询/条件查询/空间和条件组合查询
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CWebSelectParam.CompareRectOnly">
+            <summary>
+            是否仅仅比较查询对象的外包络矩形框  
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CWebSelectParam.MustInside">
+            <summary>
+            查询对象是否必须完全包含在输入的空间范围内（此条件与Intersect相交条件互斥）
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CWebSelectParam.Intersect">
+            <summary>
+            是否于查询对象相交
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.CRegionInfo">
+            <summary>
+            区几何图形参数结构
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CRegionInfo.PatID">
+            <summary>
+            填充图案ID
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CRegionInfo.FillMode">
+            <summary>
+            填充模式
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CRegionInfo.FillColor">
+            <summary>
+            填充颜色
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CRegionInfo.EndColor">
+            <summary>
+            结束填充色
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CRegionInfo.PatHeight">
+            <summary>
+            填充图案高度
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CRegionInfo.PatWidth">
+            <summary>
+            填充图案宽度
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CRegionInfo.PatAngle">
+            <summary>
+            填充图案角度
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CRegionInfo.PatColor">
+            <summary>
+            填充图案颜色
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CRegionInfo.OutPenWidth">
+            <summary>
+            填充图案笔宽
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CRegionInfo.OverMethod">
+            <summary>
+            覆盖方式
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.CPointInfo">
+             <summary>
+            点几何图形参数结构
+             </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CPointInfo.symWidth">
+            <summary>
+            子图宽度
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CPointInfo.SymID">
+            <summary>
+            子图ID
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CPointInfo.SymHeight">
+            <summary>
+            子图高度
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CPointInfo.SymWidth">
+            <summary>
+            子图宽度
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CPointInfo.Angle">
+            <summary>
+            子图角度
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CPointInfo.Color">
+            <summary>
+            子图颜色
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CPointInfo.Space">
+             <summary>
+            字符间隔
+             </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.CLineInfo">
+            <summary>
+            线几何图形参数结构
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CLineInfo.LinWidth">
+            <summary>
+            线宽度
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CLineInfo.Color">
+            <summary>
+            线颜色
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CLineInfo.LinStyleID">
+            <summary>
+            线型ID
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CLineInfo.LinStyleID2">
+            <summary>
+            辅助线型ID
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CLineInfo.Xscale">
+            <summary>
+            x比例系数
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CLineInfo.Yscale">
+            <summary>
+            y比例系数
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.CDynNoteInfo">
+            <summary>
+            动态注记信息
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.CDisplayStyle">
+            <summary>
+            地图显示样式类
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDisplayStyle.SymbleShow">
+            <summary>
+            是否进行还原显示
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDisplayStyle.FollowScale">
+            <summary>
+            符号是否跟随显示放大
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDisplayStyle.ShowCoordPnt">
+            <summary>
+            显示坐标点
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDisplayStyle.ShowElemRect">
+            <summary>
+            显示元素的外包矩形
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDisplayStyle.DriverQuality">
+            <summary>
+            图像质量
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDisplayStyle.XyScale">
+            <summary>
+            符号显示比例
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDisplayStyle.DynProjFlag">
+            <summary>
+            是否动态投影
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDisplayStyle.DynNoteFlag">
+            <summary>
+            是否动态注记
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDisplayStyle.DynNoteInfo">
+             <summary>
+            动态注记参数
+             </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CDisplayStyle.#ctor">
+            <summary>
+            默认构造函数
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.CMessageQueue">
+            <summary>
+            消息信息的定义
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CMessageQueue.SrcNode">
+            <summary>
+            消息发送结点的ID
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CMessageQueue.DesNode">
+            <summary>
+            消息到达结点的ID
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CMessageQueue.DesTab">
+            <summary>
+            目标表的名称
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CMessageQueue.IDList">
+            <summary>
+            所操作数据的ID列表
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CMessageQueue.ChargeFlag">
+            <summary>
+            标志位：0表示数据从未处理，255表示数据处理成功，其他值表示数据处理失败的次数(该记录不超过10)，
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CMessageQueue.CreateTime">
+            <summary>
+            消息创建时间
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CMessageQueue.OpType">
+            <summary>
+            操作类型
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.CNodeInfo">
+            <summary>
+            结点信息
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CNodeInfo.NodeID">
+             <summary>
+            结点ID
+             </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CNodeInfo.NodeName">
+            <summary>
+            结点名称
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CNodeInfo.NodeAddress">
+             <summary>
+            结点IP
+             </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CNodeInfo.NodeDescrib">
+            <summary>
+            结点描述
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.CGdbInfo">
+            <summary>
+            GDB信息
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CGdbInfo.NodeID">
+            <summary>
+            结点ID
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CGdbInfo.ServerAddress">
+            <summary>
+            GDB服务器所在地址,可以为IP或者计算机名
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CGdbInfo.GDBSvrName">
+            <summary>
+            GDB服务器名
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CGdbInfo.GDBName">
+            <summary>
+            GDB名
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CGdbInfo.User">
+            <summary>
+            GDB服务器用户名
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CGdbInfo.Password">
+            <summary>
+            GDB服务器密码
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CGdbInfo.#ctor">
+            <summary>
+            默认构造函数
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CGdbInfo.#ctor(System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="gdbSvrName"></param>
+            <param name="gdbName"></param>
+            <param name="user"></param>
+            <param name="password"></param>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CLayerInfo.LayerAliasName">
+            <summary>
+            图层名称
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CLayerInfo.LayerDataName">
+            <summary>
+            图层数据名
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CLayerInfo.LayerType">
+            <summary>
+            图层类型
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CLayerInfo.Bound">
+            <summary>
+            图层的逻辑范围
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CLayerInfo.CRS">
+            <summary>
+            图层座标参考系
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.CLayerAccessInfo">
+            <summary>
+            图层访问信息类，描述了取实际数据的信息，如GDB数据源信息
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CLayerAccessInfo.GdbInfo">
+            <summary>
+            GDB信息
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.CMapInfo">
+            <summary>
+            地图文档信息
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CMapInfo.NodeID">
+            <summary>
+            结点ID
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CMapInfo.SvrAddress">
+            <summary>
+            服务器的IP地址
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CMapInfo.MapDocName">
+            <summary>
+            地图文档的名称
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CMapInfo.RelPath">
+            <summary>
+            相对路径
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CMapInfo.Bound">
+            <summary>
+            逻辑范围
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.CDistrGridDataInfo">
+            <summary>
+            分布式栅格流信息
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDistrGridDataInfo.NodeID">
+            <summary>
+            结点ID
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDistrGridDataInfo.MdTitle">
+            <summary>
+            描述信息
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDistrGridDataInfo.HDFName">
+            <summary>
+            栅格流文件的名称
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDistrGridDataInfo.ServerAddress">
+            <summary>
+            栅格流服务器所在机器的IP
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDistrGridDataInfo.GisPort">
+            <summary>
+            服务器的端口号
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDistrGridDataInfo.MapLevel">
+            <summary>
+            地图的级数
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDistrGridDataInfo.StartLev">
+            <summary>
+            地图开始显示的级数
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDistrGridDataInfo.EndLev">
+             <summary>
+            地图结束显示的级数 
+             </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDistrGridDataInfo.Bound">
+            <summary>
+            地图的逻辑范围
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDistrGridDataInfo.SplitInterval">
+            <summary>
+            裁图时的经纬度跨度
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDistrGridDataInfo.MapBufferSize">
+            <summary>
+            缓存的大小
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDistrGridDataInfo.MainLev">
+            <summary>
+            位于主图的级数
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDistrGridDataInfo.Scale">
+            <summary>
+            比例尺分母，1：5万为50000，1：5000为5000
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDistrGridDataInfo.TypeCapital">
+            <summary>
+            专题类型：0为无类型，1为地质图
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDistrGridDataInfo.AttTblName">
+            <summary>
+            对应的属性表名
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDistrGridDataInfo.IsMainMap">
+            <summary>
+            是否为主图,1为是，0为否；
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CDistrGridDataInfo.TopLevel">
+            <summary>
+            最高级数
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.CAttStruct">
+            <summary>
+            结构：要素属性结构
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CAttStruct.FldNumber">
+            <summary>
+            属性字段个数
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CAttStruct.FldName">
+            <summary>
+            属性字段名
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CAttStruct.FldType">
+            <summary>
+            属性字段类型
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.CAttDataSet">
+            <summary>
+            属性数据集类
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CAttDataSet.#ctor">
+            <summary>
+            空构造函数
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CAttDataSet.#ctor(Mapgis7.WebService.BasLib.CAttDataTable[])">
+            <summary>
+            构造函数2
+            </summary>
+            <param name="attributeDataTabSet">属性表集对象</param>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.CAttDataTable">
+            <summary>
+            属性数据表类
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CAttDataTable.#ctor">
+            <summary>
+            构造函数
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CAttDataTable.#ctor(Mapgis7.WebService.BasLib.CAttStruct,Mapgis7.WebService.BasLib.CAttDataRow[])">
+            <summary>
+            构造函数
+            </summary>
+            <param name="attStruct">属性数据表结构</param>
+            <param name="attRows">属性数据表行</param>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.CAttDataRow">
+            <summary>
+            属性数据行类
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CAttDataRow.FID">
+            <summary>
+            要素ID
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CAttDataRow.Values">
+            <summary>
+            属性数据值数组
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CAttDataRow.#ctor">
+            <summary>
+            构造函数
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CAttDataRow.#ctor(System.String[])">
+            <summary>
+            构造函数
+            </summary>
+            <param name="Attrow">数据行</param>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CAttDataRow.#ctor(System.String[],System.Int64)">
+            <summary>
+            构造函数
+            </summary>
+            <param name="attributeRow">数据行</param>
+            <param name="fid">要素ID</param>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.CWebSvcBaseException">
+            <summary>
+             自定义异常类
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CWebSvcBaseException.#ctor">
+            <summary>
+            <para> 初始化<see cref="!:WebSvcBaseException"/>类的新实例。  </para>
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CWebSvcBaseException.#ctor(System.String)">
+            <summary>
+            <para>使用指定错误信息初始化<see cref="!:WebSvcBaseException"/>类的新实例。</para>
+            </summary>
+            <param name="Message">描述错误的消息。</param>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CWebSvcBaseException.#ctor(System.String,System.Exception)">
+            <summary>
+            <para>使用指定错误信息和对导致此异常的内部异常的引用
+            来初始化<see cref="!:WebSvcBaseException"/>类的新实例。</para>
+            </summary>
+            <param name="Message">解释异常原因的错误信息。</param>
+            <param name="innerException">导致当前异常的异常。</param>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CWebSvcBaseException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            <para>使用序列化数据初始化<see cref="!:WebSvcBaseException"/>类的新实例。</para>
+            </summary>
+            <param name="info">保存序列化对象数据的对象。</param>
+            <param name="context">有关源或目标的上下文信息。</param>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.CTypeConverter">
+            <summary>
+            GML、.NET系统以及Mapgis数据类型的转换
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CTypeConverter.Gml2Mapgis(System.String)">
+            <summary>
+            GML字段类型转MAPGIS格式
+            </summary>
+            <param name="gmlFldType">Gml字段类型</param>
+            <returns></returns>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CTypeConverter.Mapgis2Gml(mc_basObj7Lib.meFieldType)">
+            <summary>
+            MAPGIS字段类型转GML格式
+            </summary>
+            <param name="mapgisFldType">Mapgis字段类型</param>
+            <returns></returns>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CTypeConverter.Gml2Sys(System.String)">
+            <summary>
+            GML字段类型转.NET格式
+            </summary>
+            <param name="gmlFldType">Gml字段类型</param>
+            <returns></returns>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CTypeConverter.Sys2Gml(System.Type)">
+            <summary>
+            .NET字段类型转GML格式
+            </summary>
+            <param name="sType">系统字段类型</param>
+            <returns></returns>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CTypeConverter.Mapgis2Sys(mc_basObj7Lib.meFieldType)">
+            <summary>
+            MAPGIS字段类型转.NET格式
+            </summary>
+            <param name="mapgisFldType">MAPGIS字段类型</param>
+            <returns></returns>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CTypeConverter.Sys2Mapgis(System.Type)">
+            <summary>
+            .NET字段类型转MAPGIS格式
+            </summary>
+            <param name="sType">系统字段类型</param>
+            <returns></returns>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.EnumType">
+            <summary>
+            坐标系类型
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.EnumSphereType">
+            <summary>
+            椭球类型定义
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.EnumProjType">
+            <summary>
+            投影类型
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.EnumProjUnit">
+            <summary>
+            水平单位
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.EnumProjAngleUnit">
+            <summary>
+            弧度单位
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.ProjectParam.ProjTypeID">
+            <summary>
+            投影类型
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.ProjectParam.SphereID">
+            <summary>
+            椭球体参数
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.ProjectParam.ProjAngleUnit">
+            <summary>
+            角度单位
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.ProjectParam.ProjType">
+            <summary>
+            坐标系类型
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.ProjectParam.ProjZoneType">
+            <summary>
+            投影分带类型
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.ProjectParam.ProjZoneNO">
+            <summary>
+            投影带号
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.ProjectParam.ProjLon">
+            <summary>
+              中央子午线经度
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.ProjectParam.ProjLat">
+            <summary>
+            投影原点纬度
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.ProjectParam.ProjLat1">
+            <summary>
+            第一标准维度
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.ProjectParam.ProjLat2">
+            <summary>
+            第二标准维度
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.ProjectParam.ProjUnit">
+            <summary>
+            长度单位
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.ProjectParam.ProjRate">
+            <summary>
+            水平比例尺
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.ProjectObj.ProjectID">
+            <summary>
+            投影参照系id
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.ProjectObj.ProjectName">
+            <summary>
+            投影参照系名称
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.HDFConfig">
+            <summary>
+            HDF地图库配置
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.HDFConfig.#ctor(System.String,System.Int32,System.String,Mapgis7.WebService.BasLib.Rect,System.Int32)">
+            <summary>
+            HDF地图库配置
+            </summary>
+            <param name="gisServerIP">GIS服务器地址</param>
+            <param name="gisServerPort">GIS服务器端口</param>
+            <param name="hdfName">HDF文件名称</param>
+            <param name="rect">地图坐标范围</param>
+            <param name="startLevel">地图库中开始的级数</param>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.HDFConfig.#ctor(System.String,System.Int32,System.String,Mapgis7.WebService.BasLib.Rect)">
+            <summary>
+            HDF地图库配置，默认从第0级开始
+            </summary>
+            <param name="gisServerIP">GIS服务器地址</param>
+            <param name="gisServerPort">GIS服务器端口</param>
+            <param name="hdfName">HDF文件名称</param>
+            <param name="rect">地图坐标范围</param>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.HDFConfig.#ctor(System.String,System.Int32,System.String,Mapgis7.WebService.BasLib.Rect,System.Int32,System.Int32,System.Int32,System.Double)">
+            <summary>
+             HDF地图库配置
+            </summary>
+            <param name="gisServerIP">GIS服务器地址</param>
+            <param name="gisServerPort">GIS服务器端口</param>
+            <param name="hdfName">HDF文件名称</param>
+            <param name="rect">地图坐标范围</param>
+            <param name="startLevel">地图库中开始的级数</param>
+            <param name="imgWidth">单个地图图片的大小</param>
+            <param name="dealSize">地图缓冲处理的大小</param>
+            <param name="degree">将地图进行经纬度切分时的大小</param>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.HDFConfig.#ctor(System.String,System.Int32,System.String,Mapgis7.WebService.BasLib.Rect,System.Int32,System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="gisServerIP">GIS服务器地址</param>
+            <param name="gisServerPort">GIS服务器端口</param>
+            <param name="hdfName">HDF文件名称</param>
+            <param name="rect">地图坐标范围</param>
+            <param name="imgWidth">单个地图图片的大小</param>
+            <param name="dealSize">地图缓冲处理的大小</param>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.HDFConfig.GisServerIP">
+            <summary>
+            GIS服务器地址
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.HDFConfig.GisServerPort">
+            <summary>
+            GIS服务器端口
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.HDFConfig.HDFName">
+            <summary>
+            HDF文件名称
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.HDFConfig.MapRect">
+            <summary>
+            地图坐标范围
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.HDFConfig.StartLevel">
+            <summary>
+            地图库中开始的级数
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.HDFConfig.ImgWidth">
+            <summary>
+            单个地图图片的大小
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.HDFConfig.DealSize">
+            <summary>
+            地图缓冲处理的大小
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.HDFConfig.Degree">
+            <summary>
+            将地图进行经纬度切分时的大小
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CGmlElementNI.#ctor(Mapgis7.WebService.BasLib.GmlVersion)">
+            <summary>
+            constructor
+            </summary>
+            <param name="version"></param>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CGmlElementNI.Equal(System.String,System.String)">
+            <summary>
+            判断两gml节点名称是否相等
+            </summary>
+            <param name="GmlNodeName1">名称1</param>
+            <param name="GmlNodeName2">名称2</param>
+            <returns></returns>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CGmlElementNI.boundedBy">
+            <summary>
+            boundedBy
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CGmlElementNI.Envelope">
+            <summary>
+            Envelope
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CGmlElementNI.lowerCorner">
+            <summary>
+            lowerCorner
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CGmlElementNI.upperCorner">
+            <summary>
+            upperCorner
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CGmlElementNI.pos">
+            <summary>
+            pos
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CGmlElementNI.posList">
+            <summary>
+            posList
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CGmlElementNI.featureMember">
+            <summary>
+            featureMember
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CGmlElementNI.multiPoint">
+            <summary>
+            multiPoint
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CGmlElementNI.pointMember">
+            <summary>
+            pointMember
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CGmlElementNI.Point">
+            <summary>
+            Point
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CGmlElementNI.LineString">
+            <summary>
+            LineString
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CGmlElementNI.LinearRing">
+            <summary>
+            LinearRing
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CGmlElementNI.MultiCurve">
+            <summary>
+            MultiCurve
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CGmlElementNI.curveMember">
+            <summary>
+            curveMember
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CGmlElementNI.MultiSurface">
+            <summary>
+            MultiSurface
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CGmlElementNI.surfaceMember">
+            <summary>
+            surfaceMember
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CGmlElementNI.Polygon">
+            <summary>
+            Polygon
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CGmlElementNI.exterior">
+            <summary>
+            exterior
+            </summary>
+        </member>
+        <member name="P:Mapgis7.WebService.BasLib.CGmlElementNI.interior">
+            <summary>
+            interior
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.WebTopoType">
+            <summary>
+            拓扑关系定义
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.WebTopoType.Unknown">
+            <summary>
+            未知类型
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.WebTopoType.Intersect">
+            <summary>
+            相交
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.WebTopoType.Disjoin">
+            <summary>
+            相离
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.WebTopoType.Include">
+            <summary>
+            包含
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.WebTopoType.Adjacent">
+            <summary>
+            相邻
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.EnumLogLevel">
+            <summary>
+            日志级别
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.EnumLogLevel.Advance">
+            <summary>
+            高级
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.EnumLogLevel.basic">
+            <summary>
+            基础
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.CExDispose">
+            <summary>
+            日志类
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CExDispose.LogLevel">
+            <summary>
+            日志级别
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CExDispose.filePath">
+            <summary>
+            日志所在路径
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.CExDispose.isLog">
+            <summary>
+            是否写日志
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CExDispose.WriteLog(System.String,System.Exception)">
+            <summary>
+            日志
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CExDispose.ThrowException(System.String,System.Exception)">
+            <summary>
+            抛出异常
+            </summary>
+            <param name="des">调用函数接口描述</param>
+            <param name="ex">异常</param>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.EnumFunType">
+            <summary>
+            狗功能枚举
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.EnumFunType.edit">
+            <summary>
+            编辑
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.EnumFunType.image">
+            <summary>
+            影像
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.EnumFunType.maplib">
+            <summary>
+            图库
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.EnumFunType.oracle">
+            <summary>
+            oracle数据库
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.EnumFunType.sqlserver">
+            <summary>
+            sql数据库
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.EnumFunType.output">
+            <summary>
+            输出
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.EnumFunType.anly">
+             <summary>
+            空间分析
+             </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.EnumFunType.survey">
+            <summary>
+            测量
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.EnumFunType.webgis">
+            <summary>
+            webgis
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.EnumFunType.professional">
+            <summary>
+            专业版
+            </summary>
+        </member>
+        <member name="F:Mapgis7.WebService.BasLib.EnumFunType.search_Svc_Eng">
+            <summary>
+            搜索引擎版
+            </summary>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.CCheckWebFun">
+            <summary>
+            测试狗功能类
+            </summary>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CCheckWebFun.CheckWebFun(Mapgis7.WebService.BasLib.EnumFunType)">
+            <summary>
+            测试狗功能
+            </summary>
+            <param name="enumFunType">狗功能</param>
+        </member>
+        <member name="M:Mapgis7.WebService.BasLib.CCheckWebFun.ThrowException(System.String)">
+            <summary>
+            抛出异常
+            </summary>
+            <param name="message"></param>
+        </member>
+        <member name="T:Mapgis7.WebService.BasLib.IWebLayer">
+            <summary>
+            Web图层接口，可被要素类和简单要素类等继承
+            </summary>
+        </member>
+    </members>
+</doc>

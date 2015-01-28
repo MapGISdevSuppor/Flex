@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" xmlns:map="zdims.map.*"  xmlns:drawing="zdims.drawing.*" xmlns:layer="zdims.control.layer.*" xmlns:mark="zdims.mark.*" xmlns:IMSDraw="components.IMSDraw.*"
+			   initialize="tile_creationCompleteHandler()">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import zdimsExtends.styles.*;
+			import config.ServerIP;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import skins.*;
+			import spark.events.IndexChangeEvent;
+			import utilEvent.ReadURLEvent;
+			import zdims.control.IMSRoad;
+			import zdims.draw.*;
+			import zdims.drawing.CoordinateType;
+			import zdims.drawing.DrawingType;
+			import zdims.drawing.IMSCircle;
+			import zdims.drawing.IMSPolygon;
+			import zdims.drawing.IMSPolyline;
+			import zdims.drawing.IMSRectangle;
+			import zdims.interfaces.IGraphics;
+			import zdims.mark.IMSMark;
+			import zdims.util.IMSOperType;
+			private var drawing:Boolean=false;
+			private var type:String;
+			//绘制线
+			private var	line:IMSPredefinedLineStyle;
+			//绘制面对象
+			private var polygon:IMSPredefinedFillStyle;
+			private var VecAddress:String;
+			private var TileAddress:String
+			private var viewConfig:ServerIP;
+			private function tile_creationCompleteHandler():void{
+				viewConfig=new ServerIP();
+				viewConfig.mapConfig1(this);
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, readURLCompelte);
+			}
+			
+			//获取服务地址
+			private function readURLCompelte(event:ReadURLEvent):void
+			{
+				this.tilelayer.serverAddress=viewConfig.TileURL;
+				this.mapContainer.refresh();
+				
+			}
+			//绘制多边形处理事件
+			private function addPolygon(event:IndexChangeEvent):void
+			{ 
+				//调用绘制多边形的方法
+				addpolygon();				
+			}
+			
+			private function addPolygonClick(event:MouseEvent):void
+			{
+				//调用绘制多边形的方法
+				addpolygon();
+			}
+			
+			//添加多边形的实现函数
+			private function addpolygon():void
+			{
+				if(checkLastType())
+				{
+				this.mapContainer.graphicCanvas.setGraphicType(EDrawType.Null,false);	
+				this.mapContainer.removeEventListener(MouseEvent.MOUSE_UP,callback);
+				this.graphicsLayer.drawingType=DrawingType.Polygon;
+				//设置要绘制的多边形对象
+				polygon=new IMSPredefinedFillStyle(this.polygonType.selectedItem.id.toLowerCase());
+				//设置边框颜色
+				polygon.BorderColor=0x87C2F5;
+				//设置填充颜色
+				polygon.Fillcolor=0xF81877;
+				//设置徒手绘制的对象
+				this.graphicsLayer.drawingObj=polygon;
+				//添加绘制结束回调事件
+				this.graphicsLayer.drawingOverCallback=polygon_CalllBack;
+				}
+			}
+				//绘制多边形回调处理事件
+			private function polygon_CalllBack(gLayer:GraphicsLayer,graphics:IGraphics,logPntArr:Vector.<Point>):void
+			{
+				//设置绘制的多边形的样式信息
+				polygon=new IMSPredefinedFillStyle(this.polygonType.selectedItem.id.toLowerCase());
+				//多边形坐标点
+				polygon.points=logPntArr;
+				//边框颜色
+				polygon.BorderColor=0x87C2F5;
+				//填充颜色
+				polygon.Fillcolor=0xF81877;
+				//多边形添加到绘图层
+				this.graphicsLayer.addGraphics(polygon);
+				//调用多边形对象的绘制方法，绘制
+				polygon.draw();
+			}
+			//绘制自由线
+			private function addFreeLine(event:MouseEvent):void
+			{
+				if(checkLastType())
+				{
+				this.type=EDrawType.FreeHand_Polyline;
+				//设置地图容器的绘制对象的操作类型：绘制自有线
+				this.mapContainer.graphicCanvas.setGraphicType(EDrawType.FreeHand_Polyline,false);
+				//监听鼠标弹起事件，获取坐标
+				this.mapContainer.addEventListener(MouseEvent.MOUSE_UP,callback);
+				}
+			}
+			    //获取绘制自由线或自由面的弹起事件
+			public function callback(e:Event):void
+			{
+				var logPnts:Array=new Array();
+				//获取绘制的坐标点
+				logPnts=this.mapContainer.graphicCanvas.getSelectedLogicDotsArr();
+				var log:Vector.<Point>=new Vector.<Point>();
+				if(logPnts!=null)
+				{
+					for(var i:int=0;i<logPnts.length;i++)
+					{
+						log.push(logPnts[i] as Point);
+					}
+					if(this.type==EDrawType.FreeHand_Polyline)
+					{
+						//根据坐标将自由线添加到绘图层
+						var freeline:zdims.drawing.IMSPolyline=new IMSPolyline(CoordinateType.Logic);
+						this.graphicsLayer.addGraphics(freeline);
+						freeline.points=log;
+						freeline.draw();
+					}
+					else
+					{
+						//根据坐标将自由面添加到绘图层
+						var polygon:IMSPolygon=new IMSPolygon(CoordinateType.Logic);
+						this.graphicsLayer.addGraphics(polygon);
+						polygon.points=log;
+						polygon.draw();
+					}
+				}
+			}
+			//绘制自由面
+			private function addFreePolygon(event:MouseEvent):void
+			{
+				if(checkLastType())
+				{
+				this.type=EDrawType.Freehand_Polygon;
+				//设置地图容器的绘制对象的操作类型：绘制自有面
+				this.mapContainer.graphicCanvas.setGraphicType(EDrawType.Freehand_Polygon,false);		
+				//监听鼠标弹起事件，获取坐标
+				this.mapContainer.addEventListener(MouseEvent.MOUSE_UP,callback);
+				}
+			}
+			
+			
+			//绘制矩形
+			private function addRectangle(event:MouseEvent):void
+			{ 			
+				if(checkLastType())
+				{
+				this.mapContainer.graphicCanvas.setGraphicType(EDrawType.Null,false);	
+				this.mapContainer.removeEventListener(MouseEvent.MOUSE_UP,callback);
+				//设置绘图层的绘制类型：多边形
+				this.graphicsLayer.drawingType=DrawingType.Rectangle;
+				//添加绘制结束监听事件
+				this.graphicsLayer.drawingOverCallback=Rect_CallBack;
+				}
+			}
+			//绘制矩形结束处理事件：获取坐标点
+			private function Rect_CallBack(gLayer:GraphicsLayer,graphics:IGraphics,logPntArr:Vector.<Point>):void
+			{
+				
+				//将绘制的矩形添加到绘图层中
+				var rect:IMSRectangle=new IMSRectangle(CoordinateType.Logic);
+				rect.points=logPntArr;//徒手绘制的矩形坐标
+				this.graphicsLayer.addGraphics(rect);
+				rect.draw();
+			
+			}
+			//绘制圆
+			private function addCircle(event:MouseEvent):void
+			{
+
+				if(checkLastType())
+				{
+				this.mapContainer.graphicCanvas.setGraphicType(EDrawType.Null,false);	
+				this.mapContainer.removeEventListener(MouseEvent.MOUSE_UP,callback);
+				//设置绘图层的绘制类型：圆
+				this.graphicsLayer.drawingType=DrawingType.Circle;
+				//添加绘制结束监听事件
+				this.graphicsLayer.drawingOverCallback=Circle_CallBack;
+				}
+			}
+			//绘制圆结束处理事件：获取坐标点
+			private function Circle_CallBack(gLayer:GraphicsLayer,graphics:IGraphics,logPntArr:Vector.<Point>):void
+			{
+				//将绘制的圆添加到绘图层中
+				var circle:IMSCircle=new IMSCircle(CoordinateType.Logic);
+				circle.points=logPntArr;
+				this.graphicsLayer.addGraphics(circle);
+				circle.draw();
+			}
+			//清除绘制的要素
+			private function clearAll(event:MouseEvent):void
+			{
+				if(checkLastType())
+				{
+				this.mapContainer.graphicCanvas.clearAll();//setGraphicType(EDrawType.Null,false);
+				this.mapContainer.removeEventListener(MouseEvent.MOUSE_UP,callback);
+				this.graphicsLayer.drawingType=DrawingType.None;
+				this.markLayer.removeAllMark();				
+				this.graphicsLayer.removeAllGraphics();
+				}
+			}
+			//绘制折线
+			protected function addLineClick(event:MouseEvent):void
+			{
+				addline();
+			}
+			
+			private function addLine(event:IndexChangeEvent):void
+			{
+				addline();
+			}
+			
+			private function addline():void
+			{
+				if(checkLastType())
+				{
+				this.mapContainer.removeEventListener(MouseEvent.MOUSE_UP,callback);
+				this.graphicsLayer.drawingType=DrawingType.Polyline;		
+				//设置绘制的线样式对象
+				line=new IMSPredefinedLineStyle(this.lineType.selectedItem.id.toLowerCase());
+				//将绘制的线样式对象传给绘图层的徒手绘制对象
+				this.graphicsLayer.drawingObj=line;
+				//监听绘制结束回调事件
+				this.graphicsLayer.drawingOverCallback=Line_CalllBack;
+				}
+			}
+			private function checkLastType():Boolean
+			{
+				if(this.graphicsLayer.drawingObj!=null&&!this.mapContainer.autoMoveMapViewLockFlg)
+				{
+					this.graphicsLayer.drawingObj.shape.visible=false;
+					mx.controls.Alert.show("超出绘制区域，重新选择绘制");
+					this.graphicsLayer.drawingType=DrawingType.None;
+					return false;
+				}
+				else
+				{
+					return true;
+				}
+			}
+			//绘制结束事件：获取折线坐标
+			private function Line_CalllBack(gLayer:GraphicsLayer,graphics:IGraphics,logPntArr:Vector.<Point>):void
+			{
+				line=new IMSPredefinedLineStyle(this.lineType.selectedItem.id.toLowerCase());
+				line.points=logPntArr;
+				this.graphicsLayer.addGraphics(line);
+				line.draw();
+			}
+			//绘制点
+			private function addPointClick(event:MouseEvent):void
+			{
+				addPnt();
+			}
+			//添加点
+			private function addPoint(event:IndexChangeEvent):void
+			{
+				addPnt();
+			}
+			//绘制点
+			private function addPnt():void
+			{
+				if(checkLastType())
+				{
+				this.mapContainer.graphicCanvas.setGraphicType(EDrawType.Null,false);	
+				this.mapContainer.removeEventListener(MouseEvent.MOUSE_UP,callback);
+				//设置绘图类型：点
+				this.graphicsLayer.drawingType=DrawingType.Point;
+				//监听结束事件
+				this.graphicsLayer.drawingOverCallback=Pnt_CalllBack;
+				}
+			}
+			//点绘制结束：获取点坐标
+			private function Pnt_CalllBack(gLayer:GraphicsLayer,graphics:IGraphics,logPntArr:Vector.<Point>):void
+			{
+				//设置点样式对象
+				var shape:IMSPredefinedMarkStyle=new  IMSPredefinedMarkStyle(this.pointType.selectedItem.id.toLowerCase());
+				//点的颜色
+				shape.color=0xFF0000;
+				//new mark对象
+				var mark:IMSMark=new IMSMark(shape,CoordinateType.Logic);
+				//设置mark的坐标
+				mark.x=logPntArr[0].x;
+				mark.y=logPntArr[0].y;
+				mark.enableAnimation=false;
+				//将mark对象赋给点样式的属性mark
+				shape.mark=mark;
+				//将mark对象添加到标注图层
+				this.markLayer.addMark(mark);
+				
+			}
+		]]>
+	</fx:Script>
+	<!--添加地图容器-->
+	<map:IMSMap  id="mapContainer"  xMinMap="-181.18399779022" xMaxMap="188.619962766591"  enableProgressBar="false" enableZoomOutMinLevel="false"
+				 yMinMap="-90.7340663245236" yMaxMap="279.069894232288" levelNum="8" initShowLevel="4"   restoreCenterX="102.85000121166703" restoreCenterY="33.31638333491467">			
+		<map:TileLayer hdfName="world.hdf" id="tilelayer"  >
+		</map:TileLayer>	
+		<!--添加绘图层-->
+		<drawing:GraphicsLayer id="graphicsLayer"  >	
+		</drawing:GraphicsLayer>
+		<!--添加mark图层-->
+		<mark:MarkLayer id="markLayer" x="257" y="232">
+		</mark:MarkLayer>
+	</map:IMSMap>	
+	<s:controlBarLayout  >
+		<s:BasicLayout/>
+	</s:controlBarLayout>
+	<s:controlBarContent      >		
+		<s:DropDownList id="pointType" toolTip="绘制点"  x="236" y="1" selectedIndex="0" 
+						change="addPoint(event)" 
+						click="addPointClick(event)" 
+						prompt="  点" 
+						textAlign="center" 
+						fontSize="20" 
+						fontWeight="normal"
+						itemRenderer="spark.skins.spark.DefaultComplexItemRenderer"
+						skinClass="skins.CustomDropDownListSkin" 
+						showInAutomationHierarchy="true">
+			<s:dataProvider  >
+				<s:ArrayList>
+					<s:BitmapImage alpha="1" source="@Embed('/assets/images/circle.png')" id="circle"/>
+					<s:BitmapImage alpha="1" source="@Embed('/assets/images/star.png')" id="star"/>
+					<s:BitmapImage alpha="1" source="@Embed('/assets/images/square.png')" id="square"/>
+					<s:BitmapImage alpha="1" source="@Embed('/assets/images/diamond.png')" id="diamond"/>
+					<s:BitmapImage alpha="1" source="@Embed('/assets/images/triangle.png')" id="triangle"/>
+					<s:BitmapImage alpha="1" source="@Embed('/assets/images/x.png')" id="X"/>
+					<s:BitmapImage alpha="1" source="@Embed('/assets/images/sector.png')" id="sector"/>
+				</s:ArrayList>
+			</s:dataProvider>
+		</s:DropDownList>		
+		<s:DropDownList id="polygonType" toolTip="绘制面" 
+						x="372" y="1" change="addPolygon(event)" click="addPolygonClick(event)"
+						selectedIndex="0"
+						itemRenderer="spark.skins.spark.DefaultComplexItemRenderer"
+						skinClass="skins.CustomDropDownListSkin"
+						textAlign="center" fontSize="20" fontWeight="normal">
+			<s:dataProvider>
+				<s:ArrayList>
+					<s:BitmapImage source="@Embed('/assets/images/polygonSolid.png')" id="Solid"/>
+					<s:BitmapImage source="@Embed('/assets/images/null.png')" id="Null"/>
+					<s:BitmapImage source="@Embed('/assets/images/horizontal.png')" id="horizontal"/>
+					<s:BitmapImage source="@Embed('/assets/images/vertical.png')" id="vertical"/>
+					<s:BitmapImage source="@Embed('/assets/images/cross.png')" id="cross"/>
+					<s:BitmapImage source="@Embed('/assets/images/slash.png')" id="slash"/>
+					<s:BitmapImage source="@Embed('/assets/images/backslash.png')" id="backslash"/>
+				</s:ArrayList>
+			</s:dataProvider>
+		</s:DropDownList>
+		<s:DropDownList id="lineType" toolTip="绘制线" x="304" y="1" 
+						change="addLine(event)" 
+						click="addLineClick(event)"
+						selectedIndex="0"
+						itemRenderer="spark.skins.spark.DefaultComplexItemRenderer"
+						skinClass="skins.CustomDropDownListSkin"
+						textAlign="center" fontSize="20" fontWeight="normal"  >
+			<s:dataProvider>
+				<s:ArrayList>
+					<s:BitmapImage  source="@Embed('/assets/images/solid.png')" id="solid"/>
+					<s:BitmapImage source="@Embed('/assets/images/dash.png')" id="dash"/>
+					<s:BitmapImage source="@Embed('/assets/images/dot.png')" id="dot"/>
+					<s:BitmapImage source="@Embed('/assets/images/dashdot.png')" id="dashdot"/>
+					<s:BitmapImage source="@Embed('/assets/images/dashdotdot.png')" id="dashdotdot"/>
+				</s:ArrayList>
+			</s:dataProvider>
+		</s:DropDownList>			
+		<s:Button id="freeLine"   width="40" height="40" click="addFreeLine(event)" x="467" y="0"></s:Button>
+		<mx:Image  toolTip="自由线" source="assets/images/drawFreeLine.png" x="471" y="5" click="addFreeLine(event)"  />
+		
+		<s:Button id="freePolygon"   width="40" height="40" click="addFreePolygon(event)"  x="510" y="0"></s:Button>
+		<mx:Image  toolTip="自由面" source="assets/images/drawFreePolygon.png" x="515" y="4"  click="addFreePolygon(event) "/>
+		
+		<s:Button   id="rectangle"   width="40" height="40" click="addRectangle(event)"  x="553" y="0"/>
+		<mx:Image toolTip="矩形"  source="assets/images/drawRect.png" x="557" y="4"  click="addRectangle(event)" />
+		
+		<s:Button id="circlebtn"   width="40" height="40" click="addCircle(event)" x="596" y="0"></s:Button>
+		<mx:Image  toolTip="圆" source="assets/images/drawCircle.png" x="600" y="4"    click="addCircle(event)"/>			
+		
+		<s:Button id="clear"   width="40" height="40" click="clearAll(event)" x="639" y="0"></s:Button>
+		<mx:Image  toolTip="清除" source="assets/images/clear1.png" x="644" y="4" click="clearAll(event)" />
+		
+	</s:controlBarContent>
+</s:Application>

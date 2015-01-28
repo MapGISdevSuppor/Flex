@@ -1,0 +1,41 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>无标题文档</title>
+<style type="text/css">
+.biaoti{color:#3366FF;FONT-SIZE:13pt;}
+.xiaobiaoti{color:#3366FF;FONT-SIZE:11pt;}
+.zhengwen{FONT-SIZE:9pt;}
+.zhuji{FONT-SIZE:9pt;color:#F00;}
+</style>
+</head>
+
+<body>
+<div class="biaoti">
+    测量:
+</div>
+<br />
+<div class="xiaobiaoti">一、示例功能：
+</div>
+<br />
+ <div class="zhengwen">
+&nbsp;&nbsp;&nbsp;&nbsp;该示例实现地图的测量功能，包括距离测量与面积测量，直接用开源的测量功能控件。
+ </div>
+<br />
+
+ <div class="xiaobiaoti">二、实现说明： </div> <br />
+  <div class="zhengwen">
+   &nbsp;&nbsp;&nbsp;&nbsp;1、数据：使用世界地图的瓦片数据（NewWorldTile.HDF），已在GIS服务器（MapGIS Server Manager）中发布。<br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;2、实现步骤： <br /><br />
+   &nbsp;&nbsp;&nbsp;（1）先在设计面板中拖入一个地图容器控件（IMSMap）； <br /><br />
+   &nbsp;&nbsp;&nbsp;（2）然后在地图容器中拖入一个瓦片图层控件（TileLayerEx），设置相应参数，加载世界地图；&nbsp;<br /><br />
+   &nbsp;&nbsp;&nbsp;（3）再在设计面板中拖入测量功能控件（Measure），并设置imsmap参数绑定地图容器；&nbsp;<br /><br />
+   &nbsp;&nbsp;&nbsp;（4）最后加载两个图片按钮，作为距离测量与面积测量的功能按钮，分别通过click事件，调用setMeasureType方法实现测量功能控制。&nbsp;<br /><br />
+   <br />  
+     <div class="zhengwen">
+<p>注：详细说明请参见MapGIS IGServer for Flex的API手册（4.5）。</p></div> </div>
+</body>
+
+</html>

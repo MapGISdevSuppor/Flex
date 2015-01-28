@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600"
+			   xmlns:control="zdims.control.*" 
+			   xmlns:code="http://code.google.com/p/flex-iframe/" 
+			   pageTitle="欢迎访问MapGIS IGS Flex在线示例" xmlns:local="*" xmlns:view="view.*"
+			   creationComplete="init()" viewSourceURL="srcview/index.html">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<fx:XML id="treeData"  xmlns="*.explorer" ></fx:XML>
+		<s:HTTPService id="httpService" url="tree.xml" method="get" resultFormat="e4x" result="getXML(event)"/> 
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.google.code.flexiframe.IFrame;
+			import mx.events.FlexEvent;
+			import mx.rpc.events.ResultEvent;
+			import spark.components.Group;
+			import spark.components.NavigatorContent;
+			private var nodeApp:String = new String();
+			private var oldLeafNode:String = new String();
+			private var bigNode:XML;//一级节点 
+			private var nodeCode:String = new String();
+			private var selectedNode:XML;
+			private var nodeText:String = new String();
+			private var nodeSrc:String = new String();
+			private var iframe1:IFrame;
+			private var iframe2:IFrame;
+			private var iframe3:IFrame;
+			private var img1:Image;
+			private var img2:Image;
+			private var img3:Image;
+			private function createNav():void{
+				var content1:NavigatorContent = new NavigatorContent();
+				content1.id = "tabcontent1";
+				content1.label = "演 示";
+				content1.percentHeight = 100;
+				content1.percentWidth = 100;
+				var grp:Group=new Group();
+				grp.percentHeight=100;
+				grp.percentWidth=100;
+				img1=new Image();
+				img1.verticalCenter="0";
+				img1.horizontalCenter="0";
+				img1.source="images/backGroundMapgis.jpg";
+				
+				img1.verticalCenter=0;
+				grp.addElement(img1);
+				content1.addElement(grp);
+				iframe1 = new IFrame("iframe1");
+				iframe1.percentHeight = 100;
+				iframe1.percentWidth = 100;	
+				iframe1.source = "";
+				content1.addElement(iframe1);	
+				this.tab.addElement(content1);
+				
+				var content2:NavigatorContent = new NavigatorContent();
+				content2.id = "tabcontent2";
+				content2.label = "源 码";
+				content2.percentHeight = 100;
+				content2.percentWidth = 100;
+				
+				var grp2:Group=new Group();
+				grp2.percentHeight=100;
+				grp2.percentWidth=100;
+				img2=new Image();
+				img2.verticalCenter="0";
+				img2.horizontalCenter="0";
+				img2.source="images/backGroundMapgis.jpg";
+				img2.verticalCenter=0;
+				grp2.addElement(img2);
+				content2.addElement(grp2);
+				
+				iframe2 = new IFrame("iframe2");
+				iframe2.percentHeight = 100;
+				iframe2.percentWidth = 100;	
+				iframe2.source = "";
+				content2.addElement(iframe2);			
+				this.tab.addElement(content2);
+				
+				var content3:NavigatorContent = new NavigatorContent();
+				content3.id = "tabcontent3";
+				content3.label = "说 明";
+				content3.percentHeight = 100;
+				content3.percentWidth = 100;	
+				var grp3:Group=new Group();
+				grp3.percentHeight=100;
+				grp3.percentWidth=100;
+				img3=new Image();
+				img3.verticalCenter="0";
+				img3.horizontalCenter="0";
+				img3.source="images/backGroundMapgis.jpg";
+				img3.verticalCenter=0;
+				grp3.addElement(img3);
+				content3.addElement(grp3);
+				iframe3 = new IFrame("iframe3");
+				iframe3.percentHeight = 100;
+				iframe3.percentWidth = 100;	
+				iframe3.source = "";
+				content3.addElement(iframe3);			
+				this.tab.addElement(content3); 
+			}
+			
+			private function init():void
+			{ 
+				httpService.send();
+				this.unLoad();
+			} 
+			private function getXML(resultEvent:ResultEvent):void
+			{
+				treeData = httpService.lastResult as XML; 
+				this.tree.dataProvider = treeData; 
+			}
+			private function showData(event:Event):void{
+				if(!this.tree.selectedItem)
+				{
+					return;
+				} 
+				if(this.nodeApp != "")
+				{
+					this.oldLeafNode = this.nodeApp.toString(); //仅点中叶节点才赋值
+				}
+				nodeApp = tree.selectedItem.@url1;
+				nodeSrc = tree.selectedItem.@src;
+				nodeCode=tree.selectedItem.@url2;
+				nodeText=tree.selectedItem.@url3;
+				var node:XML = Tree(event.target).selectedItem as XML;
+				
+				if(bigNode == node)//点中原来的节点, do nothing
+				{
+					this.unLoad(); 
+				}
+				else if(node == "")//点中叶节点，do nothing
+				{ 
+					this.unLoad();
+				}
+				else//点中不同的一级节点
+				{	
+					closeAll();
+				}
+				selectedNode = Tree(event.target).selectedItem as XML;
+				if (tree.dataDescriptor.isBranch(selectedNode))
+				{  
+					if(selectedNode.parent())
+					{
+						this.tree.expandItem(selectedNode.parent(), true, true); 
+					} 
+					this.tree.expandItem(selectedNode, !tree.isItemOpen(selectedNode), true);
+					Tree(event.target).selectedItem = null;
+				} 
+				if (nodeApp != null && nodeApp != "")
+				{
+					if(this.tab.selectedIndex >= 0)
+					{   
+						if(this.oldLeafNode.match(this.nodeApp))
+						{
+							iframe1.visible = true;
+						}
+						else  
+						{
+							iframe1.visible = false;  
+							iframe1.source = nodeApp;
+							iframe2.source=nodeCode;
+							iframe3.source=nodeText;
+							iframe1.addEventListener(FlexEvent.UPDATE_COMPLETE, exampleUpdateHandler); 
+							
+							
+						} 
+					}
+					if(this.tab.selectedIndex == 1)
+					{ 
+						iframe2.source=nodeCode;
+						
+					}
+					else if(this.tab.selectedIndex == 2)
+					{
+						iframe3.source=nodeText;
+					}
+				}
+				else
+				{
+					tree.expandItem(tree.selectedItem, true, true); 
+				}
+				if(!selectedNode.toString() == "" && selectedNode.length() >0)//这里我们检测一下能否调用句柄
+				{
+					this.bigNode = selectedNode;//记下一个一级节点 
+				}    
+				invalidateDisplayList();
+			}
+			private function closeAll():void
+			{   
+				this.tree.openItems = []; 
+				this.unLoad();
+			}
+			public function unLoad():void
+			{
+				iframe1.removeAllElements(); 
+				iframe1.visible = false; 
+			}
+			private function exampleUpdateHandler(event:FlexEvent):void
+			{
+				iframe1.visible = true;	
+			}
+		]]>
+	</fx:Script>
+	<s:BorderContainer id="container" width="100%" height="60" borderColor="0x333333" borderAlpha="0.2" 
+					   left="0" right="0" top="0" bottom="0">
+		<s:SkinnableContainer width="100%" height="100%" >
+			<mx:Canvas width="100%" height="60" x="0" y="0" backgroundSize="100%" id="ICanves" backgroundImage="images/banner-bg.jpg" >
+				<mx:Image  id="headImgl"  left="0" height="60" width="875" source="images/banner-left.jpg"  >
+				</mx:Image>
+				<mx:Image  id="headImgr"   right="0" height="60" source="images/banner-right.jpg"  >
+				</mx:Image>		
+			</mx:Canvas>
+		</s:SkinnableContainer>
+	</s:BorderContainer>
+	<mx:HDividedBox x="0" y="61" id="hdbox" width="100%"  height="100%" 
+					dividerAffordance="50" backgroundColor="0xffffff" >
+		<s:BorderContainer id="leftBorder" width="16%" height="100%" borderColor="0x333333" borderAlpha="0.2" >
+			<mx:Tree width="100%" height="100%" id="tree" 
+					 labelField="@label" 
+					 horizontalScrollPolicy="off"
+					 verticalAlign="bottom"
+					 showRoot="false"
+					 showScrollTips="true" 
+					 wordWrap="false"
+					 variableRowHeight="true"
+					 fontWeight="normal" fontSize="12"
+					 indentation="12" 
+					 change="showData(event);"
+					 
+					 textSelectedColor="0xffffff" 
+					 selectionColor="0x6699FF"
+					 rollOverColor="0x66CCFF" 
+					 textRollOverColor="0xffffff" 
+					 >			
+			</mx:Tree>
+		</s:BorderContainer>
+		<s:BorderContainer id="rightBorder" width="84%" height="100%" borderColor="0x333333" borderAlpha="0.2" >
+			<mx:TabNavigator id="tab" width="100%" height="100%"  backgroundColor="#D3D2D2" backgroundAlpha="0" fontWeight="normal" fontSize="12" creationComplete="createNav()">
+			</mx:TabNavigator>	
+		</s:BorderContainer>
+	</mx:HDividedBox>
+</s:Application>

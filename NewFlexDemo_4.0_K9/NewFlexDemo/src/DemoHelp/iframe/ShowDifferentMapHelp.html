@@ -1,0 +1,42 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>无标题文档</title>
+<style type="text/css">
+.biaoti{color:#3366FF;FONT-SIZE:13pt;}
+.xiaobiaoti{color:#3366FF;FONT-SIZE:11pt;}
+.zhengwen{FONT-SIZE:9pt;}
+.zhuji{FONT-SIZE:9pt;color:#F00;}
+</style>
+</head>
+
+<body>
+<div class="biaoti">
+    显示多个不同的地图:
+</div>
+<br />
+<div class="xiaobiaoti">一、示例功能：
+</div>
+<br />
+ <div class="zhengwen">
+&nbsp;&nbsp;&nbsp;&nbsp;该示例实现根据需要灵活加载不同地图的功能，即在同一界面不同地图容器中加载不同的地图。该示例以武汉地图作为底图，通过标注的详细信息形式显示某地的三维景观地图。
+ </div>
+<br />
+
+ <div class="xiaobiaoti">二、实现说明： </div> <br />
+  <div class="zhengwen">
+   &nbsp;&nbsp;&nbsp;&nbsp;1、数据：使用武汉市的瓦片数据（WhMap.HDF）与三维景观数据（Wh3D.HDF），已在GIS服务器中发布。<br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;2、实现步骤： <br /><br />
+   &nbsp;&nbsp;&nbsp;（1）先在设计面板中拖入一个地图容器控件（IMSMap）； <br /><br />
+   &nbsp;&nbsp;&nbsp;（2）然后在该地图容器中拖入一个瓦片图层控件（TileLayer），设置相应参数，加载武汉市地图；&nbsp;<br /><br />
+   &nbsp;&nbsp;&nbsp;（3）加载一个三维景观显示窗口（MyWindow），拖入另一个地图容器控件到显示窗口中，并在该地图容器中拖入另一个瓦片图层控件（TileLayer），设置相应参数，加载三维景观地图；&nbsp;<br /><br />
+   &nbsp;&nbsp;&nbsp;（4）在加载完武汉市地图时添加标注（IMSMark），并添加该图片标注的点击事件监听，通过三维景观显示窗口的visible属性控制其显示；&nbsp;<br />
+      <br />
+   &nbsp;&nbsp;&nbsp;（5）通过主程序的creationComplete事件添加地图鼠标事件监听，修正三维景观显示窗口的位置，让三维景观显示窗口跟随地图移动。&nbsp;<br />
+   <br />  
+   &nbsp;&nbsp;&nbsp;<a href="http://www.mapgis.com.cn/templates/RsDevelopMdl/index.aspx?Page=3&nodeid=983&MNodeId=1018" alt="MapGIS IGServer for Flex的API手册。"  target="_blank" >注：详细说明请参见MapGIS IGServer for Flex的API手册。</a> </div>
+</body>
+
+</html>

@@ -1,0 +1,48 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>无标题文档</title>
+<style type="text/css">
+.biaoti{color:#3366FF;FONT-SIZE:13pt;}
+.xiaobiaoti{color:#3366FF;FONT-SIZE:11pt;}
+.zhengwen{FONT-SIZE:9pt;}
+.zhuji{FONT-SIZE:9pt;color:#F00;}
+</style>
+</head>
+
+<body>
+<div class="biaoti">
+对特定范围内的标注进行聚合显示:
+</div>
+<br />
+<div class="xiaobiaoti">一、示例功能：
+</div>
+<br />
+ <div class="zhengwen">
+&nbsp;&nbsp;&nbsp;&nbsp;该示例实现向地图中添加标注，然后对标注进行聚合显示。 </div>
+<br />
+
+ <div class="xiaobiaoti">二、实现说明： </div> <br />
+  <div class="zhengwen">
+   &nbsp;&nbsp;&nbsp;&nbsp;1、数据：使用世界地图的瓦片数据（NewWorldTile.HDF），已在GIS服务器（MapGIS Server Manager）中发布。 <br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;2、实现步骤： <br /><br />
+   &nbsp;&nbsp;&nbsp;（1）先实现瓦片数据的显示； <br /><br />
+   &nbsp;&nbsp;&nbsp;（2）再在地图容器中拖入一个标注图层控件（MarkLayer），用于显示标注；<br /><br />
+   &nbsp;&nbsp;&nbsp;（3）自定义编写函数获取点位数据，然后在代码中实例化标注控件Mark，并将点位数据赋给Mark； <br /><br />
+   &nbsp;&nbsp;&nbsp;（4）将Mark添加到标注图层，然后通过设置其聚合属性（enablePolymericMark，默认为false），实现聚合与解除聚合； <br /><br />
+   &nbsp;&nbsp;&nbsp;（4）实例化标注信息显示控件（MarkInfo），并对其属性字段赋值，然后添加标注信息。 <br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;3、聚合功能说明：<br /><br />
+  </div>
+ <div class="zhuji">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1.每次聚合均以某一点（以随机数获取）为中心，按固定范围进行搜索，将范围内的标注进行聚合，范围外的不予聚合；<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.由于搜索半径不变，当中心点变化后，聚合结果可能不一样，故地图一旦发生变化（缩放、移动等），聚合标注就会重新计算，聚合结果也发生相应变化；<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.当地图进行缩放后，视域外的标注不进行聚合；<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4.点击任意一个原始标注图标，将弹框显示该标注的详细信息。</p>
+</div>
+   <div class="zhengwen">
+<p>注：详细说明请参见MapGIS IGServer for Flex的API手册（4.5）。</p></div>
+</body>
+
+</html>

@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="utf-8"?>
+<IMSWindow xmlns:mx="library://ns.adobe.com/flex/mx" 
+		   xmlns:s="library://ns.adobe.com/flex/spark"
+		   xmlns:fx="http://ns.adobe.com/mxml/2009"
+		   xmlns:net="flash.net.*"
+		   xmlns="zdims.control.*"
+		   width="400" height="380" minHeight="350" minWidth="360"
+		   title="工具箱" close="close()" creationComplete="init()" backgroundColor="0x524f4f" layout="absolute">
+	
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<!--用于保存打印图功能-->
+		<net:FileReference id="fileReference" />
+	</fx:Declarations>
+
+	<fx:Script>
+		<![CDATA[			
+			import mx.controls.Alert;
+			import mx.graphics.ImageSnapshot;
+			import mx.managers.PopUpManager;
+			import mx.printing.FlexPrintJob;
+			import mx.printing.FlexPrintJobScaleType;
+			
+			import spark.components.BorderContainer;
+			
+			import zdims.controls.EditImage;
+			import zdims.controls.EditMapView;
+			import zdims.controls.EditMark;
+			import zdims.controls.EditText;
+			import zdims.controls.PrintPreviewWindow;
+			import zdims.controls.chart.ChartType;
+			import zdims.controls.chart.ChooseChartDialog;
+			import zdims.controls.chart.EditColumnChart;
+			import zdims.controls.chart.EditPieChart;
+			import zdims.controls.compass.ArrowcrossDraw;
+			import zdims.controls.compass.ChooseCompassDialog;
+			import zdims.controls.compass.ClosedangleDraw;
+			import zdims.controls.compass.CompassType;
+			import zdims.controls.compass.FourstarDraw;
+			import zdims.controls.compass.RhombusDraw;
+			import zdims.controls.compass.TriangleDraw;
+			import zdims.controls.event.ChooseCompassDialogEvent;
+			import zdims.controls.event.ChooseDialogEvent;
+			import zdims.controls.legend.EditLegend;
+			import zdims.controls.scale.ChooseScaleBarDialog;
+			import zdims.controls.scale.EditAlternationScaleBar;
+			import zdims.controls.scale.EditDoubleAlernationScaleBar1;
+			import zdims.controls.scale.EditDoubleAlernationScaleBar2;
+			import zdims.controls.scale.EditHollowScaleBar1;
+			import zdims.controls.scale.EditHollowScaleBar2;
+			import zdims.controls.scale.EditScaleLine;
+			import zdims.controls.scale.EditSingleDivisionScaleBar;
+			import zdims.controls.scale.EditStepedScaleLine;
+			import zdims.controls.scale.ScaleBarType;
+//			import zdims.controls.table.addTable;
+			import zdims.drawing.DrawingType;
+			import zdims.map.VectorMapDoc;
+			
+			private var  _boder:BorderContainer;
+			public var _vmapdoc:VectorMapDoc;
+			public var _editmapview:EditMapView;
+			
+			/**
+			 *设置打印框
+			 */
+			[Inspectable(category="MapGisIMS")]
+			public function set boder(m:BorderContainer):void
+			{
+				this._boder=m;
+			}
+			[Inspectable(category="MapGisIMS")]
+			public function get boder():BorderContainer
+			{
+				return this._boder;
+			}
+			
+			/**
+			 *获取矢量地图文档
+			 */
+			[Inspectable(category="MapGisIMS")]
+			public function set vmapdoc(v:VectorMapDoc):void
+			{
+				this._vmapdoc=v;
+			}
+			[Inspectable(category="MapGisIMS")]
+			public function get vmapdoc():VectorMapDoc
+			{
+				return this._vmapdoc;
+			}
+			
+			[Inspectable(category="MapGisIMS")]
+			public function set editmapview(e:EditMapView):void
+			{
+				this._editmapview=e;
+			}
+			[Inspectable(category="MapGisIMS")]
+			public function get editmapview():EditMapView
+			{
+				return this._editmapview;
+			}
+			
+			//打印
+			protected function printBtn_clickHandler(event:MouseEvent):void
+			{
+				if(this.boder.contains(this))
+			     	this.boder.removeElement(this);
+				try{
+					var job:FlexPrintJob = new FlexPrintJob();//实例化FlexPrintJob类
+					job.printAsBitmap = false;//指定以向量格式打印
+					if(job.start()) 
+					{
+						job.addObject(this.boder, FlexPrintJobScaleType.SHOW_ALL);//设置打印对象，页面缩放方式
+						job.send();//将添加的内容发送至打印机以开始打印
+					}
+				}
+				catch(err:Error)
+				{
+					Alert.show(err.message);//异常信息提示
+				}
+				
+			}
+			
+			/**
+			 *初始化
+			 */
+			public override function init():void
+			{
+				super.init();
+			}
+			
+            /**
+			 *添加文本单击事件处理
+			 */
+			protected function addTextBtn_clickHandler(event:MouseEvent):void
+			{
+				var edit:EditText=new EditText();
+				edit.x=10;
+				edit.y=20;
+				this.boder.addElement(edit);
+			}
+
+            /**
+			 *添加图例单击事件处理
+			 */
+			protected function addLegendBtn_clickHandler(event:MouseEvent):void
+			{
+				var editLengend:EditLegend=new EditLegend();
+				editLengend.vMapDoc=this.vmapdoc;
+				this.boder.addElement(editLengend);						
+			}
+
+            /**
+			 *添加指北针单击事件处理
+			 */
+			protected function addCompassBtn_clickHandler(event:MouseEvent):void
+			{
+				var dialog:ChooseCompassDialog=new ChooseCompassDialog();
+				dialog.addEventListener(ChooseCompassDialogEvent.OK,addCompass);
+				PopUpManager.addPopUp(dialog,this,true);
+				PopUpManager.centerPopUp(dialog);				
+			}
+			
+			/**
+			 *指北针选择
+			 */
+			protected function addCompass(e:ChooseCompassDialogEvent):void
+			{//根据用户选择，加载相应的指北针
+				if(e.compassType==CompassType.Triangle)
+				{
+					var triangleDraw:TriangleDraw=new TriangleDraw();
+					this.boder.addElement(triangleDraw);
+				}
+				else if(e.compassType==CompassType.Rhombus)
+				{
+					var rhombusDraw:RhombusDraw=new RhombusDraw();
+					this.boder.addElement(rhombusDraw); 
+				} 
+				else if(e.compassType==CompassType.FourStar)
+				{
+					var fourstarDraw:FourstarDraw=new FourstarDraw();
+					this.boder.addElement(fourstarDraw);
+				}
+					
+				else if(e.compassType==CompassType.ArrowCross)
+				{
+					var arrowcrossDraw:ArrowcrossDraw=new ArrowcrossDraw();
+					arrowcrossDraw.width=100;
+					arrowcrossDraw.height=125;
+					this.boder.addElement(arrowcrossDraw);
+				}
+				else if(e.compassType==CompassType.ClosedAngle)
+				{
+					var closedangleDraw:ClosedangleDraw=new ClosedangleDraw();
+					closedangleDraw.width=100;
+					closedangleDraw.height=125;
+					this.boder.addElement(closedangleDraw);
+				}
+				
+			} 
+
+            /**
+			 *添加图片单击事件处理
+			 */
+			protected function ImageBtn_clickHandler(event:MouseEvent):void
+			{
+				this.boder.addElement(new EditImage());
+			}
+
+           /**
+		   *添加表格单击事件处理
+		   */
+			protected function addTableBtn_clickHandler(event:MouseEvent):void
+			{
+//				this.boder.addElement(new addTable());
+			}
+
+            /**
+			 *设置打印框位置
+			 */
+			protected function setPrintPos_clickHandler(event:MouseEvent):void
+			{
+				this.boder.x=parseFloat(xText.text);
+				this.boder.y=parseFloat(yText.text);
+			}
+
+            /**
+			 *设置打印框的大小
+			 */
+			protected function setPrintSize_clickHandler(event:MouseEvent):void
+			{
+				boder.height=parseFloat(hText.text);
+				boder.width=parseFloat(wText.text);
+			}
+
+            /**
+			 *打印预览
+			 */
+			protected function printPriviewBtn_clickHandler(event:MouseEvent):void
+			{
+				var titlewin:PrintPreviewWindow=new PrintPreviewWindow(); 	
+				var bitmapdata:BitmapData=new BitmapData(boder.width,boder.height,true,0x000000);
+				bitmapdata.draw(boder);
+				titlewin.imgData=new Bitmap(bitmapdata);
+				
+				PopUpManager.addPopUp(titlewin,this);
+				PopUpManager.centerPopUp(titlewin);
+			}
+
+             /**
+			 *保存打印图
+			 */
+			protected function savePrintImage_clickHandler(event:MouseEvent):void
+			{
+				var imageSnap:ImageSnapshot = ImageSnapshot.captureImage(boder, 0);
+				fileReference.save(imageSnap.data, "describeType.png");
+			}
+
+            /**
+			 *添加图框单击事件处理
+			 */
+			protected function addFrameBtn_clickHandler(event:MouseEvent):void
+			{
+				if(this.imsmap.activeMapDoc==null)
+				{
+					Alert.show("请切换到2D视图再添加图框","提示");
+					return;
+				}
+				editmapview.enableFrame=true;
+			}
+
+           /**
+		   *删除图框单击事件处理
+		   */
+			protected function delFrameBtn_clickHandler(event:MouseEvent):void
+			{
+				if(editmapview.enableFrame==true)
+					editmapview.enableFrame=false;//删除图框
+				else
+					Alert.show("当前无图框可删除，请先添加图框","提示")
+			}
+
+            /**
+			 *添加标注单击事件处理
+			 */
+			protected function addMarkBtn_clickHandler(event:MouseEvent):void
+			{
+				this.boder.addElement(new EditMark());
+			}
+
+           
+
+           /**
+		   *添加统计图单击事件处理
+		   */
+			protected function addChartBtn_clickHandler(event:MouseEvent):void
+			{
+				var dialog:ChooseChartDialog=new ChooseChartDialog();//初始化统计图弹框
+				dialog.addEventListener(ChooseDialogEvent.OK,addChart);//添加监听统计图类型选择事件
+				PopUpManager.addPopUp(dialog,this,true);//弹框提供可供选择的统计图类型
+				PopUpManager.centerPopUp(dialog);//设置弹框位置
+			}
+			/**
+			 *统计图选择
+			 */
+			protected function addChart(e:ChooseDialogEvent):void
+			{
+				//根据用户选择，加载相应类型的统计图
+				if(e.chooseType==ChartType.Pie)
+				{//添加饼图
+					var pieChart:EditPieChart=new EditPieChart();
+					pieChart.vectorMapDoc=this.vmapdoc;
+					this.boder.addElement(pieChart);
+				}
+				else if(e.chooseType==ChartType.Columnar)
+				{//添加柱状图
+					var columnChart:EditColumnChart=new EditColumnChart();
+					columnChart.vectorMapDoc=this.vmapdoc;
+					this.boder.addElement(columnChart);
+				}
+			}
+
+            /**
+			 *添加比例尺
+			 */
+			protected function addScaleBtn_clickHandler(event:MouseEvent):void
+			{
+				var dialog:ChooseScaleBarDialog=new ChooseScaleBarDialog();//定义并实例化比例尺选择弹框对象
+				dialog.addEventListener(ChooseDialogEvent.OK,addScaleBar);//添加比例尺类型选择事件监听
+				PopUpManager.addPopUp(dialog,this,true);//弹框提供可选比例尺
+				PopUpManager.centerPopUp(dialog);//设置弹框位置
+			}
+			/**
+			 *比例尺选择
+			 */
+			protected function addScaleBar(event:ChooseDialogEvent):void
+			{
+				//根据用户选择，加载相应类型的比例尺
+				if(event.chooseType==ScaleBarType.AlternationScaleBar)
+				{
+					var editAlternationScaleBar:EditAlternationScaleBar=new EditAlternationScaleBar();
+					editAlternationScaleBar.imsMap=this.imsmap;
+					editAlternationScaleBar.unitLength=100;
+					this.boder.addElement(editAlternationScaleBar);
+				}
+				else if(event.chooseType==ScaleBarType.ScaleLine)
+				{
+					var editScaleLine:EditScaleLine=new EditScaleLine();
+					editScaleLine.imsMap=this.imsmap;
+					editScaleLine.unitLength=100;
+					this.boder.addElement(editScaleLine);
+				}  
+				else if(event.chooseType==ScaleBarType.SingleDivisionScaleBar)
+				{
+					var editSingleDivisionScaleBar:EditSingleDivisionScaleBar=new EditSingleDivisionScaleBar();
+					editSingleDivisionScaleBar.imsMap=this.imsmap;
+					editSingleDivisionScaleBar.unitlength=100;
+					this.boder.addElement(editSingleDivisionScaleBar);
+				}
+				else if(event.chooseType==ScaleBarType.StepedScaleLine)
+				{
+					var editStepedScaleLine:EditStepedScaleLine=new EditStepedScaleLine();
+					editStepedScaleLine.imsMap=this.imsmap;
+					editStepedScaleLine.unitLength=100;
+					this.boder.addElement(editStepedScaleLine);
+				}
+				else if(event.chooseType==ScaleBarType.HollowScaleBar1)
+				{
+					var editHollowScaleBar:EditHollowScaleBar1=new EditHollowScaleBar1();
+					editHollowScaleBar.imsMap=this.imsmap;
+					editHollowScaleBar.unitLength=100;
+					this.boder.addElement(editHollowScaleBar);
+				}	
+				else if(event.chooseType==ScaleBarType.HollowScaleBar2)
+				{
+					var editHollowScaleBar2:EditHollowScaleBar2=new EditHollowScaleBar2();
+					editHollowScaleBar2.imsMap=this.imsmap;
+					editHollowScaleBar2.unitLength=100;
+					this.boder.addElement(editHollowScaleBar2);
+				}	
+				else if(event.chooseType==ScaleBarType.DoubleAlernationScaleBar1)
+				{
+					var editDoubleAlernationScaleBar1:EditDoubleAlernationScaleBar1=new EditDoubleAlernationScaleBar1();
+					editDoubleAlernationScaleBar1.imsMap=this.imsmap;
+					editDoubleAlernationScaleBar1.unitLength=100;
+					this.boder.addElement(editDoubleAlernationScaleBar1);
+				}
+				else if(event.chooseType==ScaleBarType.DoubleAlernationScaleBar2)
+				{
+					var editDoubleAlernationScaleBar2:EditDoubleAlernationScaleBar2=new EditDoubleAlernationScaleBar2();
+					editDoubleAlernationScaleBar2.imsMap=editmapview.imsMap;
+					editDoubleAlernationScaleBar2.unitLength=100;
+					this.boder.addElement(editDoubleAlernationScaleBar2);
+				}
+			}
+
+            //添加点
+			protected function addDotBtn_clickHandler(event:MouseEvent):void
+			{
+				if(this.imsmap.activeMapDoc==null)
+				{
+					Alert.show("请切换到2D视图再添加点","提示");
+					return;
+				}
+				editmapview.drawingType=DrawingType.Point;
+				
+			}
+
+            //添加线
+			protected function addLineBtn_clickHandler(event:MouseEvent):void
+			{
+				if(this.imsmap.activeMapDoc==null)
+				{
+					Alert.show("请切换到2D视图再添加线","提示");
+					return;
+				}
+				editmapview.drawingType=DrawingType.Polyline;
+			}
+			
+			//添加区
+			protected function addPolygonBtn_clickHandler(event:MouseEvent):void
+			{
+				if(this.imsmap.activeMapDoc==null)
+				{
+					Alert.show("请切换到2D视图再添加区","提示");
+					return;
+				}
+				editmapview.drawingType=DrawingType.Polygon;
+			}
+
+
+		]]>
+	</fx:Script>
+
+		<!--<mx:TabNavigator height="100%" left="5" right="5" backgroundColor="0x524f4f" backgroundAlpha="0.4" barColor="0x524f4f" color="0xffffff">
+			<s:NavigatorContent label="打印设置" width="100%" height="100%">-->
+				<s:Label x="14" y="10" text="调整打印框位置" fontSize="13" fontWeight="normal" height="20" color="0xffffff"/>
+				<s:Label x="15" y="105" text="调整打印框大小" fontSize="13" fontWeight="normal" width="94" height="20" color="0xffffff"/>
+				<s:Label  x="14" y="38" text="X" width="31" height="28" color="0xffffff"/>
+				<s:Label  x="189" y="35" text="Y" width="35" height="31" color="0xffffff"/>
+				<mx:Button x="155" y="65" label="设置" id="setPrintPos" click="setPrintPos_clickHandler(event)" color="0xffffff"/>
+				<s:TextInput id="xText" x="53" y="35" color="0x000000"/>
+				<s:TextInput id="yText" x="239" y="35" color="0x000000"/>
+				<s:Label  x="14" y="142" text="高：" fontSize="12" width="27" height="23" color="0xffffff"/>
+				<s:TextInput id="hText" x="53" y="142" color="0x000000"/>
+				<s:Label x="193" y="142" text="宽：" fontSize="12" width="38" height="23" color="0xffffff"/>
+				<s:TextInput id="wText" x="239" y="142" color="0x000000"/>
+				<mx:Button id="setPrintSize" x="155" y="197" label="设置" click="setPrintSize_clickHandler(event)" color="0xffffff"/>
+				<mx:Button id="printPriviewBtn" x="21" y="268" label="打印预览" width="79" click="printPriviewBtn_clickHandler(event)" color="0xffffff"/>
+				<mx:Button id="printBtn" x="156" y="266" width="68" label="打印"  click="printBtn_clickHandler(event)"  color="0xffffff"/>
+				<mx:Button id="savePrintImage" x="266" y="266" label="保存打印图" click="savePrintImage_clickHandler(event)" color="0xffffff"/>				
+			<!--</s:NavigatorContent>
+			<s:NavigatorContent label="输出整饰" width="100%" height="100%">
+				<s:VGroup x="0" y="0" width="100%" height="100%" gap="2">
+					<mx:Button id="addTextBtn"    x="10" width="100%" labelPlacement="right" textAlign="left" icon="@Embed('images/printbox/wb.png')" label="添加文本" click="addTextBtn_clickHandler(event)" />
+					<mx:Button id="addLegendBtn"  x="10" width="100%" textAlign="left" icon="@Embed('images/printbox/tl.png')" label="添加图例" click="addLegendBtn_clickHandler(event)"/>
+					<mx:Button id="addCompassBtn" x="10" width="100%" textAlign="left" icon="@Embed('images/printbox/zbz.png')" label="添加指北针" click="addCompassBtn_clickHandler(event)"/>
+					<mx:Button id="addChartBtn"   x="10" width="100%" textAlign="left" icon="@Embed('images/printbox/tjt.png')" label="添加统计图" click="addChartBtn_clickHandler(event)"/>
+					<mx:Button id="addScaleBtn"   x="10" width="100%" textAlign="left" icon="@Embed('images/printbox/blc.png')" label="添加比例尺" click="addScaleBtn_clickHandler(event)"/>
+					<mx:Button id="ImageBtn"      x="10" width="100%" textAlign="left" icon="@Embed('images/printbox/tp.png')" label="添加图片" click="ImageBtn_clickHandler(event)"/>
+					<mx:Button id="addTableBtn"   x="10" width="100%" textAlign="left" icon="@Embed('images/printbox/bg.png')" label="添加表格" click="addTableBtn_clickHandler(event)"/>
+					<mx:Button id="addDotBtn"     x="10" width="100%" textAlign="left" icon="@Embed('images/printbox/xt.png')" label="添加点" click="addDotBtn_clickHandler(event)"/>
+					<mx:Button id="addLineBtn"    x="10" width="100%" textAlign="left" icon="@Embed('images/printbox/xt.png')" label="添加线" click="addLineBtn_clickHandler(event)"/>
+					<mx:Button id="addPolygonBtn" x="10" width="100%" textAlign="left" icon="@Embed('images/printbox/xt.png')" label="添加区" click="addPolygonBtn_clickHandler(event)"/>
+					<mx:Button id="addMarkBtn"    x="10" width="100%" textAlign="left" icon="@Embed('images/printbox/bz.gif')" label="添加标注" click="addMarkBtn_clickHandler(event)"/>
+					<mx:Button id="addFrameBtn"   x="10" width="100%" textAlign="left" icon="@Embed('images/printbox/tk.png')" label="添加图框" click="addFrameBtn_clickHandler(event)"/>
+					<mx:Button id="delFrameBtn"   x="10" width="100%" textAlign="left" icon="@Embed('images/printbox/tk.png')" label="删除图框" click="delFrameBtn_clickHandler(event)"/>
+				</s:VGroup>
+				
+			</s:NavigatorContent>
+		</mx:TabNavigator>-->
+</IMSWindow>

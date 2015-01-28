@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" xmlns:map="zdims.map.*"
+			   xmlns:drawing="zdims.drawing.*"
+			   xmlns:mark="zdims.mark.*" xmlns:control="zdims.control.*" xmlns:layer="zdims.control.layer.*"  pageTitle="缓冲区分析" initialize="tile_creationCompleteHandler()"  >
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:BorderContainer id="printView" x="0" y="0" width="100%" height="100%"  borderColor="0xffffff" borderWeight="1" borderAlpha="0">
+		<map:IMSMap x="0" y="0" width="100%" height="100%" levelNum="7"
+					xMinMap="114.125602"  xMaxMap="114.500788"
+					yMinMap="30.453932" yMaxMap="30.829118" enableZoomOutMinLevel="false"  enableProgressBar="false" 
+					id="mymap" initShowLevel="5" restoreCenterX="114.36698117873806" restoreCenterY="30.614603627099747">
+			
+			<!--基于K9系列平台显示矢量地图-->
+			<!--<map:VectorMapDoc  id="mapDoc" x="262" y="41" mapDocName="wh.map"   display="false" >
+			</map:VectorMapDoc>-->	
+			<!--显示矢量地图-->
+			<map:VectorMapDoc  id="mapDoc" x="262" y="41" mapDocName="wh"   display="false"  >
+			</map:VectorMapDoc>
+			
+			<!--基于K9系列平台显示瓦片地图-->
+			<!--<map:TileLayer x="197" y="138"  hdfName="whmap.hdf" id="tilelayer" >
+			</map:TileLayer>-->
+			
+			<!--显示瓦片地图-->
+			<map:TileLayer x="197" y="138"  hdfName="whmap" id="tilelayer" >
+			</map:TileLayer>
+			<drawing:GraphicsLayer x="42" y="188" id="graphicsLayer">
+			</drawing:GraphicsLayer>
+		</map:IMSMap>
+	</s:BorderContainer>
+	<s:controlBarLayout >
+		<s:BasicLayout/>
+	</s:controlBarLayout>
+	<s:controlBarContent>	
+		<s:HGroup height="35" verticalAlign="middle" left="10" width="100%">
+		<s:Label left="5" textAlign="left" verticalAlign="middle"  text="对区要素2316进行缓冲分析"  fontSize="14"  fontWeight="bold" fontFamily="宋体"/>
+		<s:Label  text="缓冲半径:" color="0x6600FF" fontWeight="bold" fontSize="14" fontFamily="宋体"  /> 
+		<s:TextInput  width="50" text="0.0005"  id="radius"/>
+		<s:Button  label="缓冲分析" click="onclick()" fontSize="13"   fontWeight="bold" fontFamily="宋体"/>
+		<s:Button label="清除" click="clear()" fontSize="13"  fontFamily="宋体" fontWeight="bold"/>
+	</s:HGroup>
+	</s:controlBarContent>
+	<fx:Script>
+		<![CDATA[
+			import Mapgis7.WebService.BasLib.CBufferFeature;
+			import Mapgis7.WebService.BasLib.CGdbInfo;
+			import Mapgis7.WebService.BasLib.CGetObjByID;
+			import Mapgis7.WebService.BasLib.CLayerAccessInfo;
+			import Mapgis7.WebService.BasLib.CLayerGetByID;
+			import Mapgis7.WebService.BasLib.CLayerInfo;
+			import Mapgis7.WebService.BasLib.COpenLayer;
+			import Mapgis7.WebService.BasLib.COperResult;
+			import Mapgis7.WebService.BasLib.EXClsType;
+			import Mapgis7.WebService.BasLib.SFeatureGeometry;
+			
+			import config.ServerIP;
+			
+			import mx.controls.Alert;
+			
+			import utilEvent.ReadURLEvent;
+			
+			import zdims.event.IMSMapEvent;
+			import zdims.map.VectorLayer;
+			import zdims.map.VectorLayerBase;
+			private  var bufferName:String;
+			private var _vLayer:VectorLayer;
+			private var BufferArr:Array=new Array();
+			private var VecAddress:String="";
+			private var TileAddress:String="";
+			private var viewConfig:ServerIP;
+			private var SuccessFlag:Boolean=true;
+			private function tile_creationCompleteHandler():void{
+					viewConfig=new ServerIP();
+					viewConfig.mapConfig1(this);
+					this.addEventListener(ReadURLEvent.READ_COMPLETE, TilereadURLCompelte);
+			}
+			
+			//获取服务地址
+			private function TilereadURLCompelte(event:ReadURLEvent):void
+			{
+				TileAddress=viewConfig.TileURL;
+				VecAddress=viewConfig.vectorURL;
+				this.tilelayer.serverAddress=TileAddress;
+				this.mapDoc.serverAddress=VecAddress;
+				this.mymap.refresh();
+			}
+		
+		  private function getWaterLayerIndex():int{
+		  
+			 var  layerNodeCount:int = mapDoc.loadMapResult.LayerCount;
+			 var layerAccessArry:Array = new Array(layerNodeCount);
+			 layerAccessArry = mapDoc.loadMapResult.LayerAccessInfo.LayerAccessInfo;
+			 var mapLayerInfoArry:Array = mapDoc.loadMapResult.MapLayerInfo;
+			 var layerIndex:int=-1;
+			 for (var i:int = 0; i < layerNodeCount; i++)
+			 {
+				 
+				 var layerAccess:CLayerAccessInfo = layerAccessArry[i] as CLayerAccessInfo;
+				 var layerInfo:CLayerInfo = layerAccess.LayerInfoList[0] as CLayerInfo;
+				 var layerName:String = layerInfo.LayerDataName;
+				 if(layerName=="水系.WP"){
+				    layerIndex=i;
+					break;
+				 }
+			 
+			 }
+			  return layerIndex;
+		  }
+			
+			//缓冲分析的方法
+			private function onclick():void{
+				this.mymap.panTo(114.36698117873806,30.614603627099747);
+				var waterLayerIndex:int=getWaterLayerIndex();
+				if(waterLayerIndex==-1){
+				    Alert.show("该地图中没有‘水系.WP’的图层");
+					return;
+				}
+				if(SuccessFlag==true){
+				bufferName="";
+				// CGetObjByID根据要素id获取需要的数据
+				var targetObj:CGetObjByID=new CGetObjByID();
+				targetObj.FeatureID=2316;		
+				targetObj.LayerIndex=waterLayerIndex;
+				//CBufferFeature根据要素id设置缓冲分析的函数参数 的对象
+				var BufferInfo:CBufferFeature=new CBufferFeature();
+				//设置缓冲分析半径 
+				BufferInfo.BufferRadius=new Number(this.radius.text);
+				//设置要素id的信息（包括所在gdb索引及图层索引等）
+				BufferInfo.FeatureInfo=targetObj;
+				//设置生成的结果图层名称
+				BufferInfo.ResultLayerName="ZLBUF"+Math.random();
+				bufferName=BufferInfo.ResultLayerName;
+				//要素缓冲分析
+				this.mapDoc.bufferFeature(BufferInfo,getBufferFeature);
+				SuccessFlag=false;
+				}
+			}
+			//缓冲分析回调函数
+			private function getBufferFeature(e:Event):void{
+				//获取缓冲区分析结果
+				var obj:COperResult=this.mapDoc.onBufferFeature(e);
+				if(obj.OperResult){
+					//设置类型为简单要素类
+					var layerType:String = EXClsType.SFeatureCls;
+					var SAddress:String=this.mapDoc.serverAddress;
+					//显示缓冲分析后的图层
+					showBufferInfo(bufferName,layerType,SAddress);
+				}else{
+				Alert.show("缓冲分析失败");
+				}
+			}
+			//缓冲分析后的图层显示函数
+			private function showBufferInfo(layerName:String, layerType:String, svrAddr:String="127.0.0.1:5141",gdbSvr:String="MapGisLocal", gdbName:String="IMSWebGISGDB", usr:String="", psw:String=""):void
+			{
+				//CGdbInfo gdb信息类 
+				var gdbinfo:CGdbInfo=new CGdbInfo();
+				gdbinfo.GDBName=gdbName;
+				gdbinfo.GDBSvrName=gdbSvr;
+				gdbinfo.User="";
+				gdbinfo.Password="";
+				//CLayerAccessInfo 图层访问信息类
+				var layerAccessInfo:CLayerAccessInfo=new CLayerAccessInfo();
+				layerAccessInfo.GdbInfo=gdbinfo;
+				//CLayerInfo图层信息类
+				var layerInfo:CLayerInfo=new CLayerInfo();
+				layerInfo.LayerDataName=layerName;
+				layerInfo.LayerType=layerType;
+				layerAccessInfo.LayerInfoList[0]=layerInfo;
+				//COpenLayer设置要叠加打开的图层信息
+				var openLayer:COpenLayer=new COpenLayer()
+				openLayer.LayerAccessInfo[0]=layerAccessInfo;
+				//实例化矢量图层
+				this._vLayer=new VectorLayer();
+				this._vLayer.serverAddress=svrAddr;
+				this.mymap.addChild(this._vLayer);
+				this._vLayer.alpha=0.6;
+				//loadLayer()加载图层的方法
+				this._vLayer.loadLayer(openLayer, onSingleLayerLoad);	
+			}
+ 			//加载图层回调函数	
+			private function onSingleLayerLoad(e:Event):void{
+				var rlt:COperResult=this._vLayer.onLoadLayer(e);
+				if(rlt.OperResult){
+					SuccessFlag=true;
+					BufferArr.push(this._vLayer);
+					this.mymap.refresh();
+				}
+			}
+			//清除缓冲分析的图层
+			private function clear():void{
+				if(BufferArr.length>0){
+					for(var i:int=0;i<BufferArr.length;i++){
+				   		this.mymap.removeElement(BufferArr[i]);
+					}
+					BufferArr=new Array();
+					SuccessFlag=true;
+				}
+			}
+		]]>
+	</fx:Script>
+
+</s:Application>

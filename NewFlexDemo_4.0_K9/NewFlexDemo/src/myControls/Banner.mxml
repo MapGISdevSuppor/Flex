@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" 
+		   
+		   backgroundColor="0xffffff" color="0xffffff"  backgroundAlpha="0.3"  borderStyle="solid"
+		    dropShadowEnabled="true" shadowDistance="4" 
+		   horizontalScrollPolicy="off" verticalScrollPolicy="off"  showEffect="blur" creationCompleteEffect="blur">
+	
+	<!--<mx:Canvas x="0.5" y="0.5" borderColor="#ffffff" backgroundColor="0x000000" color="0xffffff"  backgroundAlpha="0.5" 
+			   dropShadowEnabled="true" shadowDistance="4" cornerRadius="10"
+			   horizontalScrollPolicy="off" verticalScrollPolicy="off" width="451" height="89">-->
+		
+		<!--<mx:Image x="131" y="0" width="106" height="102" source="images/ball6.png" alpha="1"/>
+		<mx:Label x="141" y="24" text="MapGIS" width="78" height="30" fontSize="18" color="#F6F7FA" textAlign="center"/>
+		<mx:Label x="270" y="70" text="MapGIS IGServer" width="140" height="24" fontSize="15" color="#1846F0"/>-->
+		
+		<!--<mx:Image x="38" y="95" source="images/shadow.png" width="304" height="31"/>
+		<mx:Label x="245" y="33" text="生活" fontSize="30" fontWeight="bold" alpha="1" fontFamily="微软雅黑" color="#5831EA"/>
+		<mx:Label x="137" y="43" text="IGServer" width="89" height="34" fontSize="18" color="#F6F7FA" textAlign="center"/>
+		<mx:Label x="46" y="36" text="城市" fontSize="30" fontWeight="bold" alpha="1" fontFamily="微软雅黑" color="#5831EA"/>
+		<mx:Label x="42" y="78" text="Cheng Shi" width="95" height="24" fontSize="20" color="#1846F0" fontFamily="Brush Script MT" fontWeight="bold"/>
+		<mx:Label x="241" y="75" text="Sheng Huo" width="102" height="24" fontSize="20" color="#1846F0" fontFamily="Brush Script MT" fontWeight="bold"/>-->
+	<!--</mx:Canvas>-->
+	
+</mx:Canvas>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" xmlns:map="zdims.map.*"
+			   xmlns:control="zdims.control.*" initialize="tile_creationCompleteHandler()">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<mx:Zoom id="zoomAll" zoomWidthTo="1" zoomHeightTo="1" zoomWidthFrom="0.7" zoomHeightFrom="0.7"/>
+	</fx:Declarations>
+	<fx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		@namespace map "zdims.map.*";
+		mx|ToolTip
+		{
+			font-size:               12px;
+			background-alpha:        0.8;
+			background-color:        #b7d5dd;
+		}
+	</fx:Style>
+	<fx:Script>
+		<![CDATA[
+            import zdims.control.Measure;
+			import flash.events.MouseEvent;
+			import config.ServerIP;
+			import utilEvent.ReadURLEvent;
+			private var viewConfig:ServerIP;
+			private function tile_creationCompleteHandler():void{
+				viewConfig=new ServerIP();
+				viewConfig.mapConfig1(this);
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, readURLCompelte);
+			}
+			
+			//获取服务地址
+			private function readURLCompelte(event:ReadURLEvent):void
+			{
+				this.worldmap.serverAddress=viewConfig.TileURL;
+				this.mapcontainer.refresh();
+			}
+			//鼠标放到图标按钮上，能突起显示的方法
+			public function doZoom(event:MouseEvent):void 
+			{
+				if (zoomAll.isPlaying) {
+					zoomAll.reverse();
+				}
+				else 
+				{
+					zoomAll.play([event.target], event.type == MouseEvent.ROLL_OUT ? true : false);
+				}
+			}
+
+			protected function distance_clickHandler(event:MouseEvent):void
+			{
+				//距离测量
+				this.mapmeasure.setMeasureType('len');
+			}
+			protected function area_clickHandler(event:MouseEvent):void
+			{
+				//面积测量
+				this.mapmeasure.setMeasureType('area');
+			}
+			
+		]]>
+	</fx:Script>
+	<map:IMSMap x="0" y="0" width="100%" height="100%" id="mapcontainer"
+				levelNum="8" initShowLevel="4" enableProgressBar="false"
+				xMinMap="-181.18399779022" xMaxMap="188.619962766591"
+				yMinMap="-90.7340663245236" yMaxMap="279.069894232288" 
+				enableZoomOutMinLevel="false"
+				restoreCenterX="102.85000121166703" restoreCenterY="33.31638333491467">
+		<!--世界地图（瓦片图层）-->
+		<map:TileLayer x="0" y="0" id="worldmap" hdfName="world.HDF"   autoGetMapBound="true">
+		</map:TileLayer>
+		<!--测量控件-->
+		<control:Measure x="25" y="108" id="mapmeasure" imsmap="{mapcontainer}" visible="false">
+		</control:Measure>	
+	</map:IMSMap>
+	<s:controlBarLayout >
+		<s:BasicLayout/>
+	</s:controlBarLayout>
+	<s:controlBarContent>
+		<mx:Canvas width="100%" height="48"> 
+		<!--距离测量按钮-->
+		<mx:Image id="distance" horizontalCenter="0" verticalCenter="0" source="@Embed('/assets/images/distance.gif')" toolTip="距离测量" buttonMode="true" 
+				  click="distance_clickHandler(event)"  scaleX=".7" scaleY=".7" rollOver="doZoom(event)" rollOut="doZoom(event)"/>
+		<!--面积测量按钮-->
+		<mx:Image id="area" horizontalCenter="100" verticalCenter="0" source="@Embed('/assets/images/area.gif')" toolTip="面积测量" buttonMode="true" 
+				  click="area_clickHandler(event)" scaleX=".7" scaleY=".7" rollOver="doZoom(event)" rollOut="doZoom(event)"/>
+	</mx:Canvas>
+	</s:controlBarContent>
+</s:Application>

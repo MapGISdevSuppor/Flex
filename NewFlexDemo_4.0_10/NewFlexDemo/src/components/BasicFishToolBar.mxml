@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 工具条 -->
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+		   xmlns:core="com.outsmart.dock.core.*"
+		   x="0"
+		   width="100%"
+		   >
+	<mx:Style>	
+		.horizontalDock {
+			minimumSize:			32;
+			maximumSize:			64;
+			scaleRange:				150;
+			labelPosition:			bottom;
+			horizontalLabelAlign:	center;
+			labelGap:				10;
+			labelAppearanceDelay:	0;
+			
+			horizontalAlign:		right;
+			verticalAlign:			bottom;
+			paddingBottom:			5;
+			horizontalGap:			20;
+		}
+		
+	</mx:Style>
+	
+	<mx:Script>
+		<![CDATA[
+			import com.outsmart.dock.core.*;
+			import com.outsmart.dock.events.DockItemEvent;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+	
+			import zdims.control.DockItem;
+			import zdims.control.DockLabel;
+
+			import zdims.map.IMSMap;
+			import zdims.util.IMSOperType;
+
+			private var _dataProvider:ArrayCollection;
+			private var _map:IMSMap;
+
+			public function set imsmap(m:IMSMap):void
+			{
+				this._map = m;			
+			}
+			[Inspectable(category="MapGisIMS")]
+			/**
+			 * 给地图容器赋值
+			 */
+			public function get imsmap():IMSMap
+			{
+				return this._map;
+			}
+
+
+			[Bindable] private var itemRenderer:ClassFactory = new ClassFactory(DockItem);
+			[Bindable] private var labelRenderer:ClassFactory = new ClassFactory(DockLabel);
+			
+			//基本操作工具条
+			[Bindable] private var disPlayDataProvider:ArrayCollection = new ArrayCollection([
+				{url:"image/toolbar/btn_01.png", title:"放大",operation:"zoomin"},
+				{url:"image/toolbar/btn_02.png", title:"缩小",operation:"zoomout"},
+				{url:"image/toolbar/btn_03.png", title:"移动",operation:"pan"},
+				{url:"image/toolbar/btn_05.png", title:"刷新",operation:"refresh"},
+				{url:"image/toolbar/btn_04.png", title:"复位",operation:"restore"},
+			]);		
+			/**
+			 * 按钮点击事件
+			 */ 
+			private function itemSelectedHandler(event:DockItemEvent):void {
+				if (this.imsmap == null)
+				{
+					Alert.show("Toolbar控件的imsmap属性为空，请赋值。");
+					return;
+				}
+				this._dataProvider = disPlayDataProvider;//绑定基本操作工具条按钮
+				var operation:String=this._dataProvider.getItemAt(event.index).operation;
+				switch(operation)
+				{//根据operation设置相应的鼠标操作状态
+					case "zoomin"://放大
+						this.imsmap.setCurOper(IMSOperType.ZoomIn);
+						break;
+					case "zoomout"://缩小
+						this.imsmap.setCurOper(IMSOperType.ZoomOut);
+						break;
+					case "pan"://移动
+						this.imsmap.setCurOper(IMSOperType.Drag);
+						break;
+					case "refresh"://刷新
+						this.imsmap.refresh();
+						break;
+					case "restore"://复位
+						this.imsmap.restore();
+						break;
+				}
+			}			
+		]]>
+	</mx:Script>
+	<!-- dock -->
+	<core:Dock horizontalAlign="center"  backgroundAlpha="0.8" backgroundColor="#CCCCCC"  id="hdock" styleName="horizontalDock"  
+			   fixed="true" dockSide="bottom" 
+			   dataProvider="{disPlayDataProvider}"
+			   itemRenderer="{itemRenderer}" labelRenderer="{labelRenderer}" labelField="title"
+			   dockItemClick="itemSelectedHandler(event)"
+			   top="0" height="80" right="0" left="0"
+			   />
+</mx:Canvas>

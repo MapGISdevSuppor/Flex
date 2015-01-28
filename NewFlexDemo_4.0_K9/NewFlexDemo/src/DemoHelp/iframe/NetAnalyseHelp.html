@@ -1,0 +1,40 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>路径分析</title>
+<style type="text/css">
+.biaoti{color:#3366FF;FONT-SIZE:13pt;}
+.xiaobiaoti{color:#3366FF;FONT-SIZE:11pt;}
+.zhengwen{FONT-SIZE:9pt;}
+.zhuji{FONT-SIZE:9pt;color:#F00;}
+</style>
+</head>
+
+<body>
+<div class="biaoti">
+路径分析:
+</div>
+<br />
+<div class="xiaobiaoti">一、示例功能：
+</div>
+<br />
+ <div class="zhengwen">
+ &nbsp;&nbsp;&nbsp;&nbsp;该示例实现查找武汉地图上路径点的之间经过的道路，以及动画显示。</div>
+<br />
+
+ <div class="xiaobiaoti">二、实现说明： </div> <br />
+  <div class="zhengwen">
+  &nbsp;&nbsp;&nbsp;&nbsp;1、数据：使用世界地图的矢量数据（wh.map）和瓦片数据（whmap.hdf），其中矢量地图文档中要包含武汉道路网，地图已在GIS服务器中发布，道路网已在GIS服务器中配置。 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;2、实现步骤：<br /><br />
+  &nbsp;&nbsp;&nbsp;（1）首先通过CNetAnalyse对象来设置网络类的名称和路径点等信息； <br /><br />
+  &nbsp;&nbsp;&nbsp;（2）然后根据netAnalyse进行路径分析；<br /><br />
+  &nbsp;&nbsp;&nbsp;（3）根据CPathAnalyzeResult得到相对应的点的信息及名称，在图层上进行连接绘制出来； <br /><br />
+  &nbsp;&nbsp;&nbsp;（4）通过showFlash()的方法添加小车沿轨迹移动的动画。 <br /><br />
+
+<p><a href="http://www.mapgis.com.cn/templates/RsDevelopMdl/index.aspx?Page=3&nodeid=983&MNodeId=1018" alt="MapGIS IGServer for Flex的API手册。"  target="_blank" >注：详细说明请参见MapGIS IGServer for Flex的API手册。</a> </p>
+</div>
+</body>
+
+</html>

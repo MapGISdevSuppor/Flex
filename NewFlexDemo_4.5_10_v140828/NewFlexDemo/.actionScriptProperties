@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<actionScriptProperties analytics="false" mainApplicationPath="index.mxml" projectUUID="f7c4eecb-b714-4195-940c-2b51a49f6c38" version="10">
+  <compiler additionalCompilerArguments="-locale en_US" autoRSLOrdering="true" copyDependentFiles="true" fteInMXComponents="false" generateAccessible="true" htmlExpressInstall="true" htmlGenerate="true" htmlHistoryManagement="true" htmlPlayerVersionCheck="true" includeNetmonSwc="false" outputFolderPath="Flex4Demo" removeUnusedRSL="true" sourceFolderPath="src" strict="true" targetPlayerVersion="0.0.0" useApolloConfig="false" useDebugRSLSwfs="true" verifyDigests="true" warn="true">
+    <compilerSourcePath/>
+    <libraryPath defaultLinkType="0">
+      <libraryPathEntry kind="4" path="">
+        <excludedEntries>
+          <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/core.swc" useDefaultLinkType="false"/>
+        </excludedEntries>
+      </libraryPathEntry>
+      <libraryPathEntry kind="1" linkType="1" path="libs"/>
+    </libraryPath>
+    <sourceAttachmentPath/>
+  </compiler>
+  <theme themeIsDefault="false" themeIsSDK="true" themeLocation="${SDK_THEMES_DIR}/frameworks/themes/Halo"/>
+  <applications>
+    <application path="Demo/NetAnalyse.mxml"/>
+    <application path="Demo/ShowStackMap.mxml"/>
+    <application path="Demo/ThemeDemo.mxml"/>
+    <application path="Demo/QueryByBoth.mxml"/>
+    <application path="Demo/IMSMarkStyle.mxml"/>
+    <application path="index.mxml"/>
+    <application path="Demo/ShowTileLayer.mxml"/>
+    <application path="Demo/MapOperation.mxml"/>
+    <application path="Demo/ShowDifferentMap.mxml"/>
+    <application path="Demo/PolymericDemo.mxml"/>
+    <application path="Demo/PrintDemo.mxml"/>
+    <application path="Demo/DrawGraphics.mxml"/>
+    <application path="Demo/TopAnalyse.mxml"/>
+    <application path="Demo/BufferAnalyse.mxml"/>
+    <application path="Demo/Military_Arrow.mxml"/>
+    <application path="Demo/GPSDemo.mxml"/>
+    <application path="Demo/MapCommonControls.mxml"/>
+    <application path="Demo/MapMagnifier.mxml"/>
+    <application path="Demo/IsoGramDemo.mxml"/>
+    <application path="Demo/IMSLineStyle.mxml"/>
+    <application path="Demo/IMSFillStyle.mxml"/>
+    <application path="Demo/MapEagleEye.mxml"/>
+    <application path="Demo/QueryBySQl.mxml"/>
+    <application path="Demo/QueryByGeometry.mxml"/>
+    <application path="Demo/Show3DMap.mxml"/>
+    <application path="Demo/OverLayerAnalyse.mxml"/>
+    <application path="Demo/showOtherMap.mxml"/>
+    <application path="Demo/TheMaticDemo.mxml"/>
+    <application path="Demo/ShowVecterLayer.mxml"/>
+    <application path="Demo/IsogramImg.mxml"/>
+    <application path="Demo/AddHotSpot.mxml"/>
+    <application path="Demo/MapCatalog.mxml"/>
+    <application path="Demo/PolyOverlayWorkFlow.mxml"/>
+    <application path="Demo/ClipAnalyse.mxml"/>
+    <application path="Demo/MapMeasure.mxml"/>
+  </applications>
+  <modules/>
+  <buildCSSFiles/>
+  <flashCatalyst validateFlashCatalystCompatibility="false"/>
+</actionScriptProperties>

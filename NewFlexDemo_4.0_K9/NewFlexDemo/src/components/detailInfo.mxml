@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<myControls:IMSWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					  xmlns:s="library://ns.adobe.com/flex/spark" 
+					  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:myControls="myControls.*" 
+					  layout="vertical" width="300" height="350" 
+					  title="详细信息" fontFamily="微软雅黑" fontSize="12"
+					  close="close()"  creationCompleteEffect="blur" showEffect="blur" borderStyle="solid" horizontalAlign="center" cornerRadius="10" backgroundAlpha="0.6" >
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+</myControls:IMSWindow>

@@ -1,0 +1,52 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>无标题文档</title>
+<style type="text/css">
+.biaoti{color:#3366FF;FONT-SIZE:13pt;}
+.xiaobiaoti{color:#3366FF;FONT-SIZE:11pt;}
+.zhengwen{FONT-SIZE:9pt;}
+.zhuji{FONT-SIZE:9pt;color:#F00;}
+</style>
+</head>
+
+<body>
+<div class="biaoti">
+离散点生成等值线:
+</div>
+<br />
+<div class="xiaobiaoti">一、示例功能：
+</div>
+<br />
+ <div class="zhengwen">
+&nbsp;&nbsp;&nbsp;&nbsp;该示例实现根据客户端请求读取指定时间数据库里的降雨量信息，生成点图层，然后使用点图层实现离散点生成等值线的功能。 </div>
+<br />
+
+ <div class="xiaobiaoti">二、实现说明： </div> <br />
+  <div class="zhengwen">
+   &nbsp;&nbsp;&nbsp;&nbsp;1、数据：使用广西2006年降雨量业务数据（guangxio.MDF），已在SQL Server数据库服务器中附加；地图采用Google在线地图作为底图。 <br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;2、实现步骤： <br /><br />
+   &nbsp;&nbsp;&nbsp;（1）先实现第三方在线地图（Google地图）地图的显示； <br /><br />
+   &nbsp;&nbsp;&nbsp;（2）设置降雨量范围、时间、等值间隔，单击“生成等值线/面”按钮，便会发送其时间信息，请求web服务，获取数据库中各站点雨量查询信息。Flex端根据起始雨量、最大雨量对返回的结果进行筛选，获取指定雨量范围的结果，然后创建点图层； <br /><br />
+   &nbsp;&nbsp;&nbsp;（3）根据创建的点图层，REST方式调用等值线工作流600320，执行离散点生成等值线，获取生成的等值线图层信息；<br /><br />
+   &nbsp;&nbsp;&nbsp;（4）继续调用裁剪工作流，用广西的市级行政区划图裁剪第3步中得到的等值线图层，得到广西境内的等值线/面图层（非境内的均被裁剪掉了）。<br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;3、参数说明<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;调用接口： <br /><br /> </div>
+ <div class="zhuji">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CGdbInfo：结果等值线图层所在的gdb信息 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CLayerAccessInfo：图层访问信息类，用于在创建结果矢量图层进行显示时，设置图层信息 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CLayerInfo：图层信息<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;COpenLayer：打开图层的参数类，作为loadLayer的参数，用于设置将要加载的矢量图层 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GoogleInfo：谷歌地图信息，主要用来设置Google地图的类型和地址 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;linSfclsURL：生成的等值线图层URL，不能为空 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;regSfclsURL：生成的区图层URL，如果为空则不会生成区 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;annoClsURL：生成的注记类图层URL，如果为空则不会生成注记 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;meshingParam：离散点网格化参数，不能为空，为MeshingParam类型对象JSON序列化后的字符串 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;contourParam：平面等值线追踪参数，不能为空，为ContourParam类型对象JSON序列化后的字符串 <br /><br />
+  </div>
+</div>
+</body>
+
+</html>

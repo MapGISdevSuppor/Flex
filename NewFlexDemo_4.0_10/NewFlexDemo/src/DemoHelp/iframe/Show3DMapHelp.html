@@ -1,0 +1,59 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>无标题文档</title>
+<style type="text/css">
+.biaoti{color:#3366FF;FONT-SIZE:13pt;}
+.xiaobiaoti{color:#3366FF;FONT-SIZE:11pt;}
+.zhengwen{FONT-SIZE:9pt;}
+.zhuji{FONT-SIZE:9pt;color:#F00;}
+</style>
+</head>
+
+<body>
+<div class="biaoti">
+    显示三维景观地图:
+</div>
+<br />
+<div class="xiaobiaoti">一、示例功能：
+</div>
+<br />
+ <div class="zhengwen">
+&nbsp;&nbsp;&nbsp;&nbsp;该示例基于瓦片图层，实现一个三维景观地图加载功能。
+ </div>
+<br />
+
+ <div class="xiaobiaoti">二、实现说明： </div> <br />
+  <div class="zhengwen">
+   &nbsp;&nbsp;&nbsp;&nbsp;1、数据：使用三维景观示例数据（Wh3D.HDF），已在GIS服务器中发布。<br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;2、实现步骤： <br /><br />
+   &nbsp;&nbsp;&nbsp;（1）先在设计面板中拖入一个地图容器控件（IMSMap）； <br /><br />
+   &nbsp;&nbsp;&nbsp;（2）再在地图容器中拖入一个瓦片图层控件（TileLayer），设置相应参数，加载已发布的三维景观地图。
+      <br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;3、参数说明<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;IMSMap参数： <br /><br /> </div>
+ <div class="zhuji">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;levelNum：地图总级数 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;initShowLevel：地图初始显示级别 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;enableProgressBar：是否允许使用进度条 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;enableZoomOutMinLevel：是否允许地图放缩至最小级数&nbsp;<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;xMaxMap，xMinMap，yMaxMap，yMinMap：加载地图的逻辑范围
+     <br /><br />
+ </div>
+ <div class="zhengwen">
+ &nbsp;&nbsp;&nbsp;&nbsp;TileLayer参数： <br /><br />
+ </div>
+ <div class="zhuji">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hdfName：要加载的瓦片数据名称 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;serverAddress：要加载的瓦片数据服务地址&nbsp;<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dataVersion：瓦片数据版本（由文件系统转成的瓦片数据版本为0，裁图时采用了优化策略的瓦片数据为2，其它为1）<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;indexOffset：瓦片偏移量<br /><br />
+     <br />  
+</div>
+   <div class="zhengwen">
+<p>注：详细说明请参见MapGIS IGServer for Flex的API手册。</p></div>
+</body>
+
+</html>

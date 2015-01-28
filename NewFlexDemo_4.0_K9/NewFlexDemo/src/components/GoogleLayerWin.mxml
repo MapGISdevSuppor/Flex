@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:comp="components.*" xmlns:flash="flash.filters.*" xmlns:view="views.*" xmlns:control="zdims.control.*" xmlns:mx1="library://ns.adobe.com/flex/mx">
+	<mx:Script>
+		<![CDATA[
+			import mx.events.SliderEvent;
+			
+			import zdims.map.IMSMap;
+			import zdims.othermap.*;
+			
+			private var _map:IMSMap;
+			private var _googlemap:GoogleTileLayer;
+			
+			[Inspectable(category="MapGisIMS")]
+			public function set imsmap(m:IMSMap):void
+			{
+				this._map = m;
+			}
+			[Inspectable(category="MapGisIMS")]
+			/**
+			 * 给地图容器赋值
+			 */
+			public function get imsmap():IMSMap
+			{
+				return this._map;
+			}
+			
+			
+			[Inspectable(category="MapGisIMS")]
+			public function set googletilelayer(g:GoogleTileLayer):void
+			{
+				this._googlemap = g;
+			}
+			[Inspectable(category="MapGisIMS")]
+			/**
+			 * 给google图层赋值
+			 */
+			public function get googletilelayer():GoogleTileLayer
+			{
+				return this._googlemap;
+			}
+			
+			
+			
+			protected function mapAlpha_changeHandler(event:SliderEvent):void
+			{
+				// TODO Auto-generated method stub
+				this._googlemap.alpha = this.mapAlpha.value;
+				
+			}
+			protected function mapradiogroup_changeHandler(event:Event):void
+			{
+				// TODO Auto-generated method stub			
+				var mapTypeValue:Object;
+				mapTypeValue = this.mapradiogroup.selectedValue;
+				if(mapTypeValue != null)
+				{
+					switch(mapTypeValue.toString())
+					{
+						case "1":
+							this._googlemap.googleLayerType = GoogleLayerType.BasicMap;
+							break;
+						case "2":
+							this._googlemap.googleLayerType = GoogleLayerType.RasterMap;
+							this._googlemap.serverAddress = "http://mt0.google.cn/vt/lyrs=s@106&gl=cn"; //谷歌影像图地址
+							break;
+						case "3":
+							this._googlemap.googleLayerType = GoogleLayerType.RoadMap;
+							break;
+						case "4":
+							this._googlemap.googleLayerType = GoogleLayerType.TerrainMap;
+							this._googlemap.serverAddress = "http://mt3.google.cn/vt/lyrs=t@128,r@170000000&hl=zh-CN&gl=cn";//谷歌地形图地址
+							break;
+						default:
+							break; 
+					}				 
+				}			
+				this._map.restore();
+				this._map.refresh();
+			}
+			
+			//===================================================
+			//VARIABLES
+			[Bindable]
+			public var widgetid:int;
+			[Bindable]
+			public var widgetname:String = "Widget";
+			[Bindable]
+			public var widgeticon:String = "edit.png";
+			
+			
+			//===================================================
+			//WIDGET FUNCTIONS - GENERAL
+			
+			//minimize widget
+			private function minimizeWidget():void
+			{
+				currentState = "Minimized";
+				
+			}
+			
+			//maximize widget
+			private function maximizeWidget():void
+			{
+				currentState = "";
+				
+			}
+			
+		]]>
+	</mx:Script>
+	
+	<mx:transitions>
+		<mx:Transition id="transMinimize" fromState="" toState="Minimized">
+			<mx:Parallel>
+				<mx:Resize duration="500" target="{wCanvas}" />
+				<mx:Move duration="500" target="{wCanvas}" />
+			</mx:Parallel>
+		</mx:Transition>
+		<mx:Transition id="transMaximize" fromState="Minimized" toState="">
+			<mx:Parallel>
+				<mx:Resize duration="500" target="{wCanvas}" />
+				<mx:Move duration="500" target="{wCanvas}" />
+			</mx:Parallel>
+		</mx:Transition>
+	</mx:transitions>
+	
+	<mx:states>
+		<mx:State name="Minimized">
+			<mx:SetProperty target="{wCanvas}" name="height" value="30"/>
+			<mx:SetProperty target="{wCanvas}" name="y" value="26"/>
+			<mx:SetProperty target="{wCanvas}" name="width" value="150"/>
+			<mx:SetProperty target="{wHitArea}" name="buttonMode" value="true"/>
+			<mx:SetEventHandler target="{wHitArea}" name="click" handler="{maximizeWidget()}"/>
+			<mx:SetProperty target="{wHitArea}" name="useHandCursor" value="true"/>
+		</mx:State>
+	</mx:states>
+	
+	<mx:Canvas id="wCanvas" x="40" y="0" width="350" height="250" borderColor="#ffffff" borderThickness="1" borderStyle="solid" backgroundAlpha="0.7" backgroundColor="#7F91A4" dropShadowColor="#000000" dropShadowEnabled="true" shadowDirection="right" shadowDistance="2" cornerRadius="5" horizontalScrollPolicy="off">
+		<mx:HBox id="wMenu" horizontalGap="6" verticalAlign="middle" x="20" width="320" y="2" horizontalAlign="right" height="26">
+			<mx:Image width="25" height="25" source="assets/images/widget/m_minimize.png" alpha="1" id="mMinimize" click="{minimizeWidget()}" useHandCursor="true" buttonMode="true" toolTip="最小化"/>
+		</mx:HBox>
+		<mx:Text id="wName" x="20" y="2" text="Google地图设置" fontFamily="Arial" fontWeight="bold" color="#ffffff" fontSize="13" />
+		<mx:HRule id="wRule" x="20" y="30" width="320" height="2" strokeColor="#000000" shadowColor="#ffffff" alpha="0.4"/>
+		<mx:Canvas id="wViewStack" x="20" y="34" height="208" width="320" backgroundColor="#FFFFFF" backgroundAlpha="0.0" creationPolicy="all"  color="#ffffff" fontSize="12">
+			<mx:Label x="8" y="7" text="地图类型："/>
+			<mx:RadioButtonGroup id="mapradiogroup" change="mapradiogroup_changeHandler(event)"/>
+			<mx:RadioButton x="67" y="25" label="BasicMap(基本地图 )" groupName="mapradiogroup" id="basic" value="1" selected="true"/>
+			<mx:RadioButton x="67" y="45" label="RasterMap(影像图)" groupName="mapradiogroup" id="raster" value="2"/>
+			<mx:RadioButton x="67" y="65" label="RoadMap（道路及地名）" groupName="mapradiogroup" id="road" value="3"/>
+			<mx:RadioButton x="67" y="85" label="TerrainMap（地形图）" groupName="mapradiogroup" id="terrain" value="4"/>
+			<mx:Label x="8" y="123" text="地图透明度："/>
+			<mx1:HSlider x="96" y="127" id="mapAlpha" minimum="0" maximum="1" tickInterval="1" allowTrackClick="true" liveDragging="true" change="mapAlpha_changeHandler(event)" value="1">		
+			</mx1:HSlider>
+		</mx:Canvas>
+	</mx:Canvas>
+	<mx:Image id="wIcon" x="20" y="20" width="40" height="40" source="{'assets/images/icons/'+widgeticon}">
+		<mx:filters>
+			<flash:GlowFilter color="#000000" alpha="0.5" blurX="10" blurY="10"/>
+		</mx:filters>
+	</mx:Image>
+	<mx:SWFLoader id="wAlarm" x="0" y="0" width="80" height="80" source="assets/flash/Red_glow.swf" visible="false"/>
+	<mx:Canvas id="wHitArea" x="20" y="20" width="40" height="40"/>
+</mx:Canvas>

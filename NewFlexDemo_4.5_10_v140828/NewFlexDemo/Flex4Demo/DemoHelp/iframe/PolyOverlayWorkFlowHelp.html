@@ -1,0 +1,39 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>无标题文档</title>
+<style type="text/css">
+.biaoti{color:#3366FF;FONT-SIZE:13pt;}
+.xiaobiaoti{color:#3366FF;FONT-SIZE:11pt;}
+.zhengwen{FONT-SIZE:9pt;}
+.zhuji{FONT-SIZE:9pt;color:#F00;}
+</style>
+</head>
+
+<body>
+<div class="biaoti">
+    多边形叠加分析:
+</div>
+<br />
+<div class="xiaobiaoti">一、示例功能：
+</div>
+<br />
+ <div class="zhengwen">
+&nbsp;&nbsp;&nbsp;&nbsp;该示例实现一个多边形和图层叠加分析功能，即在加载世界地图的基础上，创建一个多边形与其中的矢量地图进行叠加分析。
+ </div>
+<br />
+
+ <div class="xiaobiaoti">二、实现说明： </div> <br />
+  <div class="zhengwen">
+   &nbsp;&nbsp;&nbsp;&nbsp;1、数据：使用世界地图的瓦片数据（NewWorldTile.HDF）和矢量地图文档数据（WorldG20140808.mapx），已在GIS服务器（MapGIS Server Manager）中发布。<br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;2、实现步骤： <br /><br />
+   &nbsp;&nbsp;&nbsp;（1）先实现瓦片、矢量地图文档的叠加显示，然后通过设置矢量地图文档的display属性为false使其不可见； <br /><br />
+   &nbsp;&nbsp;&nbsp;（2）然后在页面加载完毕的初始化方法里创建一个多边形（IMSPolygon）；&nbsp;<br /><br />
+   &nbsp;&nbsp;&nbsp;（3）最后构建工作流输入输出参数，拼接url字符串，使用HttpService通信方式通过工作流编号调用工作流，实现多边形叠加分析的功能。&nbsp;<br /><br />
+   <br />  
+   &nbsp;&nbsp;&nbsp;注：详细说明请参见MapGIS IGServer for Flex的API手册（4.5）。 </div>
+</body>
+
+</html>

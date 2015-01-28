@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<fxpProperties abbreviated="false" authoringTool="Flex Builder" compiles="true" parentProject="f7c4eecb-b714-4195-940c-2b51a49f6c38" projectUUID="f7c4eecb-b714-4195-940c-2b51a49f6c38" pureCatalystProject="false" sdkVersion="4.6.0" uuid="d796251e-f0c7-480d-9848-89d7ad430c18" version="15">
+  <projects>
+    <project filename="zdims4.5.fxpl" position="2" projectUUID="6a4a62cf-363e-4079-ac01-7b53a9602512" uuid="d796251e-f0c7-480d-9848-89d7ad430c18"/>
+  </projects>
+  <src/>
+  <swc>
+    <linked location="sdkPlaceHolder" path="sdkPlaceHolder" position="0" uuid="d796251e-f0c7-480d-9848-89d7ad430c18"/>
+    <linked location="C:/Users/jin77/Desktop/20140821/1-NewFlexDemo/1-NewFlexDemo/1-NewFlexDemo/libs" path="/libs" position="1" uuid="d796251e-f0c7-480d-9848-89d7ad430c18"/>
+  </swc>
+  <misc/>
+  <theme/>
+  <mxmlFormattingPrefs groupAttributesByState="true" maxLineWidth="100" mxmlAlignAttributes="true" mxmlAttributeOrder="id,userLabel,includeIn,excludeFrom,visible,x,y,z,left,right,top,bottom,width,height,minWidth,minHeight,maxWidth,maxHeight,label" mxmlKeepAttributeValuesOrganized="true"/>
+</fxpProperties>

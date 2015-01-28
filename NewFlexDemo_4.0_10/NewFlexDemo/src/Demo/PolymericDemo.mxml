@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   xmlns:map="zdims.map.*" 
+			   xmlns:mymark="components.mymark.*"
+			   pageTitle="聚合标注示例"
+			   minWidth="955" minHeight="600"
+			   initialize="tile_creationCompleteHandler()" 
+			   creationComplete="application1_creationCompleteHandler(event)" xmlns:Interface="zdimsExtends.Interface.*">
+	<fx:Script>
+		<![CDATA[
+			import components.MarkInfo;
+			import components.MyMark;
+			import mx.events.FlexEvent;
+			import utilEvent.ReadURLEvent;
+			import mx.controls.Alert;
+			import mx.controls.Image;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			import config.ServerIP;
+			import zdims.drawing.CoordinateType;
+			import zdims.event.IMSMapEvent;
+			import zdimsExtends.Interface.myMarkLayer;
+			import zdimsExtends.mymark.*;
+			include "../components/myData/myDataInfo.as";	
+			private var maTemp:IMSMark;
+			private var markinfo:MarkInfo;
+			private var flag:Boolean=true;
+			private var viewConfig:ServerIP;
+			private function tile_creationCompleteHandler():void{
+				viewConfig=new ServerIP();
+				viewConfig.mapConfig1(this);
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, readURLCompelte);
+			}
+			
+			//获取服务地址
+			private function readURLCompelte(event:ReadURLEvent):void
+			{
+				this.tileLayer.serverAddress=viewConfig.TileURL;
+				this.mapContainer.refresh();
+			}
+			//添加标注
+			protected function addmark_clickHandler(event:MouseEvent):void
+			{
+				if(markLayer!=null)
+				{
+					//清空标注图层
+					markLayer.canclePolymeric();
+					markLayer.removeAllMark();	
+				}
+				var i:int=0;
+				for(i=0;i<positionInfo[0].length;i++)
+				{
+					addmyMark(cityName[0][i],positionInfo[0][i].x,positionInfo[0][i].y);
+				}
+			}
+			//添加标注执行函数
+			private function addmyMark(markname:String,x:Number,y:Number):void
+			{
+				var img:Image=new Image();
+				img.source="mark/p1.gif";
+				var ma:IMSMark=new IMSMark(img,CoordinateType.Logic);
+				ma.x=x;
+				ma.y=y;
+				ma.markname=markname;
+
+			    ma.markControl.addEventListener(MouseEvent.CLICK,function(e:MouseEvent):void
+				{
+					showInfo(ma.x,ma.y,ma.markname);
+				});
+				this.addEventListener(MouseEvent.MOUSE_MOVE,onOut);
+				markLayer.addMark(ma);
+			}
+			
+			private function onOut(e:MouseEvent):void
+			{
+					if(markinfo!=null)
+						markinfo.close();
+			}
+			 //鼠标点击标注响应事件：弹框显示标注的详细信息
+			private function showInfo(x:Number,y:Number,markname:String):void
+			{
+				if(markinfo==null)
+				{
+					//当前没有添加过详细信息显示窗口，则创建
+					markinfo=new MarkInfo();
+					markinfo.addEventListener(FlexEvent.CREATION_COMPLETE,function(e:FlexEvent):void{
+						if(markLayer.enablePolymericMark==true)
+						{
+							markinfo.logicX=mapContainer.mouseDownLogicPnt.x;
+							markinfo.logicY=mapContainer.mouseDownLogicPnt.y;
+						}
+						else
+						{
+							markinfo.logicX=x;
+							markinfo.logicY=y;
+						}
+						//更新详细信息显示位置
+						markinfo.updatePosition();
+						markinfo.Xinfo.text=x.toString();
+						markinfo.Yinfo.text=y.toString();
+						markinfo.placeName.text=markname;
+						markinfo.visible=true;	
+					});
+					markinfo.mapcontainer=mapContainer;
+					this.mapContainer.addChild(markinfo);
+					PopUpManager.addPopUp(markinfo,this.mapContainer,false);
+				}
+				else
+				{
+					//已创建详细信息显示窗口，直接修改信息
+					if(markLayer.enablePolymericMark==true)
+					{
+						markinfo.logicX=mapContainer.mouseMoveLogicPnt.x;
+						markinfo.logicY=mapContainer.mouseMoveLogicPnt.y;
+					}
+					else
+					{
+						markinfo.logicX=x;
+						markinfo.logicY=y;
+					}
+					//更新详细信息显示位置
+					markinfo.updatePosition();
+					markinfo.Xinfo.text=x.toString();
+					markinfo.Yinfo.text=String(y);
+					markinfo.placeName.text=String(markname);
+				    markinfo.visible=true;
+				}
+			}
+			 //中心聚合标注
+
+			protected function middlemeric_clickHandler(event:MouseEvent):void
+			{
+				//this.markLayer.polymericCenterColor=0x3366CC;
+				markLayer.enablePolymericMark=true;
+			}
+
+			 //解除聚合处理
+			protected function delmeric_clickHandler(event:MouseEvent):void
+			{
+				markLayer.enablePolymericMark=false;
+			}
+            //删除标注
+			protected function delmark_clickHandler(event:MouseEvent):void
+			{
+				if(markLayer!=null)
+				{
+					//清空标注图层
+					markLayer.canclePolymeric();
+					markLayer.removeAllMark();	
+				}
+			}
+			protected function application1_creationCompleteHandler(event:FlexEvent):void
+			{
+				mapContainer.addEventListener(IMSMapEvent.MAP_OPERTYPECHANGE,onChange);
+			}
+			
+			internal function onChange(e:IMSMapEvent):void
+			{
+				if(markLayer!=null&&markLayer.enablePolymericMark)
+				{
+					markLayer.initPolymericMark();
+				}
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<!--地图显示-->
+	<map:IMSMap id="mapContainer" x="5" y="5" width="100%" height="100%" initShowLevel="3" 
+				levelNum="7" enableZoomOutMinLevel="false" enableProgressBar="false"
+				xMinMap="-181.18399779022"  xMaxMap="188.619962766591" 
+				yMinMap="-90.7340663245236" yMaxMap="279.069894232288"
+				restoreCenterX="-4.046456136786304" restoreCenterY="15.440117663467205">
+		
+		<!--基于K9系列平台显示瓦片地图-->
+		<!--<map:TileLayer id="tileLayer" x="140" y="103" autoGetMapInfo="true" isDisTileNetErrInfo="false"
+					   hdfName="world.hdf" >
+		</map:TileLayer>-->	
+		
+		<!--显示瓦片地图-->
+		<map:TileLayer id="tileLayer" x="140" y="103" autoGetMapInfo="true" isDisTileNetErrInfo="false"
+					   hdfName="world" >
+		</map:TileLayer>	
+		<Interface:myMarkLayer x="256" y="267" id="markLayer"  polymericCenterColor="0x3366FF" >
+		</Interface:myMarkLayer>
+	</map:IMSMap>
+	<!--功能按钮-->
+	<mx:Button id="addmark"     x="0" y="0" label="添加标注"  fontFamily="宋体"  fontSize="12"   width="90" height="25"
+			   click="addmark_clickHandler(event)"/>
+	<mx:Button id="middlemeric" x="90" y="0" label="中心聚合标注" fontFamily="宋体" fontSize="12"  width="110" height="25"
+			   click="middlemeric_clickHandler(event)"/>
+	<mx:Button id="delmeric" x="200" y="0" label="解除聚合" fontFamily="宋体" fontSize="12"  width="90" height="25"
+			   click="delmeric_clickHandler(event)" />
+	<mx:Button id="delmark" x="290" y="0" label="删除标注" fontFamily="宋体" fontSize="12"  width="90" height="25" 
+			   click="delmark_clickHandler(event)"/>
+</s:Application>

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" xmlns:map="zdims.map.*"
+			   xmlns:drawing="zdims.drawing.*"
+			   xmlns:mark="zdims.mark.*" xmlns:control="zdims.control.*" xmlns:layer="zdims.control.layer.*" initialize="tile_creationCompleteHandler()" >
+	<fx:Style source="css/windowstyle.css">
+	</fx:Style>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:controlBarLayout >
+		<s:BasicLayout/>
+	</s:controlBarLayout>
+	<s:controlBarContent>
+	<s:HGroup height="35" verticalAlign="middle" left="10" width="100%">	
+	<s:Label   text="绿色矩形内包含的城市植被要素与黄色矩形范围查找到的行政区要素求交叠加分析" fontFamily="宋体" fontSize="14"  fontWeight="bold"  left="5" textAlign="left" verticalAlign="middle"/>
+	<s:Button  label="叠加分析"  click="AnalyseOverLayer()" fontSize="13" fontWeight="bold" fontFamily="宋体"/>
+	<s:Button  label="清除" click="clear_Layer()" fontSize="13" fontWeight="bold" fontFamily="宋体"/>
+	</s:HGroup>
+	</s:controlBarContent>
+	<s:BorderContainer id="printView" x="0" y="0" width="100%" height="100%"  borderColor="0xffffff" borderWeight="1" borderAlpha="0">
+		<map:IMSMap x="0" y="0" width="100%" height="100%" levelNum="7"
+					xMinMap="114.125602"  xMaxMap="114.500788"
+					yMinMap="30.453932" yMaxMap="30.829118"  enableZoomOutMinLevel="false"
+					 restoreCenterX="114.32013355944824" restoreCenterY="30.641960091186526"
+					id="mymap" initShowLevel="5" enableProgressBar="false">
+			
+			<!--基于K9系列平台显示瓦片地图-->
+			<!--<map:TileLayer x="197" y="138"  hdfName="whmap.hdf" id="tilelayer"  >
+			</map:TileLayer>-->
+			
+			<!--显示瓦片地图-->
+			<map:TileLayer x="197" y="138"  hdfName="whmap" id="tilelayer"  >
+			</map:TileLayer>
+			
+			<!--基于K9系列平台显示矢量地图-->
+			<!--<map:VectorMapDoc  id="mapDoc" x="262" y="41" mapDocName="wh.map" display="false">
+			</map:VectorMapDoc>-->
+			
+			<!--显示矢量地图-->
+			<map:VectorMapDoc  id="mapDoc" x="262" y="41" mapDocName="wh" display="false" layerOpenCallBack="init">
+			</map:VectorMapDoc>		
+			<drawing:GraphicsLayer x="42" y="188" id="graphicsLayer">
+			</drawing:GraphicsLayer>
+		<layer:MyLayerDataViewer right="10" top="10" id="layerDataViewer" imsmap="{mymap}" graphicsLayer="{graphicsLayer}"  visible="false">
+		</layer:MyLayerDataViewer  >
+		</map:IMSMap>
+	</s:BorderContainer>
+	<fx:Script>
+		<![CDATA[
+			import Mapgis7.WebService.BasLib.*;
+			
+			import MyParam.OverlayBySelectParam;
+			
+			import com.adobe.serialization.json.JSON;
+			
+			import config.ServerIP;
+			
+			import mx.controls.Alert;
+			
+			import org.osmf.layout.AbsoluteLayoutFacet;
+			
+			import utilEvent.ReadURLEvent;
+			
+			import zdims.drawing.CoordinateType;
+			import zdims.drawing.DrawingType;
+			import zdims.drawing.IMSRectangle;
+			import zdims.event.IMSMapEvent;
+			import zdims.interfaces.IGraphics;
+			import zdims.map.VectorLayer;
+			import zdims.map.VectorLayerBase;
+			import zdims.util.IMSOperType;
+			import zdims.util.Plugin;
+			import zdims.util.SpacialAnalyse;
+			private var IMSrect:IMSRectangle;
+			private var IMSrect2:IMSRectangle;
+			private var rect1:Rect;
+			private var rect2:Rect;
+			private var Overflag:Boolean=true;
+			private var VecAddress:String="";
+			private var TileAddress:String="";
+			private var viewConfig:ServerIP;
+			private	var plug:Plugin;
+			private function tile_creationCompleteHandler():void{
+						viewConfig=new ServerIP();
+						viewConfig.mapConfig1(this);
+					this.addEventListener(ReadURLEvent.READ_COMPLETE, TilereadURLCompelte);
+				
+			}
+			//获取服务地址
+			private function TilereadURLCompelte(event:ReadURLEvent):void
+			{
+				TileAddress=viewConfig.TileURL;
+				VecAddress=viewConfig.vectorURL;
+				this.tilelayer.serverAddress=TileAddress;
+				this.mapDoc.serverAddress=VecAddress;
+				this.mymap.refresh();
+			}
+			//页面加载完成时添加两个叠加分析的矩形范围
+			public function init(layer:VectorLayerBase):void
+			{
+				var d:SpacialAnalyse=null;
+				//添加第一个矩形范围
+				IMSrect=new IMSRectangle(CoordinateType.Logic);
+				graphicsLayer.addGraphics(IMSrect);
+				IMSrect.startPoint=new Point(114.30829449926757,30.637357284423828);//起始点
+				IMSrect.endPoint=new Point(114.32125563671875,30.64560111743164)//结束点
+				IMSrect.beginFill(0x00FFCC,0.6);
+				IMSrect.lineStyle(1,0x000000);
+				IMSrect.draw();
+				//添加第二个矩形范围
+				IMSrect2=new IMSRectangle(CoordinateType.Logic);
+				graphicsLayer.addGraphics(IMSrect2);
+				IMSrect2.startPoint=new Point(114.3189198840332,30.63515892895508);//起始点
+				IMSrect2.endPoint=new Point(114.32991166137695,30.64738728125)//结束点
+				IMSrect2.beginFill(0xFFFF66,0.6);
+				IMSrect2.lineStyle(1,0x000000);
+				IMSrect2.draw();
+				//Rect对象存储第一个矩形的范围
+				rect1=new Rect();
+				rect1.xmin=114.30829449926757;
+				rect1.xmax=114.32125563671875;
+				rect1.ymin=30.637357284423828;
+				rect1.ymax=30.64560111743164;
+				//Rect对象存储第二个矩形范围
+				rect2=new Rect();
+				rect2.xmin=114.3189198840332;
+				rect2.xmax=114.32991166137695;
+				rect2.ymin=30.63515892895508;
+				rect2.ymax=30.64738728125;
+			}
+			//叠加分析
+			public function AnalyseOverLayer():void{
+				//叠加参数操作类
+				var param:OverlayBySelectParam=new OverlayBySelectParam();
+				//设置第一个CWebSelectParam查询参数类
+				var selectParam:CWebSelectParam = new CWebSelectParam();
+				//设置查询类型为矩形查询
+				selectParam.GeomType =EWebGeomType.Rect
+				//设置查询的矩形范围
+				selectParam.Geometry = rect1;
+				//设置搜索半径
+				selectParam.NearDistance = 0.1;
+				//设置查询类型为简单查询
+				selectParam.SelectionType = ESelectionType.SpatialRange;
+				//设置查询对象是否必须完全包含在输入的空间范围内
+				selectParam.MustInside=true;
+				//设置第二个CWebSelectParam查询参数类
+				var selectParam2:CWebSelectParam=new CWebSelectParam();
+				//设置查询类型为矩形查询
+				selectParam2.GeomType=EWebGeomType.Rect;
+				//设置查询的矩形范围
+				selectParam2.Geometry=rect2;
+				//设置搜索半径
+				selectParam2.NearDistance=0.1;
+				//设置查询类型为简单查询
+				selectParam2.SelectionType=ESelectionType.SpatialRange;
+				//CGdbInfo gdb信息类 
+				var gdbInfo:CGdbInfo= new CGdbInfo();
+				gdbInfo.GDBSvrName = "mapgislocal";
+				gdbInfo.GDBName = "world";
+				//叠加的图层名称
+				param.LayerName1 = "城市植被";
+				//叠加分析第一个图层的查询参数
+				param.SelectParam1 = selectParam;
+				//被叠加的图层名称
+				param.LayerName2 = "行政区.WP";
+				//叠加分析第二个图层的查询参数
+				param.SelectParam2 = selectParam2;
+				param.Radius = 0.001;
+				//设置叠加分析的类型   1为相交分析
+				param.OverlayType =1;
+				//是否重算面积
+				param.IsReCalculate = false;
+				param.GdbInfo1 = gdbInfo;
+				param.GdbInfo2 = gdbInfo;
+				//设置图层类型为简单要素类 
+				param.ClsType =EXClsType.SFeatureCls;
+				//var postData:String ="";
+				var postData:String =JSON.encode(param) as String;
+				//实例化插件对象
+				plug=new Plugin();
+				//插件的地址
+				plug.serverAddress=VecAddress;
+				//调用服务的插件实现叠加分析
+				plug.callPlugin("OverlayAnalysisExtend", "OverlayAnalysisClass", "OverlayBySelect", "inputFormat=JSON&outputFormat=JSON", postData,onPlug);
+				
+			}
+			public function onPlug(e:Event):void{
+				//设置两个矩形为不可见
+				this.IMSrect.visible=false;
+				this.IMSrect2.visible=false;
+				//获取callPlugin请求的结果 
+				var getOverLayerUrl:String= plug.onCallPlugin(e) as String;
+				//判断是否成功，成功就删除原有的分析成后的图层对象
+				if(getOverLayerUrl!=""||getOverLayerUrl!=null){	
+					if(Overflag==true){
+					this.layerDataViewer.removeLayer();
+				}
+				//得到分析成功后的url地址
+				var loc1:Number=getOverLayerUrl.indexOf("sfcls");
+				// 得到分析成功后的图层名称
+				var loc2:String=getOverLayerUrl.substring(loc1+6,getOverLayerUrl.length-1);
+				//设置图层类型为简单要素类
+				var layerType:String = EXClsType.SFeatureCls;
+				var SAddress:String=this.mapDoc.serverAddress;
+				//显示分析成后的图层以及属性信息
+				this.layerDataViewer.showLayerAttRecord(loc2,layerType,SAddress);
+				Overflag=true;
+				}
+			}
+			//移除分析成功后的图层
+			private function clear_Layer():void{
+				this.layerDataViewer.removeLayer();
+				Overflag=false;
+				this.layerDataViewer.visible=false;
+			}
+		]]>
+	</fx:Script>
+</s:Application>

@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600"
+			   xmlns:map="zdims.map.*" xmlns:control="zdims.control.*" initialize="tile_creationCompleteHandler()"
+			   creationComplete="application1_creationCompleteHandler(event)" xmlns:components="components.*" xmlns:mark="zdims.mark.*">
+	<fx:Style source="css/windowstyle.css">
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		@namespace map "zdims.map.*";
+		@namespace control "zdims.control.*";	
+		mx|ToolTip
+		{
+			font-size:               12px;
+			background-alpha:        0.8;
+			background-color:        #b7d5dd;
+		}
+		
+	</fx:Style>
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import config.ServerIP;
+			import flash.events.MouseEvent;
+			import mx.controls.Image;
+			import mx.controls.Text;
+			import mx.events.FlexEvent;
+			import spark.primitives.BitmapImage;
+			import utilEvent.ReadURLEvent;
+			import zdims.control.Marker;
+			import zdims.drawing.CoordinateType;
+			import zdims.event.*;
+			import zdims.event.IMSMapEvent;
+			import zdims.mark.IMSMark;
+			public var oldx:int=0;
+			public var oldy:int=0;
+			private var X:Number;
+			private var Y:Number;
+			//标注点逻辑坐标X
+			public var logicX:Number = 114.331901; 
+			//标注点逻辑坐标Y
+			public var logicY:Number = 30.548992; 				
+			public var  mark:IMSMark;
+			[Bindable]
+			[Embed("assets/images/marks/markimg1.png")]
+			public static var testIcon:Class;
+			protected function application1_creationCompleteHandler(event:FlexEvent):void
+			{
+				//添加地图移动等事件监听
+				this.mapcontainer1.addEventListener(IMSMapMoveEvent.MOVE_STEP,updatePosition);
+				this.mapcontainer1.addEventListener(IMSMapEvent.MAP_CHANGE,updatePosition);	
+			}
+			
+			public function updatePosition(e:Event=null):void
+			{
+				//更新三维景观窗口位置,更新后标注点的窗口坐标
+				var coor:Point = this.mapcontainer1.logicToScreen(logicX, logicY);		
+				//设置窗口位置点的X值
+				this.oldx = this.X = coor.x - 10;
+				//设置窗口位置点的Y值
+				this.oldy = this.Y = coor.y - 20;
+				if (this.mapwindow!= null)
+				{
+					//通过top、left修正三维景观窗口的位置
+					this.mapwindow.top = this.Y + 15;
+					this.mapwindow.left = this.X + 25;
+				}
+			}
+			
+			//添加图片标注
+			public function addImg():void
+			{				
+				//初始化标注的图片对象
+				var img:Image = new Image();
+				img.source = testIcon;
+				img.toolTip = "武汉洪山广场";
+				img.height = 60;
+				img.width = 60;		
+				// 初始化标注对象
+				mark = new IMSMark(img,CoordinateType.Logic);
+				// 设置标注对象的坐标
+				mark.x = logicX;
+				mark.y = logicY;			
+				marklayer.enableMarkHiden = false;
+				// 将标注添加到绘图图层中
+				marklayer.addMark(mark);
+				//添加标注图片的点击事件	
+                img.addEventListener(MouseEvent.CLICK,show3DMap);		
+			}
+			//显示城市三维景观地图窗口
+			public function show3DMap(e:MouseEvent):void
+			{
+				if(!this.mapwindow.visible)
+					this.mapwindow.visible = true;		   
+			}
+			private var viewConfig:ServerIP;
+			private function tile_creationCompleteHandler():void{
+				viewConfig=new ServerIP();
+				viewConfig.mapConfig1(this);
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, readURLCompelte);
+			}
+			//获取服务地址
+			private function readURLCompelte(event:ReadURLEvent):void
+			{
+				this.tilelayer.serverAddress=viewConfig.TileURL;
+				this.DTileLayer.serverAddress=viewConfig.TileURL;
+				this.mapcontainer1.refresh();
+				this.mapcontainer2.refresh();
+			}
+			
+		]]>
+	</fx:Script>
+	<map:IMSMap x="0" y="0" width="100%" height="100%" id="mapcontainer1" 
+				levelNum="7" initShowLevel="4" enableProgressBar="false"
+				enableZoomOutMinLevel="false" 
+				restoreCenterX="114.330501" restoreCenterY="30.546432">
+		
+		<!--基于K9系列平台显示瓦片地图-->
+		<!--<map:TileLayer hdfName="WhMap.hdf" 
+					   autoGetMapInfo="true"
+					   id="tilelayer"
+					   creationComplete="addImg()">		
+		</map:TileLayer>-->
+		
+		<!--显示瓦片地图-->
+		<map:TileLayer hdfName="WhMap" 
+					   autoGetMapInfo="true"
+					    id="tilelayer"
+					   creationComplete="addImg()">		
+		</map:TileLayer>
+		<mark:MarkLayer x="165" y="199"  id="marklayer">		
+		</mark:MarkLayer>
+		
+
+	</map:IMSMap>
+		<components:MyWindow height="300" width="450"  id="mapwindow"  title="三维景观窗口" >
+		<map:IMSMap   width="100%" height="100%" id="mapcontainer2" 
+					  levelNum="4" initShowLevel="2" enableProgressBar="false" 
+					  enableZoomOutMinLevel="false"
+					  xMaxMap="114.500" xMinMap="114.125" yMaxMap="30.829" yMinMap="30.453">
+			
+			<!--基于K9系列平台显示瓦片地图-->
+			<!--<map:TileLayer hdfName="Wh3D.hdf" 
+						   dataVersion="0" indexOffset="2" 
+						   id="DTileLayer"  >		
+			</map:TileLayer>-->
+			
+			<!--显示瓦片地图,加载三维景观图-->
+			<map:TileLayer hdfName="Wh3D" 
+						   dataVersion="0" indexOffset="2" 
+						   id="DTileLayer"  >		
+			</map:TileLayer>		
+		</map:IMSMap>
+		</components:MyWindow>
+	<s:controlBarLayout >
+		<s:BasicLayout/>
+	</s:controlBarLayout>
+	<s:controlBarContent>
+		<s:HGroup height="40" verticalAlign="middle" left="10" width="100%">
+		<mx:Image  source="@Embed('/assets/images/megaphone2.png')" />
+		<s:Label  text="窗口作为三维景观地图容器，跟随主地图容器内的地图移动" fontFamily="宋体" fontSize="14"  fontWeight="bold"  left="5" textAlign="left" verticalAlign="middle"/>		
+		</s:HGroup>
+	</s:controlBarContent>
+</s:Application>

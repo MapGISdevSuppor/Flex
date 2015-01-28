@@ -1,0 +1,63 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>无标题文档</title>
+<style type="text/css">
+.biaoti{color:#3366FF;FONT-SIZE:13pt;}
+.xiaobiaoti{color:#3366FF;FONT-SIZE:11pt;}
+.zhengwen{FONT-SIZE:9pt;}
+.zhuji{FONT-SIZE:9pt;color:#F00;}
+</style>
+</head>
+
+<body>
+<div class="biaoti">
+绘图示例:
+</div>
+<br />
+<div class="xiaobiaoti">一、示例功能：
+</div>
+<br />
+ <div class="zhengwen">
+&nbsp;&nbsp;&nbsp;&nbsp;该示例实现客户端徒手绘图功能。 </div>
+<br />
+
+ <div class="xiaobiaoti">二、实现说明： </div> <br />
+  <div class="zhengwen">
+   &nbsp;&nbsp;&nbsp;&nbsp;1、使用Flex二次开发库中提供的GraphicsLayer绘图图层以及相关几何绘图对象实现绘图功能。 <br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;2、实现步骤： <br /><br />
+   &nbsp;&nbsp;&nbsp;绘制几何对象：<br /><br />
+   &nbsp;&nbsp;&nbsp;（1）先在设计面板中拖入一个绘图图层控件（GraphicsLayer）； <br /><br />
+   &nbsp;&nbsp;&nbsp;（2）设置绘图图层控件的鼠标绘制类型属性（drawingType），例如：DrawingType.Polygon； <br /><br />
+   &nbsp;&nbsp;&nbsp;（3）添加绘图图层控件的绘制结束事件（drawingOverCallback）； <br /><br />
+   &nbsp;&nbsp;&nbsp;（4）在自定义绘制结束事件中创建对应的几何对象，传入坐标点，将对象添加到绘图图层控件。 <br /><br />
+   &nbsp;&nbsp;&nbsp;绘制自由线、自由面（GraphicsLayer）： <br /><br />
+   &nbsp;&nbsp;&nbsp;（1）先在设计面板中拖入一个绘图图层控件（GraphicsLayer）； <br /><br />
+   &nbsp;&nbsp;&nbsp;（2）设置地图容器的绘图对象（graphicCanvas）的绘图类型（EDrawType.FreeHand_Polyline或EDrawType.FreeHand_Polygon）； <br /><br />
+    &nbsp;&nbsp;&nbsp;（3）监听地图容器的鼠标弹起事件，在事件中获取坐标，几何对象添加到绘图图层中； <br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;3、参数说明<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;GraphicsLayer绘图图层参数： <br /><br /> </div>
+ <div class="zhuji">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;drawingType：绘图类型 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;drawingOverCallback：鼠标随手图形绘制结束的回调 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;addGraphics：添加图形到绘图图层方法 <br /><br /></Div>
+  <div class="zhengwen">
+  &nbsp;&nbsp;&nbsp;&nbsp;4、基础几何绘图对象，在MapGIS IGServer Flex二次开发基础库（zdims4.5.swc）中。 <br /><br /> </Div>
+  <div class="zhuji">
+  &nbsp;&nbsp;&nbsp;&nbsp;IMSBeeline：简单线(直线) <br /><br /> 
+  &nbsp;&nbsp;&nbsp;&nbsp;IMSCircle：圆图形 <br /><br /> 
+  &nbsp;&nbsp;&nbsp;&nbsp;IMSPolygon：多边形  <br /><br /> 
+  &nbsp;&nbsp;&nbsp;&nbsp;IMSPolyline：折线  <br /><br /> 
+  &nbsp;&nbsp;&nbsp;&nbsp;IMSRectangle：矩形  <br /><br /> </Div>
+  <div class="zhengwen">
+  &nbsp;&nbsp;&nbsp;&nbsp;5、扩展自定义绘图对象<br /><br /></Div>
+  <div class="zhuji">
+  &nbsp;&nbsp;&nbsp;&nbsp;IMSPredefinedFillStyle：矢量位图填充多边形绘图样式 ；<br /><br /> 
+  &nbsp;&nbsp;&nbsp;&nbsp;IMSPredefinedLineStyle：扩展线样式绘图对象。  <br /><br /> </div>
+ <div class="zhengwen">
+<p>注：详细说明请参见MapGIS IGServer for Flex的API手册（4.5）。</p></div>
+</body>
+
+</html>

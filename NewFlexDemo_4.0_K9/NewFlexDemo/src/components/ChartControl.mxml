@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+         xmlns="zdims.control.*" 
+         xmlns:myControls="myControls.*"
+         width="292" height="214"   minHeight="300" minWidth="330"	
+		 fontFamily="微软雅黑" color="0x000000"
+		 backgroundColor="0xFFFFFF" backgroundAlpha="1"
+		 borderStyle="solid" borderColor="0xCCCCCC" 
+		 cornerRadius="5" borderThickness="2"	 
+		 >
+	<!--<s:layout>
+		<s:BasicLayout/>
+	</s:layout>-->
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.charts.ColumnChart;
+			import mx.charts.chartClasses.ChartBase;
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.ColorPickerEvent;
+			import mx.events.FlexEvent;
+			
+			import spark.events.IndexChangeEvent;
+			
+			import zdims.map.IMSMap;
+			import zdims.map.OverlayObject;
+			
+			private var _mapContainer:IMSMap;
+			
+			[Inspectable]
+			public function get mapContainer():IMSMap
+			{
+				return _mapContainer;
+			}
+
+			public function set mapContainer(value:IMSMap):void
+			{
+				_mapContainer = value;
+			}
+
+//			[Inspectable(category="MapGISIMS")]
+//			public function set chart(value:OverlayObject):void
+//			{
+//				_chart=value;
+//			}
+//			[Inspectable(category="MapGISIMS")]
+//			public function get chart():OverlayObject
+//			{
+//				return _chart;
+//			}
+
+			private var chartType:ArrayCollection=new ArrayCollection([
+				{label:"二维柱状图",data:"Column2D"},
+				{label:"三维柱状图",data:"Column3D"},
+				{label:"二维饼状图",data:"Pie2D"},
+				{label:"三维饼状图",data:"Pie3D"},
+				{label:"曲线图",data:"Line"},
+				{label:"二维锯齿图",data:"Bar2D"},
+				{label:"二维面状图",data:"Area2D"},
+				{label:"二维环状图",data:"Doughnut2D"},
+				{label:"三维环状图",data:"Doughnut3D"},
+				{label:"平滑曲线图",data:"Spline"},
+				{label:"平滑面状图",data:"SplineArea"},
+				{label:"漏斗图",data:"Funnel"},
+				{label:"金字塔图",data:"Pyramid"}]); 
+
+//			protected function wSlider_changeHandler(event:Event):void
+//			{
+//				if(chart!=null)
+//				    this.chart.scaleX=wSlider.value/150;  //按比例缩放改变统计图宽度
+//			}
+//			
+//			protected function hSlider_changeHandler(event:Event):void
+//			{
+//				if(chart)
+//				    this.chart.scaleY=this.hSlider.value/120;   //按比例缩放改变统计图高度
+//			}
+//
+//
+//			protected function alphaSlider_changeHandler(event:Event):void
+//			{
+//				if(chart!=null)
+//				    this.chart.alpha=this.alphaSlider.value;//设置统计图透明度
+//			}
+
+		]]>
+	</fx:Script>
+	
+	<!--统计图类型选择-->
+	<s:Label text="请选择统计图类型：" x="10" y="40" height="26" fontWeight="normal" fontFamily="微软雅黑" fontSize="12"/>
+	<s:ComboBox id="myChartType" x="126" y="40" dataProvider="{chartType}" selectedIndex="0" color="0X000000" />
+	
+	<!--统计图高度设置-->
+	<s:Label x="12" y="75" text="统计图高度：" fontFamily="微软雅黑"/>
+	<s:HSlider id="hSlider" x="126" y="75" value="120" minimum="120" maximum="220" width="126"/>
+	
+	<!--统计图宽度设置-->
+	<s:Label x="12" y="110" text="统计图宽度：" fontFamily="微软雅黑"/>
+	<s:HSlider id="wSlider" x="126" y="110" minimum="162" maximum="262" width="126" value="162"
+			   />
+	
+	<!--统计图透明度设置-->
+	<s:Label x="11" y="144" text="统计图透明度：" fontFamily="微软雅黑"/>
+	<s:HSlider id="alphaSlider" x="126" y="144" snapInterval="0.1" minimum="0.1" maximum="1.0" width="126" value="1.0" />
+	
+	<!--统计图颜色选择-->
+	<!--<s:Label x="13" y="182" text="统计图颜色：" fontFamily="微软雅黑"/>
+	<mx:ColorPicker id="cPicker" x="139" y="171" selectedColor="#ff0000" />
+	<s:Label x="197" y="182" text="0x{cPicker.selectedColor.toString(16).toUpperCase()}"/>-->
+	<s:Label x="0" y="0" text="统计图样式设置" width="100%" height="30" backgroundColor="#999999" verticalAlign="middle" textAlign="center" fontSize="16" backgroundAlpha="0.8"/>
+	
+</mx:Canvas>

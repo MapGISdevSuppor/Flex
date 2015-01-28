@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" xmlns:map="zdims.map.*" xmlns:drawing="zdims.drawing.*" creationComplete="init()" xmlns:ns1="*" xmlns:myControls="myControls.*" initialize="tile_creationCompleteHandler()">
+	<fx:Declarations>
+	</fx:Declarations>
+	<fx:Style source="css/windowstyle.css">
+	</fx:Style>
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import zdimsExtends.drawingArrow.DrawingBase;
+			import zdims.util.IMSOperType;
+			import config.ServerIP;
+			import utilEvent.ReadURLEvent;
+			//实例化绘图对象
+			public var drawBaseArrow:DrawingBase=new DrawingBase();
+			private var viewConfig:ServerIP;
+			private function tile_creationCompleteHandler():void{
+				viewConfig=new ServerIP();
+				viewConfig.mapConfig1(this);
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, readURLCompelte);
+			}
+			//获取服务地址
+			private function readURLCompelte(event:ReadURLEvent):void
+			{
+				this.tilelayer.serverAddress=viewConfig.TileURL;
+				this.mymap.refresh();
+			}
+			//地图加载完成后给相关的参数赋值
+			public function init():void
+			{	
+				
+				//将地图容器的id赋值给选择绘制类型的页面
+				this.selctDraw.mymap=this.mymap;
+				//将绘图对象赋值给选择绘制类型的页面
+				this.selctDraw.drawingBase=drawBaseArrow
+				//将属性设置对象赋值给选择绘制类型 的页面
+				this.selctDraw.SPorty=this.selectProperty;
+				//将绘图对象赋值给设置属性的页面
+				this.selectProperty.drawingBase=drawBaseArrow;
+			}
+			//显示或隐藏标绘的窗口
+			private function showSelectBox():void{
+			 	if(this.selctDraw.visible==false){
+					this.selctDraw.visible=true;
+				}else{
+					this.selctDraw.visible=false;
+				}
+			}
+			//显示或隐藏属性设置的窗口
+			private function showSelectPro():void{
+				if(this.selectProperty.visible==false){
+					this.selectProperty.visible=true;
+				}else{
+					this.selectProperty.visible=false
+				}
+			}
+		]]>
+	</fx:Script>
+	<s:Group x="0" y="0" width="100%" height="100%" id="group">
+		
+		<s:BorderContainer id="printView" x="0" y="0" width="100%" height="100%"  borderColor="0xffffff" borderWeight="1" borderAlpha="0">
+			<map:IMSMap x="0" y="0" width="100%" height="100%" levelNum="8" initShowLevel="4" id="mymap" xMinMap="-181.18399779022"  xMaxMap="188.619962766591" 
+						yMinMap="-90.7340663245236" yMaxMap="279.069894232288" restoreCenterX="102.85000121166703" restoreCenterY="33.31638333491467" enableZoomOutMinLevel="false" enableProgressBar="false" >
+				
+				<!--基于K9系列平台显示瓦片地图-->
+				<!--<map:TileLayer x="0" y="0" id="tilelayer" autoGetMapBound="true" autoGetMapInfo="true" hdfName="world.hdf"   >
+				</map:TileLayer>-->
+				
+				<!--显示瓦片地图-->
+				<map:TileLayer x="0" y="0" id="tilelayer" autoGetMapBound="true" autoGetMapInfo="true" hdfName="world"   >
+				</map:TileLayer>
+				<drawing:GraphicsLayer x="97" y="206" id="graphic"  autoGetMapInfo="true">
+				</drawing:GraphicsLayer>
+				<!--	<map:VectorMapDoc x="307" y="142" autoGetMapInfo="true" mapDocName="wh.map">
+				</map:VectorMapDoc>-->
+			</map:IMSMap>
+		</s:BorderContainer>
+	</s:Group>	
+	<myControls:SelctBox left="5" top="10" id="selctDraw" >
+	</myControls:SelctBox>
+	<myControls:SelectProperty left="5" top="336" id="selectProperty"  >
+	</myControls:SelectProperty>
+	<s:controlBarLayout >
+		<s:BasicLayout/>
+	</s:controlBarLayout>
+	<s:controlBarContent>
+		<mx:Canvas  width="100%" height="36" >
+		<s:Label  left="10" top="9"  textAlign="left" verticalAlign="middle" text="  选中图标，单击开始，双击结束!"  fontSize="14"  fontWeight="bold" fontFamily="宋体" />
+			<s:Button right="83" label="标绘" click="showSelectBox()" fontSize="13"   fontWeight="bold" fontFamily="宋体"  y="5"/>
+			<s:Button right="5" label="属性" click="showSelectPro()" fontSize="13"   fontWeight="bold" fontFamily="宋体"  y="5"/>
+		</mx:Canvas>
+	</s:controlBarContent>
+</s:Application>

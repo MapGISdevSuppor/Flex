@@ -1,0 +1,40 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>缓冲区分析</title>
+<style type="text/css">
+.biaoti{color:#3366FF;FONT-SIZE:13pt;}
+.xiaobiaoti{color:#3366FF;FONT-SIZE:11pt;}
+.zhengwen{FONT-SIZE:9pt;}
+.zhuji{FONT-SIZE:9pt;color:#F00;}
+</style>
+</head>
+
+<body>
+<div class="biaoti">
+叠加分析:
+</div>
+<br />
+<div class="xiaobiaoti">一、示例功能：
+</div>
+<br />
+ <div class="zhengwen">
+ &nbsp;&nbsp;&nbsp;&nbsp;该示例实现“海洋陆地_1”图层和另一图层“湖泊_1”的要素进行叠加分析形成一个新的图层。</div>
+<br />
+ <div class="xiaobiaoti">二、实现说明： </div> <br />
+  <div class="zhengwen">
+   &nbsp;&nbsp;&nbsp;&nbsp;1、数据：使用世界地图的矢量数据（WorldG20140808.mapx）和瓦片数据（NewWorldTile.HDF），已在GIS服务器中发布。<br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;2、实现步骤： <br /><br />
+  &nbsp;&nbsp;&nbsp;（1）首先实现瓦片地图和矢量地图文档叠加显示，设置矢量地图文档的display属性为false使其不显示；<br /><br />
+  &nbsp;&nbsp;&nbsp;（2）然后设置图层叠加分析函数的参数COverlayByLayer；<br /><br />
+  &nbsp;&nbsp;&nbsp;（3）分别设置“海洋陆地_1”图层和“湖泊_1”为被叠加图层和叠加图层； <br /><br />
+  &nbsp;&nbsp;&nbsp;（4）调用SpacialAnalyse类的overlayByLayer()方法执行叠加分析；调用SpacialAnalyse类的getAnalyseResult()方法获取叠加分析的结果图层。<br /><br />
+  &nbsp;&nbsp;&nbsp;（5）在MyLayerDataViewer控件中将分析后的图层添加到地图上，同时查询它的属性信息，添加点击闪烁图层的事件。 <br /><br />
+   <div class="zhengwen">
+<p>注：详细说明请参见MapGIS IGServer for Flex的API手册。</p></div>
+</div>
+</body>
+
+</html>

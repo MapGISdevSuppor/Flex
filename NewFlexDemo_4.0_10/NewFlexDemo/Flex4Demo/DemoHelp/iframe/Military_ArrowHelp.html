@@ -1,0 +1,64 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>军标绘制</title>
+<style type="text/css">
+.biaoti{color:#3366FF;FONT-SIZE:13pt;}
+.xiaobiaoti{color:#3366FF;FONT-SIZE:11pt;}
+.zhengwen{FONT-SIZE:9pt;}
+.zhuji{FONT-SIZE:9pt;color:#F00;}
+</style>
+</head>
+
+<body>
+<div class="biaoti">
+军标绘制:
+</div>
+<br />
+<div class="xiaobiaoti">一、示例功能：
+</div>
+<br />
+ <div class="zhengwen">
+ &nbsp;&nbsp;&nbsp;&nbsp;该示例实现在地图上绘制军标箭头以及指北针。 <br /> <br />
+   <div class="xiaobiaoti">二、实现说明： </div> <br />
+  <div class="zhengwen">
+  &nbsp;&nbsp;&nbsp;&nbsp;1、数据：使用世界地图的瓦片地图(world.hdf)，已在GIS服务器中发布。 <br /> <br />
+  &nbsp;&nbsp;&nbsp;&nbsp;2、实现步骤： <br /> <br />
+  &nbsp;&nbsp;&nbsp;（1）首先实例化DrawingBase对象； <br /> <br />
+  &nbsp;&nbsp;&nbsp;（2）然后给DrawingBase的属性mymap赋值，属性FillColor设置绘制的颜色，属性Fillalpha设置绘制的透明度； <br /> <br />
+  &nbsp;&nbsp;&nbsp;（3）调用DrawingBase里的initArrow()方法来实现绘制图形，同时通过枚举类型DrawingBaseType来设置要绘制的图形类型。 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;3、操作说明： <br /> <br />
+  &nbsp;&nbsp;&nbsp;（1）绘制：选中图标，在地图上单击鼠标左键开始绘图，双击结束，其中除了简单箭头、燕尾箭头、自定义箭头、自定义燕尾箭头 和直箭头 <br /><br />
+  必须双击结束外，其他的图形绘制均可单击结束和双击结束。另外，自定义箭头和自定义燕尾箭头的绘制在选中之后至少要在地图上点击两下确定才能确定图形。 <br /><br />
+  &nbsp;&nbsp;&nbsp;（2）修改：鼠标左键单击一次地图上绘制的图形，此时在图形上或者周围出现正方形的修改点，拖动修改点即可修改绘制的图形。 <br /><br />
+  &nbsp;&nbsp;&nbsp;（3）拖动：在修改点在图形上出现之后，再在图形上点击一次鼠标左键，此时在图形上出现一个圆形的拖动点，鼠标点击移动该拖动点即可实现图形的拖动。 <br /><br />
+  &nbsp;&nbsp;&nbsp;（4）删除：在绘制的图形上单击鼠标右键，此时右键菜单中会有删除图形的选项，点击删除图形的功能菜单即可删除该图形。 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;4、参数说明 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType参数：<br /><br /> </div>
+ <div class="zhuji">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType.SimpleArrow：简单箭头 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType.TailedArrow：燕尾箭头<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType.CustomArrow：自定义箭头<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType.CustomTailedArrow：自定义燕尾箭头 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType.StraightArrow：直箭头 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType.DoubleArrow：双箭头 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType.AssemblyArea：集结地域 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType.Circle：圆形区域 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType.CurveFlag：曲线旗标 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType.RectFlag：直角旗标<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType.TriangleFlag：三角旗标 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType.ClosedangleCompass：尖角指北针<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType.FourstarCompass：四角指北针 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType.RhombusCompass：菱形指北针 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType.TriangleCompass：三角指北针<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType.ArrowcrossCompass：十字箭头指北针 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType.CircleClosedangleCompass：圆形尖角指北针 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType.DoubleClosedangleCompass：双向尖角指北针<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType.SameDirectionClosedangleCompass：同向尖角指北针 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DrawingBaseType.VaneCompass：风向标指北针<br /><br />
+</div>	
+</body>
+
+</html>

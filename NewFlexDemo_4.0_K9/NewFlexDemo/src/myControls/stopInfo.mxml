@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--定位显示信息窗口-->
+<IMSWindow    xmlns="zdims.control.*" 
+				xmlns:mx="http://www.adobe.com/2006/mxml"
+				allowClose="true" 
+				allowResize="false" allowMinimize="false" allowMaximize="false"
+				headerColors="{['#D6EAF2','#D6EAF2']}" backgroundAlpha="0.8"
+				width="300" height="182" 
+				verticalAlign="top" layout="absolute"
+				 >
+
+	<mx:Label  x="10" y="4" text="名称：" width="77" height="33" fontWeight="bold" fontSize="13"/>
+	<mx:Label x="9" y="39" text="经度：" width="78" height="32" fontWeight="bold" fontSize="13"/>
+	<mx:Label x="10" y="85" text="纬度:" width="64" height="35" fontWeight="bold" fontSize="13"/>
+	<mx:Text id="stop_name"  x="95" y="6" width="175" height="32" fontSize="12"/>
+	<mx:Text id="stop_Y"  x="95" y="86" width="175" height="32" fontSize="12" />
+	<mx:Text id="stop_X"  x="95" y="44" width="175" height="32" fontSize="12" />
+</IMSWindow>

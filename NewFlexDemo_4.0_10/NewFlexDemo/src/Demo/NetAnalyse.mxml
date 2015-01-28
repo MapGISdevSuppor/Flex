@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" xmlns:map="zdims.map.*"
+			   xmlns:drawing="zdims.drawing.*"
+			   xmlns:mark="zdims.mark.*" xmlns:control="zdims.control.*" xmlns:layer="zdims.control.layer.*" initialize="tile_creationCompleteHandler()"   >
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Style source="css/windowstyle.css">
+	</fx:Style>
+	<s:controlBarLayout >
+		<s:BasicLayout/>
+	</s:controlBarLayout>
+	<s:controlBarContent>
+	<s:HGroup height="35" verticalAlign="middle" left="10" width="100%">	
+	<s:Label   text="对地图上三个路径点进行路径分析，分析成功可播放动画" fontFamily="宋体" fontSize="14"  fontWeight="bold"  left="5" textAlign="left" verticalAlign="middle"/>
+	<s:Button   label="路径分析" click="submit()"  fontSize="13"  fontWeight="bold" fontFamily="宋体" />
+	<s:Button   label="清除" click="clearRoad()" fontSize="13"  fontWeight="bold" fontFamily="宋体" />
+		</s:HGroup>
+</s:controlBarContent>
+		<s:BorderContainer id="printView" x="0" y="0" width="100%" height="100%"  borderColor="0xffffff" borderWeight="1" borderAlpha="0">
+		<map:IMSMap x="0" y="0" width="100%" height="100%" levelNum="7"
+					xMinMap="114.125602"  xMaxMap="114.500788"
+					yMinMap="30.453932" yMaxMap="30.829118" enableZoomOutMinLevel="false"
+					 restoreCenterX="114.3026612133789" restoreCenterY="30.547545303710937"
+					id="mymap" initShowLevel="4"  enableProgressBar="false">
+			
+			<!--基于K9系列平台显示瓦片地图-->
+			<!--<map:TileLayer x="197" y="138"  hdfName="whmap.hdf" id="tilelayer" >
+			</map:TileLayer>-->
+			
+			<!--显示瓦片地图-->
+			<map:TileLayer x="197" y="138"  hdfName="whmap" id="tilelayer" >
+			</map:TileLayer>
+			
+			<!--基于K9系列平台显示矢量地图-->
+			<!--<map:VectorMapDoc  id="mapDoc" x="262" y="41" mapDocName="wh.map"  display="false">
+			</map:VectorMapDoc>	-->
+			
+			<!--显示矢量地图-->
+			<map:VectorMapDoc  id="mapDoc" x="262" y="41" mapDocName="wh"  display="false" layerOpenCallBack="init">
+			</map:VectorMapDoc>		
+			<drawing:GraphicsLayer x="42" y="188" id="graphicsLayer">
+			</drawing:GraphicsLayer>
+			<control:NetAnalyse right="5" top="39" id="netAnalyse" visible="false">
+			</control:NetAnalyse>
+		</map:IMSMap>
+	</s:BorderContainer>
+	<fx:Script>
+		<![CDATA[
+			import Mapgis7.WebService.BasLib.*;
+			
+			import config.ServerIP;
+			
+			import mx.controls.Alert;
+			import mx.core.UIComponent;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			import mx.managers.ToolTipManager;
+			
+			import org.osmf.layout.AbsoluteLayoutFacet;
+			
+			import utilEvent.ReadURLEvent;
+			
+			import zdims.control.IMSRoad;
+			import zdims.control.Marker;
+			import zdims.event.IMSMapEvent;
+			import zdims.event.IMSMapMouseEvent;
+			import zdims.interfaces.IVector;
+			import zdims.map.VectorLayerBase;
+			import zdims.util.IMSOperType;
+			import zdims.util.SpacialAnalyse;
+			[Inspectable(category="MapGisIMS")]
+			public var GDBName:String="world";
+			[Inspectable(category="MapGisIMS")]
+			public var GDBSvrName:String="MapGisLocal";
+			[Inspectable(category="MapGisIMS")]
+			public var Password:String="";
+			[Inspectable(category="MapGisIMS")]
+			public var User:String="";
+			[Inspectable(category="MapGisIMS")]
+			public var NetLayerName:String="武汉道路网";
+			private var road:IMSRoad;
+			private var inputDot:Array=new Array();
+			private var _spatial:SpacialAnalyse;
+			//三个路径点坐标
+			private var pathDots:String=114.26244962792968+","+30.55578913671875+","+114.27868539904786+","+30.55466705944824+","+114.29711952563477+","+30.546514824584957+",";
+			private var VecAddress:String="";
+			private var TileAddress:String="";
+			private var viewConfig:ServerIP;
+			private var SuccessFlag:Boolean=true;
+			private function tile_creationCompleteHandler():void{
+				viewConfig=new ServerIP();
+				viewConfig.mapConfig1(this);
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, TilereadURLCompelte);
+			}
+			//获取服务地址
+			private function TilereadURLCompelte(event:ReadURLEvent):void
+			{
+				TileAddress=viewConfig.TileURL;
+				VecAddress=viewConfig.vectorURL;
+				this.tilelayer.serverAddress=TileAddress;
+				this.mapDoc.serverAddress=VecAddress;
+				this.mymap.refresh();
+			}
+			//地图加载完成后添加的三个路径点
+			public function init(layer:VectorLayerBase):void{
+				Mapinit();
+			}
+			private function  Mapinit():void{
+				//起始路径点
+				var pathDot1:Marker = new Marker();
+				pathDot1.logicX =114.26244962792968;
+				pathDot1.logicY =30.55578913671875;
+				pathDot1.name = "路径点";
+				pathDot1.toolTip="起始点";
+				pathDot1.setIconSrc("image/bus/qidian.gif");
+				this.mymap.addChildAt(pathDot1,this.mymap.layerLenth);	
+				//经过的路径点
+				var pathDot2:Marker = new Marker();
+				pathDot2.logicY =30.55466705944824;
+				pathDot2.logicX =114.27868539904786;
+				pathDot2.name = "路径点";
+				pathDot2.toolTip="路径点";
+				pathDot2.setIconSrc("image/mark/v1.gif");
+				this.mymap.addChildAt(pathDot2,this.mymap.layerLenth);
+				//目的路径点
+				var pathDot3:Marker = new Marker();
+				pathDot3.logicX =114.29711952563477;
+				pathDot3.logicY =30.546514824584957;
+				pathDot3.name = "路径点";
+				pathDot3.toolTip="目的点";
+				pathDot3.setIconSrc("image/bus/zhongdian.gif");
+				this.mymap.addChildAt(pathDot3,this.mymap.layerLenth);
+				this.road=new IMSRoad();
+				this.road.imsmap=this.mymap;
+				this.netAnalyse.road=this.road;
+			
+			}
+			
+			 //路径分析触发函数
+			public function submit():void
+			{	
+				if(SuccessFlag==true){
+				this.netAnalyse.road=this.road;
+				this.netAnalyse.roadInfo.htmlText ="";
+				if (this.mapDoc == null)
+				{
+					Alert.show("没有激活的图层。", "提示");
+					return;
+				}
+				//清除地图上的路径点
+				this.road.clear();
+				this.road._roadCoorArr = "";
+				this.road._stopIcon = new Array();
+				var pathPnts:String=new String();
+				pathPnts=this.pathDots.substring(0, this.pathDots.length - 2);
+				//CGdbInfo gdb信息类 
+				var gdb:CGdbInfo = new CGdbInfo();
+				gdb.GDBName = this.GDBName;
+				gdb.GDBSvrName = this.GDBSvrName;
+				gdb.Password = this.Password;
+				gdb.User = this.User;
+				//网络分析类
+				var obj:CNetAnalyse = new CNetAnalyse();
+				//设置要做网络分析的网络类所在的gdb信息 
+				obj.GdbInfo = gdb;
+				//设置网络类的名称 
+				obj.NetLayerName = this.NetLayerName;
+				//设置路径点坐标序列
+				obj.RequestDots = pathPnts;
+				//设置障碍点坐标序列
+				obj.BarrierDots ="";
+				//设置路径分析的半径
+				obj.NearDis = 0.002;
+				//设置网标的类型 
+				obj.FlgType = "line";
+				//设置网权
+				obj.NetWeight = ",Weight1,Weight1";
+				//空间分析操作类
+				this._spatial = new SpacialAnalyse(this.mapDoc);
+				//netAnalyse()网络分析方法
+				this._spatial.netAnalyse(obj,onSubmit);
+				SuccessFlag=false;
+				}
+			}
+			//网络分析回调函数
+			public function onSubmit(e:Event):void{
+				//onNetAnalyse()获取网络分析结果方法
+				var obj:CPathAnalyzeResult=new  CPathAnalyzeResult(); 
+				obj= this._spatial.onNetAnalyse(e);
+				if (obj == null || obj.Paths == null)
+					return;
+				//设置分析结果窗口显示
+				this.netAnalyse.visible=true;
+				//网络路径类
+				var path:CNetPath = CNetPath(obj.Paths[0]);
+				var edgeNum:int = path.Edges.length;
+				//显示分析经过的路径名称
+				this.netAnalyse.roadInfo.htmlText += "1.从起点出发";
+				for (var i:int = 0; i < edgeNum; i++)
+				{
+					//CNetEdge网络边线类
+					var edge:CNetEdge = CNetEdge(path.Edges[i]);
+					if (i != 0)
+						this.netAnalyse.roadInfo.htmlText += i + 1 + ".";
+					if (i != edgeNum - 1)
+					{
+						this.netAnalyse.roadInfo.htmlText += "经<font color='#ff0000'><b>" + edge.FieldValus[2] + "</b></font>到达<font color='#ff0000'><b>" + CNetNode(path.Nodes[i + 1]).FieldValus[0] + "</b></font><br/>";
+					}
+					else
+						this.netAnalyse.roadInfo.htmlText += "经<font color='#ff0000'><b>" + edge.FieldValus[2] + "</b></font>到达终点";
+					
+					var dotNum:int = edge.Dots.length;
+					for (var j:int = 0; j < dotNum; j++)
+					{
+						var dot:Dot_2D = Dot_2D(edge.Dots[j]);
+						this.road._roadCoorArr += dot.x + "," + dot.y + ",";
+					}
+					this.road.addNode(edge.FieldValus[2], Dot_2D(edge.Dots[Math.floor(dotNum / 2)]).x, Dot_2D(edge.Dots[Math.floor(dotNum / 2)]).y, 0, "image/bus/stop.gif");
+				}
+				this.road._roadCoorArr = this.road._roadCoorArr.substring(0, this.road._roadCoorArr.length - 2);
+				var dotstart:Dot_2D = CNetInputDot(obj.inputDots[0]).pDot;
+				this.road.addNode("起点", dotstart.x, dotstart.y, 0, "image/bus/qidian.gif", false);
+				var dotend:Dot_2D = CNetInputDot(obj.inputDots[obj.inputDots.length - 1]).pDot;
+				this.road.addNode("终点", dotend.x, dotend.y, 0, "image/bus/zhongdian.gif", false);
+				this.road.drawRoad();
+				//将路径分析结果窗口显示在地图上
+				SuccessFlag=true;
+				PopUpManager.addPopUp(netAnalyse,this,false);
+			}
+			public function clearRoad():void{
+				//清除地图上路径
+				this.road.clear();
+				this.road._roadCoorArr = "";
+				this.road._stopIcon = new Array();
+				clearPathDot();
+				this.netAnalyse.road=null;
+			}
+			
+			// 清除路径点
+			public function clearPathDot():void
+			{
+				var mark:Array = this.mymap.getChildren();
+				for (var i:int = 0; i < mark.length; i++)
+				{
+					if (mark[i] is Marker&&UIComponent(mark[i]).name == "路径点")
+						this.mymap.removeChild(mark[i]);
+				}
+				//清除路径分析后的路径结果名称
+				this.netAnalyse.roadInfo.htmlText="";
+				//设置路径分析结果窗口为不可见
+				this.netAnalyse.visible=false;
+				SuccessFlag=true;
+				//清除后再地图上添加路径点
+				Mapinit();
+			}
+		]]>
+	</fx:Script>
+	
+	
+</s:Application>

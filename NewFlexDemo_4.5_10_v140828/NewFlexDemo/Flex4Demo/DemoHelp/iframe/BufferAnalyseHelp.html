@@ -1,0 +1,38 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>缓冲区分析</title>
+<style type="text/css">
+.biaoti{color:#3366FF;FONT-SIZE:13pt;}
+.xiaobiaoti{color:#3366FF;FONT-SIZE:11pt;}
+.zhengwen{FONT-SIZE:9pt;}
+.zhuji{FONT-SIZE:9pt;color:#F00;}
+</style>
+</head>
+
+<body>
+<div class="biaoti">
+缓冲区分析:
+</div>
+<br />
+<div class="xiaobiaoti">一、示例功能：
+</div>
+<br />
+ <div class="zhengwen">
+&nbsp;&nbsp;&nbsp;&nbsp;该示例实现湖泊图层中的一个要素缓冲的分析。 </div>
+<br />
+ <div class="xiaobiaoti">二、实现说明： </div> <br />
+  <div class="zhengwen">
+  &nbsp;&nbsp;&nbsp;&nbsp;1、数据：使用世界地图的矢量数据（WorldG20140808.mapx）和瓦片数据（NewWorldTile.HDF），其中湖泊图层的索引号为5，即在WorldG20140808.mapx的矢量地图文档中湖泊图层的顺序排第六，已在GIS服务器（MapGIS Server Manager）中发布。 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;2、实现步骤：  <br /><br />
+  &nbsp;&nbsp;&nbsp;（1）首先根据CGetObjByID来设置要素的图层号和ID； <br /><br />
+  &nbsp;&nbsp;&nbsp;（2）然后根据CBufferFeature设置缓冲半径、缓冲要素信息以及缓冲后的名称； <br /><br />
+  &nbsp;&nbsp;&nbsp;（3）再通过bufferFeature()方法进行缓冲分析。  <br /><br />
+  &nbsp;&nbsp;&nbsp;（4）分析成功之后，可以通过loadLayer()将结果图层添加到原来的地图上进行显示。  <br /><br />
+<p>注：详细说明请参见MapGIS IGServer for Flex的API手册（4.5）。</p>
+
+</body>
+
+</html>

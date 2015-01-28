@@ -1,0 +1,49 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>无标题文档</title>
+<style type="text/css">
+.biaoti{color:#3366FF;FONT-SIZE:13pt;}
+.xiaobiaoti{color:#3366FF;FONT-SIZE:11pt;}
+.zhengwen{FONT-SIZE:9pt;}
+.zhuji{FONT-SIZE:9pt;color:#F00;}
+</style>
+</head>
+
+<body>
+<div class="biaoti">
+生成专题图:
+</div>
+<br />
+<div class="xiaobiaoti">一、示例功能：
+</div>
+<br />
+ <div class="zhengwen">
+&nbsp;&nbsp;&nbsp;&nbsp;该示例实现web端生成专题图功能。 </div>
+<br />
+
+ <div class="xiaobiaoti">二、实现说明： </div> <br />
+  <div class="zhengwen">
+   &nbsp;&nbsp;&nbsp;&nbsp;1、数据：使用Google在线地图作底图，矢量数据采用已转换为Web墨卡托坐标系下的广西市级行政区图层（0831lineGX）和广西矢量地图文档（gx.mapx）叠加显示，矢量地图文档已在GIS服务器（MapGIS Server Manager）中发布。 <br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;2、实现步骤： <br /><br />
+   &nbsp;&nbsp;&nbsp;（1）首先实现Google在线地图、广西市级行政区矢量图层、广西矢量地图文档的叠加显示； <br /><br />
+   &nbsp;&nbsp;&nbsp;（2）再添加控制面板，用于设置生成专题图的字段、生成专题图的类型；添加一个Button按钮，用于触发生成专题图的事件处理；<br /><br />
+   &nbsp;&nbsp;&nbsp;（3）自定义创建不同的专题图类，在专题图类里实现addtheme()方法，以根据输入的信息执行生成专题图的任务；<br /><br />
+   &nbsp;&nbsp;&nbsp;（4）在Button的click事件处理函数中，根据DropDownList条目的选择信息（即选择的专题图类型）实例化不同的专题图类别，调用该专题图类下的addtheme()方法生成专题图，然后将生成专题图的矢量地图文档添加到地图容器中。<br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;3、参数说明<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;调用接口： <br /><br /> </div>
+ <div class="zhuji">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ThemeOper：专题图操作类。提供生成专题图addThemesInfo()、获取专题图信息getThemesInfo()、更新专题图updateThemesInfo()、删除专题图removeThemesInfo()的方法 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ThemesInfo：专题图信息结构。设置专题图的名称LayerName、生成专题图的专题信息数组ThemeArr（用于存储各种专题对象）<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Expression：字段表达式。将根据此字段的属性值生成专题图<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CMultiClassTheme：分段专题图 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CGraduatedSymbolTheme：等级符号专题图(根据符号的大小来反映数据的级别差异) <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CDotDensityTheme：点密度专题图 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CChartTheme：统计专题图 <br /><br />
+  </div>
+</div>
+</body>
+
+</html>

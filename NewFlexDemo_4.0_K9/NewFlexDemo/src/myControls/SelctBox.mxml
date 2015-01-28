@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<myControls:IMSWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					  xmlns:s="library://ns.adobe.com/flex/spark" 
+					  xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:myControls="myControls.*"
+					   layout="absolute" width="230" height="310"
+					   close="close()"  creationCompleteEffect="blur" showEffect="blur" borderStyle="solid" horizontalAlign="center"  fontSize="12" cornerRadius="10" backgroundAlpha="0.35" >
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import zdimsExtends.drawingArrow.DrawingBaseType;
+			import zdimsExtends.drawingArrow.DrawingBase;
+			import zdims.map.IMSMap;
+			import zdims.util.IMSOperType;
+			public var mymap:IMSMap;
+			public var drawingBase:DrawingBase;
+			public var SPorty:SelectProperty;
+			//绘制图形
+			private function DrawArrow(drawType:String):void{
+				this.mymap.setCurOper(IMSOperType.Drag);
+				//将地图容器的id赋值给绘制图形的页面
+				drawingBase.mymap=this.mymap;
+				//设置绘制图形的颜色值,默认值为0xFF0010
+				drawingBase.FillColor=SPorty.selectColorFill;
+				//设置绘制图形的Alpha值
+				drawingBase.Fillalpha=SPorty.selectAlphaFill;
+				//绘制图形，传入绘制的类型
+				drawingBase.initDrawArrow(drawType);
+			}
+			//鼠标移入到绘制的图标上改变颜色的效果
+			private function rollOverHandler(event:Event):void{
+				event.currentTarget.filters=[glower];
+			}
+			//鼠标移出到绘制的图标上恢复原始效果
+			private function rollOutHandler(event:Event):void{
+				event.currentTarget.filters=[];
+			}
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<s:GlowFilter id="glower" alpha="1.0" blurX="6.0" blurY="6.0" color="#FF5800" inner="false"
+					  knockout="false" quality="2" strength="1"/>
+	</fx:Declarations>
+	<mx:Grid width="100%" height="100%" paddingBottom="10" paddingLeft="10" paddingRight="10"
+			 paddingTop="10" >
+		<mx:GridRow>
+			<mx:GridItem>
+				<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.SimpleArrow)"
+						  rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)"
+						  source="Draw/images/arrow.png" toolTip="简单箭头" useHandCursor="true"/>
+			</mx:GridItem>
+			<mx:GridItem>
+				<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.TailedArrow)"
+						  rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)"
+						  source="Draw/images/tail_arrow.png" toolTip="燕尾箭头"
+						  useHandCursor="true"/>
+			</mx:GridItem>
+			<mx:GridItem>
+				<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.CustomArrow)"
+						  rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)"
+						  source="Draw/images/custom_arrow.png" toolTip="自定义箭头"
+						  useHandCursor="true"/>
+			</mx:GridItem>
+			<mx:GridItem>
+				<mx:Image buttonMode="true"
+						  click="DrawArrow(DrawingBaseType.CustomTailedArrow)"
+						  rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)"
+						  source="Draw/images/custom_tail_arrow.png" toolTip="自定义燕尾箭头"
+						  useHandCursor="true"/>
+			</mx:GridItem>
+		</mx:GridRow>
+		<mx:GridRow>
+			<mx:GridItem>
+				<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.StraightArrow)"
+						  rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)"
+						  source="Draw/images/stright_arrow.png" toolTip="直箭头"
+						  useHandCursor="true"/>
+			</mx:GridItem>
+			<mx:GridItem>
+				<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.DoubleArrow)"
+						  rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)"
+						  source="Draw/images/double_arrow.png" toolTip="双箭头"
+						  useHandCursor="true"/>
+			</mx:GridItem>
+			<mx:GridItem>
+				<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.AssemblyArea)"
+						  rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)"
+						  source="Draw/images/assembly.png" toolTip="集结地域" useHandCursor="true"/>
+			</mx:GridItem>
+			<mx:GridItem>
+				<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.Circle)"
+						  rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)"
+						  source="Draw/images/circle.png" toolTip="圆形区域" useHandCursor="true"/>
+			</mx:GridItem>
+		</mx:GridRow>
+		<mx:GridRow>
+			<mx:GridItem>
+				<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.CurveFlag)"
+						  rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)"
+						  source="Draw/images/curve_flag.png" toolTip="曲线旗标"
+						  useHandCursor="true"/>
+			</mx:GridItem>
+			<mx:GridItem>
+				<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.RectFlag)"
+						  rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)"
+						  source="Draw/images/rect_flag.png" toolTip="直角旗标"
+						  useHandCursor="true"/>
+			</mx:GridItem>
+			<mx:GridItem>
+				<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.TriangleFlag)"
+						  rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)"
+						  source="Draw/images/triangle_flag.png" toolTip="三角旗标"
+						  useHandCursor="true"/>
+			</mx:GridItem>
+			<mx:GridItem>
+				<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.ClosedangleCompass)"
+						  rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)"
+						  source="Draw/images/closedangle.png" toolTip="尖角指北针"
+						  useHandCursor="true"/>
+			</mx:GridItem>
+		</mx:GridRow>
+		<mx:GridRow>
+			<mx:GridItem>
+				<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.FourstarCompass)"
+						  rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)"
+						  source="Draw/images/fourstar.png" toolTip="四角指北针"
+						  useHandCursor="true"/>
+			</mx:GridItem>
+			<mx:GridItem>
+				<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.RhombusCompass)"
+						  rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)"
+						  source="Draw/images/rhombus.png" toolTip="菱形指北针"
+						  useHandCursor="true"/>
+			</mx:GridItem>
+			<mx:GridItem>
+				<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.TriangleCompass)"
+						  rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)"
+						  source="Draw/images/triangle.png" toolTip="三角指北针"
+						  useHandCursor="true"/>
+			</mx:GridItem>	
+			<mx:GridItem>
+				<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.ArrowcrossCompass)"
+						  rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)"
+						  source="Draw/images/arrowcross.png" toolTip="十字箭头指北针"
+						  useHandCursor="true"/>
+			</mx:GridItem>
+		</mx:GridRow>
+		<mx:GridRow>
+			<mx:GridItem>
+				<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.CircleClosedangleCompass)"
+						  rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)"
+						  source="Draw/images/CircleClosedangleCompass.png" toolTip="圆形尖角指北针"
+						  useHandCursor="true"/>
+			</mx:GridItem>
+			<mx:GridItem>
+				<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.DoubleClosedangleCompass)"
+						  rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)"
+						  source="Draw/images/DoubleClosedangleCompass.png" toolTip="双向尖角指北针"
+						  useHandCursor="true"/>
+			</mx:GridItem>
+			<mx:GridItem>
+				<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.SameDirectionClosedangleCompass)"
+						  rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)"
+						  source="Draw/images/SameDirectionClosedangleCompass.png" toolTip="同向尖角指北针"
+						  useHandCursor="true"/>
+			</mx:GridItem>
+			<mx:GridItem>
+				<mx:Image buttonMode="true" click="DrawArrow(DrawingBaseType.VaneCompass)"
+						  rollOut="rollOutHandler(event)" rollOver="rollOverHandler(event)"
+						  source="Draw/images/VaneCompass.png" toolTip="风向标指北针"
+						  useHandCursor="true"/>
+			</mx:GridItem>
+		</mx:GridRow>
+	</mx:Grid>	
+</myControls:IMSWindow>

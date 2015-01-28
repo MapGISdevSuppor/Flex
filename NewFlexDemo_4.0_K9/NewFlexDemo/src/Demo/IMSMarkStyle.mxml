@@ -1,0 +1,554 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" 
+			   minHeight="600" xmlns:map="zdims.map.*" xmlns:mark="zdims.mark.*" 
+			   initialize="tile_creationCompleteHandler()" 
+			   creationComplete="application1_creationCompleteHandler(event)">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>	
+	<fx:Script>
+		<![CDATA[
+			import zdimsExtends.styles.*;
+			import config.ServerIP;
+			import mx.controls.Alert;
+			import mx.events.ColorPickerEvent;
+			import mx.events.FlexEvent;			
+			import spark.events.IndexChangeEvent;			
+			import utilEvent.ReadURLEvent;			
+			import zdims.drawing.CoordinateType;
+			import zdims.mark.IMSMark;	
+			private var chose:Boolean;
+			private var style:*;
+			private var Prestyle:*;	
+			private var PicStyle:*;
+			private var VecAddress:String;
+			private var TileAddress:String
+			private var viewConfig:ServerIP;
+			
+			private function tile_creationCompleteHandler():void{
+				viewConfig=new ServerIP();
+				viewConfig.mapConfig1(this);
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, readURLCompelte);
+			}
+			
+			//获取服务地址
+			private function readURLCompelte(event:ReadURLEvent):void
+			{
+				this.tileLayer.serverAddress=viewConfig.TileURL;
+				this.mapContainer.refresh();
+			   
+			}
+			//取消选择处理事件
+			private function Cancle(e:MouseEvent):void
+			{
+				if(!this.chose)
+				{
+				if(this.style!=null&&this.style.EnableEdit)
+				{
+					//若当前选择了对象，取消选择
+						this.style.EnableEdit=false;
+						this.style=null;
+				}
+				}
+				else
+				{
+					this.chose=false;
+				}
+			}
+			//设置图标大小
+			protected function size_changeHandler(event:Event):void
+			{  
+				setsize();
+				
+			}
+			
+			protected function size_clickHandler(event:MouseEvent):void
+			{
+				setsize();
+			}
+			
+			protected function setsize():void
+			{
+				if(checkStyle(style))
+				{
+					if(this.style is IMSPredefinedMarkStyle)
+						//设置图标大小
+						this.style.size=this.size.value;
+					else
+					{
+						Alert.show("不是选择的几何图形点！");
+					}
+					
+				}
+			}
+			
+			protected function fillColor_changeHandler(event:ColorPickerEvent):void
+			{
+				if(checkStyle(style))
+				{
+					if(this.style is IMSPredefinedMarkStyle)
+						//设置图标颜色
+					this.style.color=this.fillColor.value;
+					else
+					{
+						Alert.show("不是选择的几何图形点！");
+					}
+				}
+			}
+			//设置图标透明度
+			protected function fillAlpha_changeHandler(event:Event):void
+			{
+				setfillAlpha();
+			}
+			
+			protected function fillAlpha_clickHandler(event:MouseEvent):void
+			{
+				setfillAlpha();
+			}
+			protected function setfillAlpha():void
+			{
+				if(checkStyle(style))
+				{
+					if(this.style is IMSPredefinedMarkStyle)
+						//设置图标透明度
+						this.style.Alpha=this.fillAlpha.value;
+					else
+					{
+						Alert.show("不是选择的几何图形点！");
+					}
+				}
+			}
+			//设置几何点显示样式
+			protected function markerSymbol_changeHandler(event:IndexChangeEvent):void
+			{
+				setSymbol();
+			}
+			protected function markerSymbol_clickHandler(event:MouseEvent):void
+			{
+				setSymbol();
+			}
+			private function setSymbol():void
+			{
+				if(checkStyle(style))
+				{
+					if(this.style is IMSPredefinedMarkStyle)
+						//设置几何点显示样式
+						this.style.symbol=this.markerSymbol.selectedItem;
+					else
+					{
+						Alert.show("不是选择的几何图形点！");
+					}
+				}
+			}
+			private function GetRandomCoordinate(index:int, centerX:Number, 
+												 centerY:Number, temp:Number):Point
+			{
+				//获取随机点
+				switch (index % 16)
+				{
+					case 0:
+						centerX = centerX + temp;
+						//centerY = centerY;
+						break;
+					case 1:
+						centerX = centerX + temp * 0.866;
+						centerY = centerY + temp / 2;
+						break;
+					case 2:
+						centerX = centerX + temp * 0.707;
+						centerY = centerY + temp * 0.707;
+						break;
+					case 3:
+						centerX = centerX + temp / 2;
+						centerY = centerY + temp * 0.866;
+						break;
+					case 4:
+						//centerX = centerX;
+						centerY = centerY + temp;
+						break;
+					case 5:
+						centerX = centerX - temp / 2;
+						centerY = centerY + temp * 0.866;
+						break;
+					case 6:
+						centerX = centerX - temp * 0.707;
+						centerY = centerY + temp * 0.707;
+						break;
+					case 7:
+						centerX = centerX - temp * 0.866;
+						centerY = centerY + temp / 2;
+						break;
+					case 8:
+						centerX = centerX - temp;
+						//centerY = centerY;
+						break;
+					case 9:
+						centerX = centerX - temp * 0.866;
+						centerY = centerY - temp / 2;
+						break;
+					case 10:
+						centerX = centerX - temp * 0.707;
+						centerY = centerY - temp * 0.707;
+						break;
+					case 11:
+						centerX = centerX - temp / 2;
+						centerY = centerY - temp * 0.866;
+						break;
+					case 12:
+						//centerX = centerX;
+						centerY = centerY - temp;
+						break;
+					case 13:
+						centerX = centerX + temp / 2;
+						centerY = centerY - temp * 0.866;
+						break;
+					case 14:
+						centerX = centerX + temp * 0.707;
+						centerY = centerY - temp * 0.707;
+						break;
+					case 15:
+						centerX = centerX + temp * 0.866;
+						centerY = centerY - temp / 2;
+						break;
+				}
+				return new Point(centerX,centerY);
+			}			
+			protected function application1_creationCompleteHandler(event:FlexEvent):void
+			{			
+				//添加地图容器的鼠标弹起事件：取消选择当前对象
+				this.mapContainer.addEventListener(MouseEvent.CLICK,Cancle)
+				if(markLayer.numElements<=0)
+				{
+					var count:int=0;
+					var xMin:Number = -181.183997790225;
+					var yMin:Number = -90.7340663245236;
+					var xMax:Number = 188.619962766591;
+					var yMax:Number = 279.069894232288;
+					var centerX:Number =3.11;// (xMin + xMax) / 2;
+					var centerY:Number = 5.93;//(yMin + yMax) / 2;
+					var pnt:Point;
+					var mark:IMSMark;
+					var styleTemp:*;
+					while(count<5)
+					{
+						//生成随机指标
+						pnt=GetRandomCoordinate(Math.random()*100+Math.random()*100+Math.random()*10,centerX,centerY,15);
+						centerX=pnt.x;
+						centerY=pnt.y;
+						if (centerX > xMin && centerX < xMax && centerY > yMin && centerY < yMax)
+						{
+							count++;
+							//初始化几何点对象
+					       styleTemp=new  IMSPredefinedMarkStyle();
+						   //添加对象的鼠标按下事件：用于鼠标选择编辑的点
+							styleTemp.mouseClickCallback=call1;
+							//new mark对象，传入点样式对象
+							mark=new IMSMark(styleTemp,CoordinateType.Logic);
+							//将mark对象赋值给集合点对象的属性
+							styleTemp.mark=mark;
+							//设置坐标
+							mark.x=centerX;
+							mark.y=centerY;	
+							mark.enableAnimation=false;
+							//mark对象添加marklayer图层
+							markLayer.addMark(mark);
+						}
+						else
+						{
+							centerX = (xMin + xMax) / 2;
+							centerY = (yMin + yMax) / 2;
+						}
+					}
+					count=0;
+					while(count<5)
+					{  
+						//生成随机指标			
+						pnt=GetRandomCoordinate(Math.random()*100+Math.random()*100+Math.random()*10,centerX,centerY,30);
+						centerX=pnt.x;
+						centerY=pnt.y;
+						if (centerX > xMin && centerX < xMax && centerY > yMin && centerY < yMax)
+						{
+							count++;
+							//初始化图片样式点对象
+							styleTemp=new  IMSPredefinedPictureMarkStyle("assets/images/unknown.png");
+							//new mark对象，传入点样式对象
+							mark=new IMSMark(styleTemp,CoordinateType.Logic);	
+							//添加对象的鼠标按下事件：用于鼠标选择编辑的点
+							styleTemp.mouseClickCallback=call1;
+							//将mark对象赋值给集合点对象的属性
+							styleTemp.mark=mark;	
+							//设置坐标
+							mark.x=centerX;
+							mark.y=centerY;
+							mark.enableAnimation=false;
+							//mark对象添加marklayer图层
+							markLayer.addMark(mark);
+						}
+						else
+						{
+							centerX = (xMin + xMax) / 2;
+							centerY = (yMin + yMax) / 2;
+						}
+					}
+				}
+			}
+			//选择多边形对象处理事件
+			public function call1(obj:*,event:MouseEvent):void
+			{
+				if(this.style!=null)
+				{
+					this.style.EnableEdit=false;
+				}
+				this.chose=true;
+				//设置当前鼠标选择的对象
+				this.style=obj;
+				if(obj is IMSPredefinedMarkStyle)
+				{					
+					this.style.toolTip="预定义点样式属性框中修改样式";
+					
+				}
+				if(obj is IMSPredefinedPictureMarkStyle)
+				{					
+					this.style.toolTip="图片点样式属性框中修改样式";
+				}
+				//设置为可编辑
+				this.style.EnableEdit=true;
+				
+			}
+			//检查当前是否选择对象
+			public function checkStyle(obj:*):Boolean
+			{
+				if(obj==null)
+				{
+					Alert.show("请选择点！");
+					return false;
+				}
+				else
+				{
+					return true;
+				}
+			}
+			//设置图片点的宽度
+			protected function picWidth_changeHandler(event:Event):void
+			{
+				setpicWidth();
+			}
+			protected function picWidth_clickHandler(event:MouseEvent):void
+			{
+				setpicWidth();
+			}
+			protected function setpicWidth():void
+			{
+				if(checkStyle(style))
+				{
+					if(this.style is IMSPredefinedPictureMarkStyle)
+						//设置图片点的宽度
+						this.style.Width=this.picWidth.value;
+					else
+					{
+						Alert.show("不是选择的图片样式点！");
+					}
+				}
+			}
+			//设置图片点的高度
+			protected function picHeight_changeHandler(event:Event):void
+			{
+				setpicHeight();
+			}
+			protected function picHeight_clickHandler(event:MouseEvent):void
+			{
+				setpicHeight();
+			}
+			protected function  setpicHeight():void
+			{
+				if(checkStyle(style))
+				{
+					if(this.style is IMSPredefinedPictureMarkStyle)
+						//设置图片点的高度
+						this.style.Height=this.picHeight.value;
+					else
+					{
+						Alert.show("不是选择的图片样式点！");
+					}
+				}		
+			}
+			//设置图片点的透明度
+			protected function picAlpha_changeHandler(event:Event):void
+			{
+				setpicAlpha();
+			}	
+			protected function picAlpha_clickHandler(event:MouseEvent):void
+			{
+				setpicAlpha();
+			}
+			protected function setpicAlpha():void
+			{
+				if(checkStyle(style))
+				{
+					if(this.style is IMSPredefinedPictureMarkStyle)
+					{
+						//设置图片点的透明度
+						this.style.Alpha=this.picAlpha.value;
+					}
+					else
+					{
+						this.picAlpha.enabled=false;
+						Alert.show("不是选择的图片样式点！");
+					}
+				}				
+			}
+			//设置图片点的旋转角度
+			protected function picAngle_changeHandler(event:Event):void
+			{
+				setpicAngle();
+			}
+			protected function picAngle_clickHandler(event:MouseEvent):void
+			{
+				setpicAngle();
+			}
+			protected function setpicAngle():void
+			{
+				if(checkStyle(style))
+				{
+					if(this.style is IMSPredefinedPictureMarkStyle)
+						//设置图片点的旋转角度
+						this.style.angle=this.picAngle.value;
+					else
+					{
+						Alert.show("不是选择的图片样式点！");
+					}
+				}
+			}
+		]]>
+	</fx:Script>
+<!--	<mx:TitleWindow id="mapTile"  fontFamily="宋体"  x="0" y="0" width="100%" height="100%" fontSize="18" title="                            先选择点，然后修改点样式信息,点击地图空白处取消选择"  headerColors="{['#516A81','#516A81']}" >	
+-->	
+	<s:controlBarLayout >
+		<s:BasicLayout/>
+	</s:controlBarLayout>
+	<s:controlBarContent>
+		<s:HGroup height="35" verticalAlign="middle" left="10" width="100%">
+		<s:Label x="19" y="8" height="25" text="  先选择点，然后修改点样式信息,点击地图空白处取消选择" fontFamily="宋体" fontSize="14"  fontWeight="bold"  left="5" textAlign="left" verticalAlign="middle" />
+		</s:HGroup>
+	</s:controlBarContent>
+	<map:IMSMap id="mapContainer" x="0" y="0"  restoreCenterX="3.11" restoreCenterY="5.93" width="100%" height="100%" xMinMap="-181.18399779022" xMaxMap="188.619962766591"
+					enableProgressBar="false" enableZoomOutMinLevel="false"	yMinMap="-90.7340663245236" yMaxMap="279.069894232288" initShowLevel="3" levelNum="8" color="#454343">
+			<map:TileLayer id="tileLayer" x="9" y="10"  hdfName="world.HDF" autoGetMapBound="true">
+			</map:TileLayer>		
+			<mark:MarkLayer x="144" y="238" id="markLayer">
+			</mark:MarkLayer>											
+		</map:IMSMap>
+<!--	</mx:TitleWindow>
+-->	<s:Panel
+		title="预定义点样式属性"
+		left="12" top="10" blendMode="layer" color="#454343">
+		<s:layout>
+			<s:VerticalLayout horizontalAlign="right"
+							  paddingBottom="0"
+							  paddingTop="0"/>
+		</s:layout>
+		<mx:Form paddingBottom="4"
+				 paddingTop="4"
+				 width="100%">
+			<mx:FormItem label="填充颜色:">
+				<mx:ColorPicker id="fillColor" change="fillColor_changeHandler(event)" selectedColor="0xcc3300"/>
+			</mx:FormItem>
+			<mx:FormItem label="填充大小:">
+				<s:HSlider id="size"
+						   liveDragging="true"
+						   maximum="60"
+						   minimum="0"
+						   focusEnabled="false"
+						   snapInterval="0.1"
+						   value="20"
+						   width="100" click="size_clickHandler(event)" change="size_changeHandler(event)"/>
+			</mx:FormItem>
+			<mx:FormItem label="填充透明度:">
+				<s:HSlider id="fillAlpha"
+						   liveDragging="true"
+						   maximum="1"
+						   minimum="0"
+						   focusEnabled="false"
+						   snapInterval="0.01"
+						   value="0.8"
+						   width="100" click="fillAlpha_clickHandler(event)" change="fillAlpha_changeHandler(event)"/>
+			</mx:FormItem>
+			<mx:FormItem label="点符号:">
+				<s:DropDownList id="markerSymbol" selectedIndex="0" click="markerSymbol_clickHandler(event)" change="markerSymbol_changeHandler(event)">
+					<s:ArrayList>
+						<fx:String>circle</fx:String>
+						<fx:String>star</fx:String>
+						<fx:String>sector</fx:String>
+						<fx:String>diamond</fx:String>
+						<fx:String>square</fx:String>
+						<fx:String>triangle</fx:String>
+						<fx:String>x</fx:String>
+					</s:ArrayList>
+				</s:DropDownList>
+			</mx:FormItem>
+		</mx:Form>
+	</s:Panel>
+	<s:Panel
+		title="图片点样式属性"		
+		 alpha="1" right="12" top="10" color="#454343" width="220" blendMode="layer" id="jj1">
+		<s:layout>
+			<s:VerticalLayout 
+				horizontalAlign="right"
+				paddingBottom="0"
+				paddingTop="0"/>
+		</s:layout>
+		
+		<mx:Form paddingBottom="4"
+				 paddingTop="4"
+				 width="100%">
+			<mx:FormItem label="宽度:">
+				<s:HSlider id="picWidth"
+						   liveDragging="true"
+						   maximum="80"
+						   minimum="1"
+						   focusEnabled="false"
+						   snapInterval="1"
+						   value="50"
+						   width="100%" click="picWidth_clickHandler(event)" change="picWidth_changeHandler(event)" />
+			</mx:FormItem>
+			<mx:FormItem label="高度:">
+				<s:HSlider id="picHeight"
+						   liveDragging="true"
+						   maximum="80"
+						   focusEnabled="false"
+						   minimum="1"
+						   snapInterval="1"
+						   value="50"
+						   width="100%" click="picHeight_clickHandler(event)" change="picHeight_changeHandler(event)" />
+			</mx:FormItem>
+			<mx:FormItem label="图片透明度:">
+				<s:HSlider id="picAlpha"
+						   liveDragging="true"
+						   maximum="1"
+						   minimum="0"
+						   focusEnabled="false"
+						   snapInterval="0.01"
+						   value="0.8"
+						    click="picAlpha_clickHandler(event)"
+						   change="picAlpha_changeHandler(event)"
+						   width="100%"/>
+			</mx:FormItem>
+			<mx:FormItem label="旋转:">
+				<s:HSlider id="picAngle"
+						   liveDragging="true"
+						   maximum="360"
+						   minimum="0"
+						   focusEnabled="false"
+						   snapInterval="1"
+						   value="0"
+						   width="100%" click="picAngle_clickHandler(event)"  change="picAngle_changeHandler(event)"   />
+			</mx:FormItem>
+		</mx:Form>
+	</s:Panel>
+	
+</s:Application>

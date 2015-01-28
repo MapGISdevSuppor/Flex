@@ -1,0 +1,36 @@
+/* CSS Document */
+*{ margin:0px; padding:0px;}
+body,html{ font:12px/24px "ËÎÌו"; color:#555555; background: url(../images/body_bg.jpg) repeat-x #FFFFFF;}
+ul{ list-style:none;}
+img{ border:0px;}
+a { color:#15648F; text-decoration:none; cursor:pointer;}
+a:hover { color:#000; text-decoration:underline; cursor:pointer;}
+a:active { color: #CC9966; text-decoration:none; cursor:pointer;}
+
+#warp{ width:1006px; margin:0 auto; background:url(../images/pagebody_bg.gif) repeat-y; padding:0px 10px 0px 10px; overflow:hidden;}
+#header{ background:url(../images/banner.jpg) no-repeat; width:1006px; height:108px; float:left; overflow:hidden;}
+
+#content{ width:1006px; margin:0 auto; background: url(../images/content_bg.jpg) repeat-x #FFFFFF; float:left; overflow:hidden;}
+#left{ background:url(../images/left_bg.gif) no-repeat; width:236px; height:587px; float:left; margin:20px 10px 0px 10px; position:relative; cursor:pointer;}
+
+#left_list1{ position:absolute; top:40px; left:0px; width:100%;}
+.list_title{ float:left; background:url(../images/left_icon.gif) no-repeat 0px 3px; padding-left:10px; width:226px; margin-left:25px; font:14px/24px "ËÎÌו"; color:#093D72; font-weight:bold;}
+.list_link{  float:left; width:219px; margin-left:8px !important; margin-left:4px;}
+.list_link ul li{ height:23px;}
+#li_1{ background:#BDDEF5;}
+.list_li_txt{ margin-left:50px;}
+#line{ border-top:#DFDFDF dashed 1px; width:193px; margin:0px auto;}
+
+#left_list2{ position:absolute; top:150px; left:0px; width:236px; height:100px;}
+#left_list3{ position:absolute; top:260px; left:0px; width:236px; height:100px;}
+#left_list4{ position:absolute; top:370px;left:0px; width:236px; height:100px;}
+#left_list5{ position:absolute; top:480px; left:0px; width:236px; height:100px; }
+
+#right{ width:718px;  float:left; margin-top:20px; }
+#right_top{ background:url(../images/right_title.gif) no-repeat; width:718px; height:24px; float:left;}
+#right_body{ border:#B0D6F6 solid 1px; width:716px; height:562px; float:left;}
+
+#foot{ background:#FFFFFF; width:1006px; height:60px; margin:0 auto; float:left;}
+#foot ul{ text-align:center; border-top: #3399FF dashed 1px; width:970px; margin:15px auto 0px;}
+.copyright{ color:#0055AA; height:20px; margin-top:5px;}
+.design{ color:#555555; height:20px; margin-top:5px;}

@@ -1,0 +1,59 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>无标题文档</title>
+<style type="text/css">
+.biaoti{color:#3366FF;FONT-SIZE:13pt;}
+.xiaobiaoti{color:#3366FF;FONT-SIZE:11pt;}
+.zhengwen{FONT-SIZE:9pt;}
+.zhuji{FONT-SIZE:9pt;color:#F00;}
+</style>
+</head>
+
+<body>
+<div class="biaoti">
+    显示第三方网络地图:
+</div>
+<br />
+<div class="xiaobiaoti">一、示例功能：
+</div>
+<br />
+ <div class="zhengwen">
+&nbsp;&nbsp;&nbsp;&nbsp;该示例实现第三方网络地图的加载显示，如google地图、微软必应地图与雅虎地图。其中，通过对话框交互，控制不同类型的google地图显示。
+ </div>
+<br />
+
+ <div class="xiaobiaoti">二、实现说明： </div> <br />
+  <div class="zhengwen">
+   &nbsp;&nbsp;&nbsp;&nbsp;1、数据：使用第三方网络地图，确保网络畅通。<br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;2、实现步骤： <br /><br />
+   &nbsp;&nbsp;&nbsp;（1）先在设计面板中拖入一个地图容器控件（IMSMap）； <br /><br />
+   &nbsp;&nbsp;&nbsp;（2）再在地图容器中分别拖入google地图图层控件（GoogleTileLayer）、bing地图图层控件（BingTileLayer）、雅虎地图图层控件（YahooTileLayer），并设置相应参数；&nbsp;<br /><br />
+   &nbsp;&nbsp;&nbsp;（3）分别加载三个地图图层的控制按钮，通过click事件设置图层的display属性，控制地图的显示；&nbsp;<br /><br />
+   &nbsp;&nbsp;&nbsp;（4）加载一个自定义的google地图控制面板（GoogleLayerWin），控制显示不同类型的google地图，以及googel图层的透明度。&nbsp;<br /><br />
+      &nbsp;&nbsp;&nbsp;&nbsp;3、参数说明<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;IMSMap参数： <br /><br /> </div>
+ <div class="zhuji">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;levelNum：地图总级数 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;initShowLevel：地图初始显示级别 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;enableProgressBar：是否允许使用进度条&nbsp;&nbsp;<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;xMaxMap，xMinMap，yMaxMap，yMinMap：加载地图的逻辑范围
+     <br /><br />
+ </div>
+ <div class="zhengwen">
+ &nbsp;&nbsp;&nbsp;&nbsp;TileLayer参数： <br /><br />
+ </div>
+ <div class="zhuji">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;startLevel：MapGIS 瓦片数据第0级在第三方地图的级数<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;originalRow：MapGIS 瓦片数据第0级在第三方地图的行号&nbsp;<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;originalColumn：MapGIS 瓦片数据第0级在第三方地图的列号<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;viewBeginLevel：瓦片数据开始显示级数<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;viewEndLevel：瓦片数据结束显示级数<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;display：图层是否显示标志<br /><br />
+   <br />  
+   &nbsp;&nbsp;&nbsp;<a href="http://www.mapgis.com.cn/templates/RsDevelopMdl/index.aspx?Page=3&nodeid=983&MNodeId=1018" alt="MapGIS IGServer for Flex的API手册。"  target="_blank" >注：详细说明请参见MapGIS IGServer for Flex的API手册。</a> </div>
+</body>
+
+</html>

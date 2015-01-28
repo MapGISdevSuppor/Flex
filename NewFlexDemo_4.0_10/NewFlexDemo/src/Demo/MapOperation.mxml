@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application 
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:core="com.outsmart.dock.core.*"
+	xmlns:map="zdims.map.*" 
+	xmlns:zdims="zdims.control.*" 
+	layout="absolute"  backgroundColor="#ffffff"
+	verticalScrollPolicy="off" 
+	horizontalScrollPolicy="off" 
+	backgroundSize="100%"
+	width="100%" height="100%" xmlns:components="components.*"  initialize="tile_creationCompleteHandler()">
+	
+	<mx:Style>
+		@namespace s "library://ns.adobe.com/flex/spark";
+		@namespace mx "library://ns.adobe.com/flex/mx";
+		mx|ToolTip{
+			fontSize: 12;
+		}
+	</mx:Style>
+	<mx:Script>
+		<![CDATA[
+			import config.ServerIP;
+			import utilEvent.ReadURLEvent;
+			private var viewConfig:ServerIP;
+			private function tile_creationCompleteHandler():void{
+				viewConfig=new ServerIP();
+				viewConfig.mapConfig1(this);
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, readURLCompelte);
+			}
+			
+			//获取服务地址
+			private function readURLCompelte(event:ReadURLEvent):void
+			{
+				this.tilelayer.serverAddress=viewConfig.TileURL;
+				this.mapcontainer.refresh();
+			}
+		]]>
+	</mx:Script>
+	<!--加载地图容器-->
+	<map:IMSMap   width="100%" height="100%" id="mapcontainer" 
+				  levelNum="8" initShowLevel="4" enableProgressBar="false"
+				  xMinMap="-181.18399779022" xMaxMap="188.619962766591"
+				  yMinMap="-90.7340663245236" yMaxMap="279.069894232288" 
+				  restoreCenterX="102.85000121166703" restoreCenterY="33.31638333491467"
+				  enableZoomOutMinLevel="false"  >
+		
+		<!--基于K9系列平台显示瓦片地图-->
+		<!--<map:TileLayer hdfName="world.hdf" autoGetMapInfo="true" id="tilelayer" >
+		</map:TileLayer>-->
+		
+		<!--显示瓦片地图-->
+		<map:TileLayer hdfName="world" autoGetMapInfo="true" id="tilelayer" >
+		</map:TileLayer>
+		<!--加载自定义的基本操作工具条-->
+		<components:BasicFishToolBar  id="fishbar" imsmap="{mapcontainer}" top="0" buttonMode="true" height="80"  width="100%">		
+		</components:BasicFishToolBar>
+	</map:IMSMap>
+</mx:Application>

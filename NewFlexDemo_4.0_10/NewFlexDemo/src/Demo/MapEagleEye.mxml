@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600"
+			   xmlns:map="zdims.map.*"  creationComplete="tile_creationCompleteHandler()">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import config.ServerIP;
+			import utilEvent.ReadURLEvent;
+			private var TileAddress:String="";
+			private var viewConfig:ServerIP;
+			private function tile_creationCompleteHandler():void{
+						viewConfig=new ServerIP();
+						viewConfig.mapConfig1(this);
+					this.addEventListener(ReadURLEvent.READ_COMPLETE, TilereadURLCompelte);
+				
+			}
+			//获取服务地址
+			private function TilereadURLCompelte(event:ReadURLEvent):void
+			{
+				TileAddress=viewConfig.TileURL;
+				this.tileLayer.serverAddress=TileAddress;
+				this.worldmap.serverAddress=TileAddress;
+				this.mapcontainer.refresh();
+			}
+		]]>
+	</fx:Script>
+	<map:IMSMap x="0" y="0" width="100%" height="100%" id="mapcontainer" 
+				levelNum="6" initShowLevel="3" enableProgressBar="false" enableZoomOutMinLevel="false"
+				xMinMap="114.125602"  xMaxMap="114.500788"
+				yMinMap="30.453932" yMaxMap="30.829118"
+				>
+		<map:IMSEagleEye bottom="0"  right="0" levelNum="6" imsmap="{mapcontainer}" eagleLocation="右上"
+						 levelDiff="1">
+			
+			<!--基于K9系列平台显示瓦片地图-->
+			<!--<map:TileLayer x="0" y="0" id="worldmap" hdfName="whmap.HDF" >
+			</map:TileLayer>-->
+			
+			<!-- 鹰眼地图-->
+		    <map:TileLayer x="0" y="0" id="worldmap" hdfName="whmap" >
+		    </map:TileLayer>
+		</map:IMSEagleEye>
+		
+		<!--基于K9系列平台显示瓦片地图-->
+		<!--<map:TileLayer hdfName="whmap.hdf" 
+					   autoGetMapInfo="true"
+					   id="tileLayer">		
+		</map:TileLayer>-->
+		
+		<!--显示瓦片地图-->
+		<map:TileLayer hdfName="whmap" 
+					   autoGetMapInfo="true"
+					   id="tileLayer">		
+		</map:TileLayer>
+		
+	</map:IMSMap>
+</s:Application>

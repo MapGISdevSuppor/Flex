@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" xmlns:map="zdims.map.*" 
+			   xmlns:othermap="zdims.othermap.*" xmlns:control="zdims.control.*" xmlns:components="components.*"
+			   initialize="init_creationCompleteHandler()"
+			   >
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<mx:Glow id="glowImage" duration="1000"
+				 alphaFrom="1.0" alphaTo="0.3"
+				 blurXFrom="0.0" blurXTo="60.0"
+				 blurYFrom="0.0" blurYTo="60.0"
+				 color="#fffae4">	
+		</mx:Glow>
+		<mx:Glow id="unglowImage" duration="1000"
+				 alphaFrom="0.3" alphaTo="1.0"
+				 blurXFrom="60.0" blurXTo="0.0"
+				 blurYFrom="60.0" blurYTo="0.0"
+				 color="#fffae4">	
+		</mx:Glow>
+		
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[	
+			import components.GoogleLayerWin;
+			
+			import config.ServerIP;
+			
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			
+			import utilEvent.ReadURLEvent;
+			
+			import zdims.othermap.GoogleLayerType;
+			private var viewConfig:ServerIP;
+			private var googleLayerWin:GoogleLayerWin;	
+			public var TerrainURL:String="";
+			public var RasterURL:String="";
+			public var BasicURL:String="";
+			
+			
+			private function init_creationCompleteHandler():void{
+				viewConfig=new ServerIP();
+				viewConfig.mapConfig1(this);
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, readURLCompelte);
+			}
+			//获取服务地址
+			private function readURLCompelte(event:ReadURLEvent):void
+			{
+				//this.worldmap.serverAddress=viewConfig.TileURL;
+				this.TerrainURL=viewConfig.TerrainURL;
+				this.RasterURL=viewConfig.RasterURL;
+				this.BasicURL=viewConfig.BasicURL;
+				if(this.googleMap){
+				   this.googleMap.serverAddress=this.BasicURL;
+				   googleMapInit();
+				  
+				}
+				this.mapcontainer.refresh();
+			}
+			
+			
+			protected function googleMapInit():void
+			{
+		
+					//初始化 google地图设置窗口
+					googleLayerWin = new GoogleLayerWin();
+					googleLayerWin.id = "googleSetWin";
+					googleLayerWin.y = 60;
+					googleLayerWin.right = 10;
+					//设置google地图设置控件与地图容器关联
+					googleLayerWin.imsmap = this.mapcontainer;
+					//关联地图容器中的google地图
+					googleLayerWin.googletilelayer = this.googleMap;
+					googleLayerWin.TerrainURL=this.TerrainURL;
+					googleLayerWin.BasicURL=this.BasicURL;
+					googleLayerWin.RasterURL=this.RasterURL;
+					//加载google地图设置窗口控件
+					this.addElement(googleLayerWin);
+				
+			}
+			
+			protected function googleBtn_clickHandler(event:MouseEvent):void
+			{
+				if(this.googleLayerWin.visible == false)
+					//显示 google地图设置窗口
+					this.googleLayerWin.visible = true; 
+				this.googleLayerWin.basic.selected = true;
+				this.googleMap.alpha = this.googleLayerWin.mapAlpha.value = 1;
+				//设置初始默认显示BasicMap
+				this.googleMap.googleLayerType = GoogleLayerType.BasicMap;
+				this.googleMap.serverAddress=this.BasicURL;
+				if(this.googleMap.display == false)
+				{
+					//显示google地图
+					this.googleMap.display = true;
+					//隐藏bing地图
+					this.bingMap.display = false;
+					//隐藏yahoo地图
+					this.yahooMap.display = false;
+				}
+				//设置地图复位
+				this.mapcontainer.restore();
+			}
+			
+			protected function bingBtn_clickHandler(event:MouseEvent):void
+			{
+				//隐藏google地图设置窗口
+				this.googleLayerWin.visible = false;
+				if(this.bingMap.display == false)
+				{
+					//隐藏google地图
+					this.googleMap.display = false;
+					//显示bing地图
+					this.bingMap.display = true;
+					//隐藏yahoo地图
+					this.yahooMap.display = false;
+				}
+				//设置地图复位
+				this.mapcontainer.restore();
+			}
+			
+			protected function yahooBtn_clickHandler(event:MouseEvent):void
+			{
+				//隐藏google地图设置窗口
+				this.googleLayerWin.visible = false;
+				if(this.yahooMap.display == false)
+				{
+					//隐藏google地图
+					this.googleMap.display = false;
+					//隐藏bing地图
+					this.bingMap.display = false;
+					//显示yahoo地图
+					this.yahooMap.display = true;
+				}
+				//设置地图复位	
+				this.mapcontainer.restore();		
+			}			
+			
+		]]>
+	</fx:Script>
+	<!--地图容器-->
+	<map:IMSMap x="0" y="0" width="100%" height="100%"  
+		id="mapcontainer" levelNum="10" initShowLevel="0" enableProgressBar="false"  enableAnimate="false">	
+	<!--Google地图-->
+		<othermap:GoogleTileLayer x="0" y="0" blankImageSrc="" id="googleMap"
+								  startLevel="7" originalRow="52" originalColumn="104" viewBeginLevel="0" viewEndLevel="22"
+								  googleLayerType="{GoogleLayerType.BasicMap}"  >
+		</othermap:GoogleTileLayer>		
+		<!--微软必应地图-->
+		<othermap:BingTileLayer x="0" y="0" id="bingMap" startLevel="7" originalRow="52" originalColumn="104" viewBeginLevel="0" viewEndLevel="17" display="false" isDisTileNetErrInfo="false">
+		</othermap:BingTileLayer>		
+		<!--雅虎地图-->
+		<othermap:YahooTileLayer x="0" y="0" id="yahooMap" originalRow="52" originalColumn="104" startLevel="7" viewBeginLevel="0" viewEndLevel="18" display="false" isDisTileNetErrInfo="false">
+		</othermap:YahooTileLayer>
+		
+	</map:IMSMap>
+	<!--地图切换按钮-->
+	<mx:Canvas width="360" height="45" horizontalCenter="3"  backgroundColor="#CCCCCC" backgroundAlpha="0.35"  cornerRadius="16" y="10" borderColor="#B7BABC" dropShadowEnabled="true" borderStyle="solid" >
+		<!--google地图按钮-->
+		<mx:Image id="googleBtn" source="@Embed('/assets/images/google.png')" x="48" y="3" 
+				  buttonMode="true" mouseDownEffect="{glowImage}" mouseUpEffect="{unglowImage}" 
+				  click="googleBtn_clickHandler(event)" />
+		<!--bing地图按钮-->
+		<mx:Image id="bingBtn" source="@Embed('/assets/images/bing.png')"  x="152" y="2" 
+				  buttonMode="true" mouseDownEffect="{glowImage}" mouseUpEffect="{unglowImage}" 
+				  click="bingBtn_clickHandler(event)"/>
+		<!--yahoo地图按钮-->
+		<mx:Image id="yahooBtn" source="@Embed('/assets/images/yahoo.png')"  x="260" y="2" 
+				  buttonMode="true" mouseDownEffect="{glowImage}" mouseUpEffect="{unglowImage}" 
+				  click="yahooBtn_clickHandler(event)"/>
+	</mx:Canvas>
+</s:Application>

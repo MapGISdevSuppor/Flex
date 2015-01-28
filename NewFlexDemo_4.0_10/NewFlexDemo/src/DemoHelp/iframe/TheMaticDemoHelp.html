@@ -1,0 +1,48 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
+<title>无标题文档</title>
+<style type="text/css">
+.biaoti{color:#3366FF;FONT-SIZE:13pt;}
+.xiaobiaoti{color:#3366FF;FONT-SIZE:11pt;}
+.zhengwen{FONT-SIZE:9pt;}
+.zhuji{FONT-SIZE:9pt;color:#F00;}
+</style>
+</head>
+
+<body>
+<div class="biaoti">
+显示统计图:
+</div>
+<br />
+<div class="xiaobiaoti">一、示例功能：
+</div>
+<br />
+ <div class="zhengwen">
+&nbsp;&nbsp;&nbsp;&nbsp;该示例实现对地图中某些点的相关属性进行统计，并用多种样式的统计图进行显示。 </div>
+<br />
+
+ <div class="xiaobiaoti">二、实现说明： </div> <br />
+  <div class="zhengwen">
+   &nbsp;&nbsp;&nbsp;&nbsp;1、数据：使用世界地图的瓦片数据（world.HDF），已在GIS服务器中发布。 <br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;2、实现步骤： <br /><br />
+   &nbsp;&nbsp;&nbsp;（1）先实现瓦片地图显示； <br /><br />
+   &nbsp;&nbsp;&nbsp;（2）自定义统计图设置控件（ChartControl），控制统计图的类型选择、颜色设置、透明度调整、高宽设置。 <br /><br />
+   &nbsp;&nbsp;&nbsp;（3）自定义编写添加统计图方法（addchart），实现向特定位置添加统计图。 <br /><br />
+   &nbsp;&nbsp;&nbsp;（4）通过一个循环，读取数据信息，并将数据作为参数传给addchart方法，实现统计图的添加及显示。 <br /><br />
+   &nbsp;&nbsp;&nbsp;&nbsp;3、参数说明<br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;myCharts参数： <br /><br /> </div>
+ <div class="zhuji">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;chartlabel：统计图名称 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;control：关联到统计图设置控件（ChartControl） <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;logicX，logicY：统计图左上角的逻辑x、y坐标 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;dataProvider：统计图的数据源 <br /><br />
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;enableUpdatePosition：设置为true时，随着地图实时更新统计图的位置 <br /><br />
+</div>
+    <div class="zhengwen">
+<p>注：详细说明请参见MapGIS IGServer for Flex的API手册。</p></div> 
+</body>
+
+</html>

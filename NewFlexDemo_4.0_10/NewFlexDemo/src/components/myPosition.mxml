@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Panel xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 width="294" height="206"
+		 title="当前鼠标的位置" 
+		 creationComplete="group1_creationCompleteHandler(event)"  fontFamily="微软雅黑" fontSize="12" textAlign="left">
+	<!--<s:layout>
+		<s:BasicLayout/>
+	</s:layout>-->
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			import zdims.map.IMSMap;
+			
+			private var _mapContainer:IMSMap;
+			
+			[Inspectable(category="MapGisIMS")]
+			public function get mapContainer():IMSMap
+			{
+				return _mapContainer;
+			}
+
+			public function set mapContainer(value:IMSMap):void
+			{
+				_mapContainer = value;
+			}
+
+			protected function group1_creationCompleteHandler(event:FlexEvent):void
+			{
+				this.mapContainer.addEventListener(MouseEvent.MOUSE_MOVE,onMouseMove);
+			}
+			private function onMouseMove(evt:MouseEvent):void
+			{
+				this.xValue.text=this.mapContainer.mouseMoveLogicPnt.x.toString();
+				this.yValue.text=this.mapContainer.mouseMoveLogicPnt.y.toString();
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<s:Label x="37" y="43" text="X:"/>
+	<mx:Text id="xValue" x="70" y="29" text="" width="150" height="33"/>
+	<s:Label x="37" y="114" text="Y:"/>
+	<mx:Text id="yValue" x="70" y="100" text="" width="150" height="33"/>
+</s:Panel>

@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600" xmlns:map="zdims.map.*"
+			   xmlns:drawing="zdims.drawing.*"
+			   xmlns:mark="zdims.mark.*" xmlns:control="zdims.control.*" xmlns:layer="zdims.control.layer.*" pageTitle="裁剪分析" initialize="tile_creationCompleteHandler()"  >
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<s:BorderContainer id="printView" x="0" y="0" width="100%" height="100%"  borderColor="0xffffff" borderWeight="1" borderAlpha="0" >
+		<map:IMSMap x="0" y="0" width="100%" height="100%" levelNum="7"
+					xMinMap="114.125602"  xMaxMap="114.500788"
+					yMinMap="30.453932" yMaxMap="30.829118" enableProgressBar="false" enableZoomOutMinLevel="false"
+					id="mymap" initShowLevel="5"  restoreCenterX="114.3041267836914" restoreCenterY="30.651509197753906">
+			<!--基于K9系列平台显示瓦片地图-->
+			<!--<map:TileLayer x="197" y="138"  hdfName="whmap.hdf" id="tilelayer" >
+			</map:TileLayer>-->
+			<!--显示瓦片地图-->
+			<map:TileLayer x="197" y="138"  hdfName="whmap" id="tilelayer" >
+			</map:TileLayer>
+			<!--基于K9系列平台显示矢量地图-->
+			<!--<map:VectorMapDoc  id="mapDoc" x="262" y="41" mapDocName="wh.map"  display="false">
+			</map:VectorMapDoc>	-->
+			<!--显示矢量地图-->
+			<map:VectorMapDoc  id="mapDoc" x="262" y="41" mapDocName="wh"  display="false" layerOpenCallBack="init">
+			</map:VectorMapDoc>	
+			<drawing:GraphicsLayer x="42" y="188" id="graphicsLayer">
+			</drawing:GraphicsLayer>
+		</map:IMSMap>
+		<mx:ProgressBar id="progressBar" 
+						mode="manual"        
+						labelPlacement="center"  
+						width="218" 
+						height="16" 
+						creationComplete="initProBar();"   
+						borderColor="#E3EEEE" alpha="1.0" visible="false"  />  
+	</s:BorderContainer>
+	<s:controlBarLayout >
+		<s:BasicLayout/>
+	</s:controlBarLayout>
+	<s:controlBarContent>
+		<s:HGroup height="35" verticalAlign="middle" left="10" width="100%">
+			<s:Label   text="对圆形区域内的水系要素进行裁剪分析" fontFamily="宋体" fontSize="14"  fontWeight="bold"  left="5" textAlign="left" verticalAlign="middle"/>
+			<s:Button  label="裁剪"  click="submit()" fontSize="13"  fontWeight="bold" fontFamily="宋体" />
+			<s:Button  label="清除" click="removeVec()" fontSize="13"   fontWeight="bold" fontFamily="宋体"   />
+			</s:HGroup>
+	</s:controlBarContent>
+	<fx:Script>
+		<![CDATA[
+			import Mapgis7.WebService.BasLib.*;
+			
+			import config.ServerIP;
+			
+			import flash.utils.getTimer;
+			
+			import mx.controls.Alert;
+			import mx.preloaders.DownloadProgressBar;
+			
+			import utilEvent.ReadURLEvent;
+			
+			import zdims.drawing.CoordinateType;
+			import zdims.drawing.IMSBeeline;
+			import zdims.drawing.IMSCircle;
+			import zdims.event.IMSMapEvent;
+			import zdims.map.VectorLayer;
+			import zdims.map.VectorLayerBase;
+			import zdims.util.SpacialAnalyse;
+			private var _spatial:SpacialAnalyse=null;
+			private var _clipLayerAcsInfo:CLayerAccessInfo=null;
+			private var _serverAddr:String="";
+			private var _vLayer:VectorLayer=null;
+			private var _clipname:String="";
+			private var clipTimer:Timer=new Timer(10);
+			private var Flag:int=0;
+			private var obj:Circle=null;
+			private var ClipCircle:IMSCircle=null;
+			private var VecAddress:String="";
+			private var TileAddress:String="";
+			private var viewConfig:ServerIP;
+			private var timer:Timer;
+			[Bindable] 
+			private var j:uint=10;
+			[Bindable]
+			private var enableProbar:String="";  
+			private function tile_creationCompleteHandler():void{
+						viewConfig=new ServerIP();
+						viewConfig.mapConfig1(this);
+						this.addEventListener(ReadURLEvent.READ_COMPLETE, TilereadURLCompelte);
+			}
+			
+			//获取服务地址
+			private function TilereadURLCompelte(event:ReadURLEvent):void
+			{
+				TileAddress=viewConfig.TileURL;
+				VecAddress=viewConfig.vectorURL;
+				this.tilelayer.serverAddress=TileAddress;
+				this.mapDoc.serverAddress=VecAddress;
+				this.mymap.refresh();
+			}
+			//页面加载完成时调用		
+			public function init(layer:VectorLayerBase):void{
+				//设置一个圆
+				obj = new Circle();
+				obj.Center=new Dot_2D();
+				obj.Center.x=114.3041267836914;
+				obj.Center.y=30.65155499682617;
+				obj.Radius=0.004484101072174819;
+				//在地图上添加一个圆形裁剪范围
+				ClipCircle=new IMSCircle(CoordinateType.Logic);
+				this.graphicsLayer.addGraphics(ClipCircle);
+				ClipCircle.cenX=obj.Center.x;
+				ClipCircle.cenY=obj.Center.y;
+				ClipCircle.radius=obj.Radius;
+				ClipCircle.beginFill(0xFFFF66,0.5);
+				ClipCircle.lineStyle(1,0x000000);
+				ClipCircle.draw();
+				//设置第二个水系图层为激活状态
+				this.mymap.activeMapDoc=this.mapDoc;
+				
+				var waterLayerIndex:int=getWaterLayerIndex();
+				if(waterLayerIndex==-1){
+					Alert.show("该地图中没有‘水系.WP’的图层");
+					return;
+				}
+				
+				this.mapDoc.activeLayerIndex=waterLayerIndex;
+				this.mapDoc.updateAllLayerInfo();
+			}
+			
+			
+			private function getWaterLayerIndex():int{
+				
+				var  layerNodeCount:int = mapDoc.loadMapResult.LayerCount;
+				var layerAccessArry:Array = new Array(layerNodeCount);
+				layerAccessArry = mapDoc.loadMapResult.LayerAccessInfo.LayerAccessInfo;
+				var mapLayerInfoArry:Array = mapDoc.loadMapResult.MapLayerInfo;
+				var layerIndex:int=-1;
+				for (var i:int = 0; i < layerNodeCount; i++)
+				{
+					
+					var layerAccess:CLayerAccessInfo = layerAccessArry[i] as CLayerAccessInfo;
+					var layerInfo:CLayerInfo = layerAccess.LayerInfoList[0] as CLayerInfo;
+					var layerName:String = layerInfo.LayerDataName;
+					if(layerName=="水系.WP"){
+						layerIndex=i;
+						break;
+					}
+					
+				}
+				return layerIndex;
+			}
+			
+	    	
+			//裁剪分析
+			public function submit():void{
+				//设置原始进度条不可见
+				this.mymap.enableProgressBar=false;
+				//判断是否存在已裁减分析的图层，如果有，就在地图上移除
+				if(this._vLayer!=null){
+					if(Flag==0){
+						this.mymap.removeElement(this._vLayer);
+					}
+					//设置裁剪范围的圆形图形为不可见
+				}	this.ClipCircle.visible=false;
+				//GRegion多区 
+				var region:GRegion = new GRegion();
+				//AnyLine任意线 
+				region.Rings[0] = new AnyLine();
+				//得到圆形区域边界上所有的点
+				AnyLine(region.Rings[0]).Arcs[0].Dots = obj.GetDots();
+				//设置图层访问信息
+				this._clipLayerAcsInfo=new CLayerAccessInfo();
+				this._clipLayerAcsInfo=this.mymap.activeMapDoc.getActiveLayerAccessInfo();
+				this._serverAddr=this.mymap.activeMapDoc.serverAddress;
+				//SpacialAnalyse空间分析类
+				this._spatial = new SpacialAnalyse(this.mymap.activeMapDoc);
+				//设置裁剪分析参数
+				var clip:CClipByPolygon = new CClipByPolygon();
+				//设置要裁剪的区
+				clip.Region = region;
+				var clipLayer:CLayerAccessInfo = this._clipLayerAcsInfo;
+				clip.GdbInfo = clipLayer.GdbInfo;
+				clip.LayerName = CLayerInfo(clipLayer.LayerInfoList[0]).LayerDataName;
+				//裁剪的图层类型
+				clip.XClsType = CLayerInfo(clipLayer.LayerInfoList[0]).LayerType;
+				clip.FClsNameRtn = "ZLClip"+getTimer();
+				this._clipname=clip.FClsNameRtn;
+				clip.Radius = 0.0001;
+				clip.IsReCalculate = false;
+				clip.ClipFlg = 3;
+				//加载进度条
+				this.progressBar.x=this.printView.width/2-this.progressBar.width/2;
+				this.progressBar.y=this.printView.height/2-23;
+				this.progressBar.visible=true;
+				playProgressBar();
+				//裁剪分析
+				this._spatial.clipByPolygon(clip,onSubmit);
+				
+			}
+			//裁剪分析回调函数
+			public function onSubmit(e:Event):void{
+				//onClipByPolygon()获取多边形裁剪结果的方法
+				var uid:String = this._spatial.onClipByPolygon(e);
+				if(uid != null && uid != "")
+				{	
+					//监听查找分析后的结果图层，一直到查询出来为止
+					clipTimer = new Timer(1000);
+					clipTimer.addEventListener(TimerEvent.TIMER,function(e:TimerEvent):void{onTimer(uid,e)});
+					clipTimer.start();
+				}
+				else
+				{ 
+					cancel();
+				}
+				
+			}
+			//计时器回调函数
+			private function onTimer(uid:String,e:TimerEvent):void
+			{	
+				//获取某次空间分析操作进度情况 
+				this._spatial.getAnalyseResult(uid,getClipResult);
+				this.clipTimer.stop();
+			}
+			public function getClipResult(e:Event):void{
+				//onGetAnalyseResult()获取空间分析结果图层名的方法
+				var rltName:String = this._spatial.onGetAnalyseResult(e);
+				if(rltName == null) 
+				{
+					cancel();
+					return;
+				}
+				if(rltName == "")
+				{ 
+					this.clipTimer.start();
+					return;
+				}
+				if(rltName == "*#*")
+				{
+					Alert.show("裁剪失败","提示");
+				}
+				else
+				{
+					if(rltName!=null&&rltName!=""){
+						//显示裁剪分析后的图层 
+						showClipInfo(rltName,CLayerInfo(this._clipLayerAcsInfo.LayerInfoList[0]).LayerType,this._serverAddr);
+						//将添加的进度条设置为不可见，并添加原始的进度条
+						this.progressBar.visible=false;
+						timer.stop();
+						this.enableProbar="false";
+						//this.mymap.enableProgressBar=true;
+					}
+					cancel();
+				}
+			}
+			//将裁剪分析后的图层添加到地图上去
+			private function showClipInfo(layerName:String, layerType:String, svrAddr:String="127.0.0.1:5141",gdbSvr:String="MapGisLocal", gdbName:String="IMSWebGISGDB", usr:String="", psw:String=""):void
+			{
+				//CGdbInfo gdb信息类 
+				var gdbinfo:CGdbInfo=new CGdbInfo();
+				gdbinfo.GDBName=gdbName;
+				gdbinfo.GDBSvrName=gdbSvr;
+				gdbinfo.User="";
+				gdbinfo.Password="";
+				//CLayerAccessInfo 图层访问信息类
+				var layerAccessInfo:CLayerAccessInfo=new CLayerAccessInfo();
+				layerAccessInfo.GdbInfo=gdbinfo;
+				//CLayerInfo图层信息类
+				var layerInfo:CLayerInfo=new CLayerInfo();
+				layerInfo.LayerDataName=layerName;
+				layerInfo.LayerType=layerType;
+				layerAccessInfo.LayerInfoList[0]=layerInfo;
+				//COpenLayer设置要叠加打开的图层信息 
+				var openLayer:COpenLayer=new COpenLayer()
+				openLayer.LayerAccessInfo[0]=layerAccessInfo;
+				//实例化矢量图层
+				this._vLayer=new VectorLayer();
+				this._vLayer.serverAddress=svrAddr;
+				this.mymap.addChild(this._vLayer);
+				this._vLayer.alpha=0.7;
+				//loadLayer()加载图层的方法
+				this._vLayer.loadLayer(openLayer, onSingleLayerLoad);	
+			}
+			//加载图层回调函数	
+			private function onSingleLayerLoad(e:Event):void{
+				var rlt:COperResult=this._vLayer.onLoadLayer(e);
+				if(rlt.OperResult){
+					Flag=0;
+					this.mymap.refresh();
+				}
+			}
+			
+			//  取消触发函数
+			public function cancel():void
+			{
+				if(this.clipTimer != null && this.clipTimer.running)
+				{ 
+					this.clipTimer.stop();
+				}
+			}
+			//在地图上移除分析成功的图层
+			public function removeVec():void{
+				if(this._vLayer!=null){
+				Flag=1;
+				this.mymap.removeElement(this._vLayer);
+				this._vLayer=null;
+				}
+				
+			}
+			
+			//进度条begin		
+			private function runit():void
+			{
+				if(enableProbar=="")
+				{
+					if(j<=100){       
+						progressBar.setProgress(j,100);
+						progressBar.label= "正在分析...." ;
+						j+=1;      
+						if(j==100){
+							j=0;
+						}
+					}
+				}
+			} 
+			
+			private function initProBar():void { 
+				timer = new Timer(10); 
+				timer.addEventListener(TimerEvent.TIMER, timer_timer); 
+			} 
+			
+			private function timer_timer(evt:TimerEvent):void { 
+				runit();
+			} 
+			private function resetProgressBar():void { 
+				timer.start();                
+				progressBar.setProgress(0, 100); 
+			} 
+			private function playProgressBar():void { 
+				enableProbar="";
+				j=0;
+				resetProgressBar(); 
+				timer.start(); 
+			} 
+			//进度条end	
+		]]>
+	</fx:Script>
+	
+	
+</s:Application>

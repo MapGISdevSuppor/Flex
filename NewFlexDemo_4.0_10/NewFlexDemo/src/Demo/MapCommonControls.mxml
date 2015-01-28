@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600"
+			   xmlns:map="zdims.map.*" xmlns:control="zdims.control.*"  initialize="tile_creationCompleteHandler()">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import config.ServerIP;
+			import utilEvent.ReadURLEvent;
+			private var viewConfig:ServerIP;
+			private function tile_creationCompleteHandler():void{
+				viewConfig=new ServerIP();
+				viewConfig.mapConfig1(this);
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, readURLCompelte);
+			}
+			
+			//获取服务地址
+			private function readURLCompelte(event:ReadURLEvent):void
+			{
+				this.tileLayer.serverAddress=viewConfig.TileURL;
+				this.mapcontainer.refresh();
+			}
+			
+		]]>
+	</fx:Script>
+	<!--地图容器-->
+	<map:IMSMap x="0" y="0" width="100%" height="100%" id="mapcontainer" 
+				levelNum="8" initShowLevel="4"  enableProgressBar="false"
+				enableZoomOutMinLevel="false"
+				xMinMap="-181.18399779022" xMaxMap="188.619962766591"
+				yMinMap="-90.7340663245236" yMaxMap="279.069894232288" 
+				restoreCenterX="102.85000121166703" restoreCenterY="33.31638333491467">
+		
+		<!--基于K9系列平台显示瓦片地图-->
+		<!--<map:TileLayer hdfName="world.hdf" 
+					   autoGetMapInfo="true"
+					   id="tileLayer" >		
+		</map:TileLayer>-->
+		
+		<!--显示瓦片地图-->
+		<map:TileLayer hdfName="world" 
+					   autoGetMapInfo="true"
+					   id="tileLayer" >		
+		</map:TileLayer>
+		<!--鹰眼-->
+		<map:IMSEagleEye id="eagle" bottom="0"  right="0" levelNum="6" levelDiff="1" imsmap="{mapcontainer}"  eagleLocation="右上"   />
+		<!--比例尺-->
+		<control:Scale left="20"  bottom="100" imsmap="{mapcontainer}" />
+		<!--导航-->
+		<control:NavigationBar x="30" y="100" imsmap="{mapcontainer}" />	
+	</map:IMSMap>
+</s:Application>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" minWidth="955" minHeight="600"
+			   xmlns:map="zdims.map.*" pageTitle="热点区域" initialize="tile_creationCompleteHandler()" creationComplete="addHotSpot()" xmlns:mark="zdims.mark.*" >
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import config.ServerIP;
+			import mx.containers.Canvas;
+			import utilEvent.ReadURLEvent;
+			import zdims.control.HotSpot;
+			import zdims.event.IMSMapEvent;
+			import zdims.mark.IMSMark;
+			import zdims.drawing.CoordinateType;
+			private var viewConfig:ServerIP;
+			[Bindable]
+			[Embed("assets/images/marks/china.png")]
+			public static var testIcon:Class;
+			private function tile_creationCompleteHandler():void{
+				viewConfig=new ServerIP();
+				viewConfig.mapConfig1(this);
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, readURLCompelte);
+			}
+			//获取服务地址
+			private function readURLCompelte(event:ReadURLEvent):void
+			{
+				//基于K9系列平台显示的瓦片地图的名称
+				//this.tileLayer.hdfName="china.hdf";
+				//显示的瓦片地图的名称
+				this.tileLayer.hdfName="china";
+				this.tileLayer.serverAddress=viewConfig.TileURL;
+				this.mapcontainer.refresh();
+			}
+			public function addHotSpot():void
+			{
+				// 初始化热点对象
+				var hot:HotSpot=new HotSpot();
+				hot.hotLabelText="中国的首都——北京欢迎您！";
+				var area:Array = new Array();
+				area = [new Point(1228.34,1172.43),new Point(1228.34,1137.34),new Point(1266.34,1137.34),new Point(1266.34,1172.43)];	
+				// 设置热点区域坐标
+				hot.hotAreaDots = area;
+				//热点区域添加到地图上
+				this.mapcontainer.addChild(hot);
+				//初始化标注的图片对象
+				var img:Image = new Image();
+				img.source = testIcon;
+				img.height = 70;
+				img.width = 60;		
+				// 初始化标注对象
+				var mark:IMSMark = new IMSMark(img,CoordinateType.Logic);
+				// 设置标注对象的坐标
+				mark.x = 1252.85;
+				mark.y = 1157.50;			
+				marklayer.enableMarkHiden = false;
+				// 将标注添加到绘图图层中	
+				marklayer.addMark(mark);		
+			}					
+		]]>
+	</fx:Script>
+	<map:IMSMap x="0" y="0" width="100%" height="100%" id="mapcontainer" enableProgressBar="false" enableZoomOutMinLevel="false" 
+				levelNum="6" initShowLevel="4" xMaxMap="1818.49472371382" xMinMap="195.159468953626" yMaxMap="1901.26433490333" yMinMap="277.929080143126"
+				restoreCenterX="1247.48" restoreCenterY="1149.33">
+		<!--中国地图-->
+		<map:TileLayer  autoGetMapInfo="true"
+						id="tileLayer" >		
+		</map:TileLayer>
+		<mark:MarkLayer  x="165" y="199"  id="marklayer">			
+		</mark:MarkLayer>
+	</map:IMSMap>
+	<s:controlBarLayout  >
+		<s:BasicLayout/>
+	</s:controlBarLayout>
+	<s:controlBarContent >		
+		<mx:Image  source="@Embed('/assets/images/megaphone2.png')" x="25" y="-1"/>
+		<s:Label x="84" y="11" text="请将鼠标移到北京市的位置，您会有新的发现哦！" fontSize="14"  fontWeight="bold" fontFamily="宋体"/>	
+	</s:controlBarContent>
+</s:Application>

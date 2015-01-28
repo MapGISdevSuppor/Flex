@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:control="zdims.control.*"
+			   xmlns:map="zdims.map.*" 
+			   xmlns:components="components.*"
+			   minWidth="955" minHeight="600"  
+			   initialize="tile_creationCompleteHandler()"
+			   xmlns:mychart="zdimsExtends.mychart.*" >
+	<fx:Declarations>
+		<!--控制面板效果设计-->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import components.myCharts;
+			import config.ServerIP;
+			import mx.binding.utils.BindingUtils;
+			import mx.charts.ColumnChart;
+			import mx.charts.chartClasses.NumericAxis;
+			import mx.controls.ColorPicker;
+			import mx.core.UIComponent;
+			import mx.events.ColorPickerEvent;
+			import mx.events.FlexEvent;
+			import spark.events.IndexChangeEvent;
+			import utilEvent.ReadURLEvent;
+			import zdims.control.IMSColumnChart;
+			import zdims.control.IMSPieChart;
+			import zdims.event.IMSMapEvent;
+			import zdims.event.IMSMapMouseEvent;
+			import zdims.map.OverlayObject;
+			include "../components/myData/myData.as";
+			private var charts:Array=new Array();
+			private var _chartType:String;
+			private var mychart:myCharts;
+			private var viewConfig:ServerIP;
+			private function tile_creationCompleteHandler():void{
+				viewConfig=new ServerIP();
+				viewConfig.mapConfig1(this);
+				this.addEventListener(ReadURLEvent.READ_COMPLETE, readURLCompelte);
+			}
+			
+			//获取服务地址
+			private function readURLCompelte(event:ReadURLEvent):void
+			{
+				this.tileLayer.serverAddress=viewConfig.TileURL;
+				this.mapContainer.refresh();
+			}
+			//添加统计图
+			private function addChart_clickHandler():void
+			{
+				chartControl.visible=true;
+				btnHide.label="Hide Form";
+				
+				var i:int=0;
+				clearChart();
+				while(i<labelInfo[0].length)
+				{  
+					addchart(labelInfo[0][i],positionInfo[0][i].x,positionInfo[0][i].y,dataInfo);
+				    chartControl.hSlider.addEventListener(Event.CHANGE,onStyleChange);
+				    chartControl.wSlider.addEventListener(Event.CHANGE,onStyleChange);
+				    chartControl.alphaSlider.addEventListener(Event.CHANGE,onStyleChange);
+				    i++;
+				}
+			}
+			
+			private  function addchart(label:String,x:Number,y:Number,data:ArrayCollection):void
+			{
+				 mychart=new myCharts();
+				 mychart.name="点";
+				 mychart.chartlabel=label;
+				 mychart.control=this.chartControl;
+				 mychart.logicX=x;
+				 mychart.logicY=y;
+				 mychart.dataProvider=data;
+				 mychart.enableUpdatePosition=true;
+				 mychart.imsmap=this.mapContainer;
+				 this.mapContainer.addChild(mychart);
+			}
+			
+			//删除统计图
+			public function clearChart():void
+			{
+				var chart:Array=this.mapContainer.getChildren();
+				//清除地图上的统计图
+				for (var i:int=0;i<chart.length;i++)
+				{
+					if(UIComponent(chart[i]).name=="点")
+						//调用地图容器的清除方法
+						this.mapContainer.removeChild(chart[i]);   
+				}
+			}
+			 //颜色设置
+			private function onColorChange(e:ColorPickerEvent):void
+			{	
+				addChart_clickHandler();
+			}
+			
+			 //统计图样式设置
+			private function onStyleChange(evt:Event):void
+			{
+				var chart:Array=this.mapContainer.getChildren();
+				//清除地图上的统计图
+				for (var i:int=0;i<chart.length;i++)
+				{
+					if(UIComponent(chart[i]).name=="点")
+					{
+					UIComponent(chart[i]).scaleX=chartControl.wSlider.value/162;
+					UIComponent(chart[i]).scaleY=chartControl.hSlider.value/120;
+					UIComponent(chart[i]).alpha=chartControl.alphaSlider.value;
+					}
+				}
+			}
+			
+			//隐藏控制面板
+			private function hideChart():void
+			{
+				if(chartControl.visible)
+				{
+					chartControl.visible=false;
+					btnHide.label="Show Form";
+				}
+				else
+				{
+					chartControl.visible=true;
+					btnHide.label="Hide Form";
+				}
+			}
+		
+	
+			 //位置判断及更新
+			private  function newpositon(x:Number,y:Number):void
+			{
+				var oldx:Number=0;
+				var oldy:Number=0;
+				var coor:Point=this.mapContainer.logicToScreen(x,y);
+			}
+
+		]]>
+	</fx:Script>
+
+	<!--地图-->
+	<map:IMSMap x="0" y="0" id="mapContainer" initShowLevel="3" levelNum="8" width="100%" height="100%"
+				xMinMap="-181.18399779022"  xMaxMap="188.619962766591" 
+				yMinMap="-90.7340663245236" yMaxMap="279.069894232288"
+				restoreCenterX="-31.67341217447779" restoreCenterY="0.6335137739854986"
+				enableZoomOutMinLevel="false" enableProgressBar="false">
+		
+		<!--基于K9系列平台显示瓦片地图-->
+		<!--<map:TileLayer   x="73" y="75" id="tileLayer" autoGetMapInfo="true" 
+						 hdfName="world.hdf"  >
+		</map:TileLayer>-->
+		
+		<!--显示瓦片地图-->
+		<map:TileLayer   x="73" y="75" id="tileLayer" autoGetMapInfo="true" 
+						 hdfName="world"  >
+		</map:TileLayer>
+	</map:IMSMap>
+	<!--统计图设置-->
+	<components:ChartControl id="chartControl" alpha="0.7"
+							 dropShadowEnabled="true" shadowDistance="10" visible="false"
+							 mapContainer="{mapContainer}" x="{this.width-350}" height="231" width="302" y="80">
+		
+	</components:ChartControl>
+	<!--面板控制-->
+	<s:controlBarLayout >
+		<s:BasicLayout/>
+	</s:controlBarLayout>
+	<s:controlBarContent>
+		<!--添加统计图-->
+		<mx:Canvas width="100%" height="35" >
+		<s:Button id="addChart"  left="200" top="4" height="25"   label="添加统计图" click="addChart_clickHandler()" fontSize="13"  fontWeight="bold" fontFamily="宋体" />
+			<s:Button id="delChart"  left="286" top="4"  height="25"    label="删除统计图" click="clearChart()" fontSize="13"  fontWeight="bold" fontFamily="宋体" />
+		<s:Button id="btnHide" label="Hide Form" click="hideChart()"  right="5" top="9"/>
+		</mx:Canvas>
+	</s:controlBarContent>
+</s:Application>
